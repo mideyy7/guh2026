@@ -82,17 +82,20 @@ test('distress: delivered to a drone webhook; a failed delivery is retried until
   const [x, y] = m.cell.split('-').map(Number);
   // Only drone-1 goes to the sender (others to a far corner), so drone-1 must be the receiver.
   const far = x < 4 ? { x: 7, y: y < 4 ? 7 : 0 } : { x: 0, y: y < 4 ? 7 : 0 };
-  await call('POST', '/move', { actor: 'drone-1', target: { x, y }, key: 'go-1' });
-  for (const d of ['drone-2', 'drone-3', 'drone-4']) await call('POST', '/move', { actor: d, target: far, key: `away-${d}` });
   failDrone = 'drone-1';
-  await call('POST', '/control/step', { n: Math.max(12, m.sent_tick + 10) });
+  // Moves last one tick (C2), so re-command every step, as an actor's Act stage does.
+  for (let t = 0; t < Math.max(12, m.sent_tick + 10); t++) {
+    await call('POST', '/move', { actor: 'drone-1', target: { x, y }, key: `go-1-${t}` });
+    for (const d of ['drone-2', 'drone-3', 'drone-4']) await call('POST', '/move', { actor: d, target: far, key: `away-${d}-${t}` });
+    await call('POST', '/control/step', { n: 1 });
+  }
   await wait(120);
   const tries = hits.filter((h) => h.path === 'distress' && h.body.msg_id === m.msg_id);
   assert.ok(tries.length >= 1, 'attempted');
   assert.ok(tries.every((t) => t.id === 'drone-1'), 'only drone-1 was in range');
 
   failDrone = null;
-  await call('POST', '/control/step', { n: 2 });
+  for (let t = 0; t < 2; t++) { await call('POST', '/move', { actor: 'drone-1', target: { x, y }, key: `stay-${t}` }); await call('POST', '/control/step', { n: 1 }); await wait(60); }
   await wait(120);
   const after = hits.filter((h) => h.path === 'distress' && h.body.msg_id === m.msg_id);
   const delivered = (await call('GET', '/world')).body.distress.find((d) => d.msg_id === m.msg_id);

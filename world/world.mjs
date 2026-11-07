@@ -9,7 +9,8 @@ export function createWorld(seed, params, actorIds) {
   const G = params.grid;
   const actors = {};
   for (const a of sc.actors) {
-    actors[a.id] = { id: a.id, role: a.role, pos: parseCell(a.start), target: null, task_id: null, progress: 0, travel: {} };
+    // cmd: the target commanded for the NEXT step only (contract C2). target: last commanded target, for display.
+    actors[a.id] = { id: a.id, role: a.role, pos: parseCell(a.start), cmd: null, target: null, task_id: null, progress: 0, travel: {} };
   }
   const survivors = Object.fromEntries(sc.survivors.map((s) => [s.id, { ...s, pos: parseCell(s.cell) }]));
   const st = {
@@ -30,20 +31,23 @@ export function createWorld(seed, params, actorIds) {
     return a;
   }
 
-  // Advance one tick: apply each actor's current target at its speed, in actor-ID order.
+  // Advance one tick: apply each actor's commanded target at its speed, in actor-ID order. A command
+  // lasts one step: an actor that sends no move this tick holds position. A team's fractional
+  // progress carries over only while it keeps commanding the same target.
   // Returns the distress messages delivered this tick: [{to, msg_id, text, sent_tick, delivered_tick}].
   function step() {
     st.tick += 1;
     for (const id of ids) {
       const a = actors[id];
-      if (!a.target) continue;
+      const cmd = a.cmd; a.cmd = null;
+      if (!cmd) { a.progress = 0; continue; }
       a.progress += params.speed[a.role];
-      while (a.progress >= 1 && a.target && !samePos(a.pos, a.target)) {
-        a.pos = stepToward(a.pos, a.target);
+      while (a.progress >= 1 && !samePos(a.pos, cmd)) {
+        a.pos = stepToward(a.pos, cmd);
         a.progress -= 1;
         if (a.task_id) a.travel[a.task_id] = (a.travel[a.task_id] || 0) + 1;
       }
-      if (a.target && samePos(a.pos, a.target)) { a.target = null; a.progress = 0; }
+      if (samePos(a.pos, cmd)) { a.target = null; a.progress = 0; }
     }
     return deliverDistress();
   }
@@ -81,7 +85,8 @@ export function createWorld(seed, params, actorIds) {
     return { tick: st.tick, actor: id, pos: { ...a.pos }, footprint, detections };
   }
 
-  // C2 /move: sets the target; applied by step() at the actor's speed. Repeated key is ignored.
+  // C2 /move: commands a target for the next step only; applied by step() at the actor's speed.
+  // Repeated key is ignored.
   function move(id, target, task_id, key) {
     const a = requireActor(id);
     if (!target || !Number.isInteger(target.x) || !Number.isInteger(target.y) || target.x < 0 || target.y < 0 || target.x >= G || target.y >= G)
@@ -89,8 +94,9 @@ export function createWorld(seed, params, actorIds) {
     if (key && st.moveKeys.has(key)) return { ok: true, pos: { ...a.pos }, duplicate: true };
     if (key) st.moveKeys.add(key);
     const changed = !a.target || !samePos(a.target, target);
-    a.target = samePos(a.pos, target) ? null : { x: target.x, y: target.y };
     if (changed) a.progress = 0;
+    a.cmd = samePos(a.pos, target) ? null : { x: target.x, y: target.y };
+    a.target = a.cmd;
     a.task_id = task_id ?? null;
     return { ok: true, pos: { ...a.pos } };
   }

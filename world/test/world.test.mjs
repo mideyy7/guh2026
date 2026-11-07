@@ -60,10 +60,13 @@ test('determinism: same seed and inputs → identical world after 240 ticks, 3 r
 
 test('speeds: drone 1 cell/tick, team 1 cell per 2 ticks, stops exactly on target (diagonals allowed)', () => {
   const w = createWorld(1, params);
-  w.move('drone-1', { x: 7, y: 7 }, null, 'k1'); // from 3-3: 4 diagonal steps
-  w.move('team-1', { x: 1, y: 6 }, null, 'k2'); // from 1-2: 4 steps
   const trace = [];
-  for (let i = 0; i < 9; i++) { w.step(); trace.push([w.sense('drone-1').pos, w.sense('team-1').pos]); }
+  for (let i = 0; i < 9; i++) {
+    // Commands last one tick, so actors re-send each tick (as the n8n Act stage does).
+    w.move('drone-1', { x: 7, y: 7 }, null, `k1-${i}`); // from 3-3: 4 diagonal steps
+    w.move('team-1', { x: 1, y: 6 }, null, `k2-${i}`);  // from 1-2: 4 steps
+    w.step(); trace.push([w.sense('drone-1').pos, w.sense('team-1').pos]);
+  }
   assert.deepEqual(trace[0][0], { x: 4, y: 4 });
   assert.deepEqual(trace[3][0], { x: 7, y: 7 });
   assert.deepEqual(trace[8][0], { x: 7, y: 7 }, 'drone stays on target');
@@ -77,7 +80,7 @@ test('sensing: drone sees a 5×5 block, team a 3×3 block, clipped at the edges'
   const w = createWorld(1, params);
   assert.equal(w.sense('drone-1').footprint.length, 25); // at 3-3
   assert.equal(w.sense('team-1').footprint.length, 9);   // at 1-2
-  w.move('drone-1', { x: 0, y: 0 }, null, 'k'); for (let i = 0; i < 3; i++) w.step();
+  for (let i = 0; i < 3; i++) { w.move('drone-1', { x: 0, y: 0 }, null, `k${i}`); w.step(); }
   assert.equal(w.sense('drone-1').footprint.length, 9);  // corner: 3×3 survives clipping
 });
 
@@ -96,8 +99,7 @@ test('rescue: idempotent per key, exactly once per survivor, duplicates measured
   const s = w.scenario.survivors.find((x) => x.appear_tick === 0);
   const p = parseCell(s.cell);
   // Teleport-free: walk team-1 and team-2 there.
-  w.move('team-1', p, `T-${s.id}`, 'a'); w.move('team-2', p, `T-${s.id}`, 'b');
-  for (let i = 0; i < 20; i++) w.step();
+  for (let i = 0; i < 20; i++) { w.move('team-1', p, `T-${s.id}`, `a${i}`); w.move('team-2', p, `T-${s.id}`, `b${i}`); w.step(); }
   assert.equal(w.rescue('team-1', s.id, 'team-1:r').result, 'rescued');
   assert.deepEqual(w.rescue('team-1', s.id, 'team-1:r'), w.rescue('team-1', s.id, 'team-1:r'), 'same key → same receipt');
   assert.equal(w.rescue('team-1', s.id, 'team-1:r').result, 'rescued', 'replay does not turn into already_rescued');
@@ -134,7 +136,7 @@ test('distress: delivered once, to the nearest drone in range; waits ("Sending�
   const delivered = [];
   for (let t = 0; t < 200; t++) {
     // Sweep drone-1 across the map so it passes every district.
-    if (t % 8 === 0) w.move('drone-1', { x: (t / 8) % 8, y: Math.floor(t / 64) * 3 % 8 }, null, `sweep${t}`);
+    w.move('drone-1', { x: Math.floor(t / 8) % 8, y: (Math.floor(t / 64) * 3) % 8 }, null, `sweep${t}`);
     delivered.push(...w.step());
   }
   const ids = delivered.map((d) => d.msg_id);
@@ -169,11 +171,14 @@ test('distress: with two drones in range, the nearer one receives it (ties → l
   const m = w.scenario.distress[0];
   const c = parseCell(m.cell);
   // Park drone-2 on the sender's cell and drone-1 two cells away, before the message is sent.
-  const near = { x: c.x, y: c.y }, far = { x: Math.min(7, c.x + 2), y: c.y };
-  w.move('drone-2', near, null, 'n'); w.move('drone-1', far.x === c.x ? { x: Math.max(0, c.x - 2), y: c.y } : far, null, 'f');
-  w.move('drone-3', { x: 7, y: 7 }, null, 'g3'); w.move('drone-4', { x: 7, y: 7 }, null, 'g4');
+  const near = { x: c.x, y: c.y }, far0 = { x: Math.min(7, c.x + 2), y: c.y };
+  const far = far0.x === c.x ? { x: Math.max(0, c.x - 2), y: c.y } : far0;
   let got = null;
-  for (let t = 0; t < 30 && !got; t++) for (const d of w.step()) if (d.msg_id === m.msg_id) got = d;
+  for (let t = 0; t < 30 && !got; t++) {
+    w.move('drone-2', near, null, `n${t}`); w.move('drone-1', far, null, `f${t}`);
+    w.move('drone-3', { x: 7, y: 7 }, null, `g3${t}`); w.move('drone-4', { x: 7, y: 7 }, null, `g4${t}`);
+    for (const d of w.step()) if (d.msg_id === m.msg_id) got = d;
+  }
   assert.ok(got, 'delivered');
   const snapActors = Object.fromEntries(w.snapshot().actors.map((a) => [a.id, a.pos]));
   const dd = (id) => Math.max(Math.abs(snapActors[id].x - c.x), Math.abs(snapActors[id].y - c.y));
@@ -185,12 +190,22 @@ test('distress: with two drones in range, the nearer one receives it (ties → l
 test('distress: a failed delivery goes back to "Sending…" and is retried', () => {
   const w = createWorld(11, params);
   const m = w.scenario.distress[0];
-  w.move('drone-1', parseCell(m.cell), null, 'go');
   let first = null;
-  for (let t = 0; t < 30 && !first; t++) first = w.step().find((d) => d.msg_id === m.msg_id);
+  for (let t = 0; t < 30 && !first; t++) { w.move('drone-1', parseCell(m.cell), null, `go${t}`); first = w.step().find((d) => d.msg_id === m.msg_id); }
   assert.ok(first);
   assert.equal(w.requeueDistress(m.msg_id), true);
   assert.equal(w.snapshot().distress.find((x) => x.msg_id === m.msg_id).state, 'sending');
   const again = w.step().find((d) => d.msg_id === m.msg_id);
   assert.ok(again, 'redelivered on the next tick');
+});
+
+test('a move lasts one tick: an actor that sends nothing holds position', () => {
+  const w = createWorld(1, params);
+  w.move('drone-1', { x: 7, y: 3 }, null, 'once');
+  w.step(); w.step(); w.step();
+  assert.deepEqual(w.sense('drone-1').pos, { x: 4, y: 3 }, 'moved one step, then held');
+  // A team re-commanding the same target keeps its half-speed progress; switching resets it.
+  w.move('team-1', { x: 1, y: 6 }, null, 't1'); w.step();
+  w.move('team-1', { x: 1, y: 6 }, null, 't2'); w.step();
+  assert.deepEqual(w.sense('team-1').pos, { x: 1, y: 3 });
 });
