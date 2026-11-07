@@ -166,7 +166,9 @@ Two keys go beyond the plan's C7 example: `gossip_event_cap` (the 200-event goss
 | S1 memory under load | A | pending | |
 | S2 deploy via CLI | B | pending | needs Docker |
 | S3 concurrency = 1 serialises | B | pending | needs Docker |
-| S4 injected core in a Code node | B | see below | |
+| S4 injected core in a Code node | B | **pre-check pass**; live n8n check pending | `spikes/s4-codenode-sim.mjs`: in a vm sandbox with no `module`/`require` (like the n8n task runner), the existing `module.exports` guard is safe and `HiveCBBA`/`HiveEvents` load. A 293 KB state round-trip takes p50 22 ms, worst 40 ms (budget 200 ms). |
 | S5 network isolation | A | pending | |
 | S6 shared credential | B | pending | needs Docker |
-| S7 AI with Haiku 5.5 | B | see below | |
+| S7 AI with Haiku 5.5 | B | **API pass**; n8n AI node check pending | `spikes/s7-anthropic.mjs`: the §12.5 request returns schema-valid JSON, `district: "Piccadilly"`, in ~2.0 s. Sending `temperature` returns **HTTP 400**, confirmed, so the HTTP Request fallback is ready if the AI Agent node sends one. The model counts the sender as a person ("me + 2 kids" gives `people: 3`); the Phase 4 fixtures must label people the same way. |
+
+**Blocker (2026-11-07, Dev B's machine):** Docker Desktop isn't installed, so S2, S3, S6 and the live halves of S4 and S7 can't run here yet.
