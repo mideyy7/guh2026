@@ -130,7 +130,14 @@ html{scroll-behavior:smooth}
       <li><kbd>Insights</kbd> → <kbd>Actor knowledge</kbd>: every actor’s separate memory, side by side.</li>
     </ol></div>
   </div>
-  <div class="notes"><p><b>Say:</b> “This isn’t a shared database. Each column is one actor’s own belief, read from its own store.”</p></div>
+  <div class="eyebrow"><b>How CBBA works</b> · Consensus-Based Bundle Algorithm · Choi, Brunet &amp; How, MIT</div>
+  <div class="flow" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+    <div class="wf"><code>1 · Bundle</code><span class="trig">each actor, on its own</span><p>Each rescue team scores every rescue it knows about: how urgent the people are, how soon it could reach them, and how much work it already has. It picks its best few rescues (its “bundle”) and records a bid for each.</p></div>
+    <div class="wf"><code>2 · Consensus</code><span class="trig">with every peer it can reach</span><p>Actors swap bid tables and apply the same rules: the higher bid wins, a lower actor ID breaks a tie, and fresher information beats older. Because every actor applies identical rules, they all reach the same answer without an auctioneer.</p></div>
+    <div class="wf"><code>3 · Release &amp; rebid</code><span class="trig">until nothing changes</span><p>An actor that is outbid drops that rescue and every rescue it planned after it, because those plans assumed the lost one. It then rebids. Within a few rounds every actor agrees who rescues whom.</p></div>
+  </div>
+  <p class="lead"><strong>Example:</strong> Drone 02 spots Amara’s family. Rescue 01 is 3 streets away and bids high; Rescue 02 is across the river and bids lower. Both see each other’s bids, both conclude Rescue 01 wins, and Rescue 02 moves on to the next rescue. Nobody told them. <strong>During a blackout</strong> each island runs CBBA among the actors it can reach; when links return, the islands run it again and settle on one plan.</p>
+  <div class="notes"><p><b>Say:</b> “This isn’t a shared database. Each column is one actor’s own belief, read from its own store.”</p><p><b>CBBA in one line:</b> “Each team bids for a bundle of rescues, and they agree among themselves who gets what, with the same rules everywhere and no auctioneer.”</p><p><b>If pushed:</b> CBBA is a published algorithm (Choi, Brunet &amp; How, MIT, 2009). We tested that it always reaches one conflict-free plan, including after a network split, over hundreds of random cases.</p></div>
 </section>
 
 <!-- 4 -->
