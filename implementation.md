@@ -28,6 +28,35 @@ The two halves meet only at the **contracts** you agree in Phase 0 (§3). Inside
 
 ---
 
+## Progress (updated as work lands on `dev_a`)
+
+### Dev A status
+
+| Phase | Dev A deliverable | Status |
+|---|---|---|
+| 0 | Repo layout, `npm test`, contracts draft, compose generator, S1 (boot), S5 (isolation) | ✅ Done. S1: cold boot 5 min 41 s, staggered (D11). S5: isolation 133/133 checks |
+| 1 | World model, link presets, simulator, proxy, store, isolation script | ✅ Done and running in Docker |
+| 2 | Dashboard server + UI, `tests/e2e/lib.mjs`, infra smoke test | ✅ Done. `node tests/e2e/smoke-infra.mjs` → 11/11 |
+| 3 | Scenario generator + distress texts, BLACKOUT/RESTORE, click-to-cut, island colours, divergence badge, timed convergence check, headless runner | ✅ Done (runner uses the stub core until Dev B's core exists) |
+| 4 | HQ dispatcher (live + headless), both central baselines, metrics | ✅ Done. Live RPC path verified in Docker |
+| 5 | Benchmark matrix, summary CSV/JSON, HTML report with headline chart | ✅ Built. **Needs a rerun with the real core** for real numbers |
+| 6 | Scripted 90-second demo, "Send text" control | ✅ Built. Rehearsed infra-only |
+
+Unit tests: **84/84** (`npm test`, no Docker needed).
+
+**Still blocked on Dev B:** Gate 0 (Dev B's spikes S2, S3, S4, S6, S7 and a review of `contracts/README.md`), S1 under real load (Gate 2), real benchmark numbers, live-vs-headless parity, and filling in N and M in hack.md §8.
+
+### Hand-off notes for Dev B
+1. **Read the contracts changelog first** (`contracts/README.md`). Additive changes and two behaviour rules (D12, D13) were found while building.
+2. **Your core is plugged in automatically.** Once `core/dist/hive-core.js` exists, `bench/run.mjs`, `bench/matrix.mjs` and the HQ service use it instead of `bench/stub-core.cjs`. `loadCore()` rejects a core missing any C6 function.
+3. **Act stage:** send `POST /move` **every tick** you want to move (D12). Use a fresh key per tick, e.g. `<actor>:<tick>:move`.
+4. **Central mode:** `act(state, {hq})` must add `hq.task` to the team's known tasks (D13); `hq` is `null` when HQ is unreachable.
+5. **Headless interpret:** the benchmark calls `interpret(state, null, raw)`, i.e. the regex fallback, because it can't call the LLM. The raw object is `{msg_id, text, sent_tick, delivered_tick}`.
+6. **AI fixtures:** `tests/ai/fixtures.json` (20 generated + 5 messy, with ground-truth labels).
+7. **Driving the live stack:** `tests/e2e/lib.mjs` has every helper your checkpoint and acceptance scripts need. They talk only to the dashboard API.
+
+---
+
 ## 1. Setup: accounts, keys and installs
 
 Do this **before** the hackathon starts. Venue Wi-Fi is slow, and pulling Docker images there wastes the first hour.
@@ -170,6 +199,8 @@ These choices follow from what n8n 2.x actually does. Some of them refine the st
 | D8 | **CBBA uses wall-clock timestamps** (`Date.now()` passed in by the shell, simulated time in the benchmark). | Convergence is checked while the simulation is paused. With tick numbers frozen, CBBA's "fresher information" rule would stall, but wall-clock time keeps moving. |
 | D9 | **CBBA uses bid warping:** a bid is never higher than the previous bid in the bundle. | **Tested:** with our travel-style scoring, CBBA *fails* to converge without warping and passes with it. See [core/test/cbba.test.js](core/test/cbba.test.js). |
 | D11 | **n8n instances boot one at a time.** Each n8n `depends_on` the previous one passing `/healthz/readiness` (not `/healthz`, which answers before migrations finish). | **Measured:** 7 simultaneous first boots on the 8 GB Mac never finished (load 35+, none ready after 10 minutes). Staggered, a cold boot takes 5 min 41 s, and steady state is ~350 MiB and 1–12% CPU per instance. |
+| D12 | **A move command lasts one tick** (contract C2). The Act stage re-sends `POST /move` every tick; an actor that sends nothing holds position. | **Found by the benchmark:** with persistent targets, a central-naive team that lost HQ kept walking, so "idles when cut off" wasn't true. |
+| D13 | **HQ replies with the task's details**, `{assignment, task: {id, survivor_id, cell, urgency, people}}`, not just an ID. | **Found by the benchmark:** a team only knows tasks it detected itself; with a bare ID, central teams rescued 2 people instead of 20. |
 | D10 | Workflows are **deployed by CLI** (`n8n import:credentials`, `import:workflow`, `publish:workflow`) with a shared `N8N_ENCRYPTION_KEY`. | n8n 2.x replaced activate/deactivate with publish/unpublish. Importing deactivates workflows, so you must publish them afterwards. Spike S2 proves the exact script. |
 
 **How `hack.md` §5's six workflows map to n8n:** Perceive, Bid and Act run as three labelled Code nodes **inside one `hive-tick` workflow**, so they always execute in order on each tick. Interpret, Gossip and Merge are their own workflows. That gives 4 workflow files and the same 6 stages on the canvas.
