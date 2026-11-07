@@ -1,288 +1,223 @@
-# HIVE — five-minute UI demo
+# HIVE — five-minute live demo
 
-**Target:** finish speaking at **4:25**, leaving 35 seconds for a slow transition or a question. Timings below are elapsed presentation time, not the simulation clock.
+**Target:** finish speaking at **4:25**, leaving 35 seconds for a slow transition or one question. Timings are elapsed presentation time, not simulation time.
 
-**The story:** a drone discovers people → a local team responds during a network split → disconnected actors have different knowledge → reconnection shares the missing discoveries.
+**The story:** seven independent n8n actors share one mission → a distress text reaches a drone and becomes a task → the network splits into three islands → each island keeps rescuing on its own knowledge → links return, the actors gossip what was missing and agree again → the benchmark shows what that is worth.
 
-**Route:** Mission → Swarm / Agent workflows → Swarm / Agent coordination → Insights / Actor knowledge → Swarm / recovery → Insights / Actor knowledge → Mission.
+**Route:** Mission → Swarm / Agent workflows → n8n editor → Swarm / Agent coordination → Insights / Actor knowledge → Swarm / recovery → Insights / Actor knowledge → Insights / Performance comparison → Mission.
 
-The quoted paragraphs are the spoken script: approximately **350 words** on the main route, leaving time for clicks and the rescue to complete. Everything else is a stage direction or preparation note. Rehearse the clicks alongside the words.
+The quoted paragraphs are the spoken script (about **380 words**). Everything else is a stage direction.
 
-## 1. Choose the truthful version before rehearsing
+## 1. What is real, and what you may claim
 
-This script matches the current `mockup/` UI: **four browser-simulated actors**, planned n8n canvases, example bids, and illustrative comparison figures. It does not describe four live n8n instances. Some architecture plans in `hack.md` describe a larger system; use the actor count and capabilities actually visible in the demo.
+| Part | Status | Claim you may make |
+|---|---|---|
+| 7 actors (4 drones, 3 rescue teams), each its own n8n 2.x instance + SQLite store, own Docker network | Built (`scripts/gen-compose.mjs`) | “Seven independent n8n instances. No server tells them what to do.” **Only once you have seen all seven running.** |
+| Workflows `hive-tick`, `hive-gossip`, `hive-merge`, `hive-interpret` | Built, tested by `n8n/test/` emulator | “Every actor runs byte-identical workflows; only its store’s role differs.” |
+| Decision logic: CBBA, version vectors, gossip, merge | `core/`, unit-tested | The same code runs in n8n and in the benchmark. |
+| Network cut | Chaos proxy refuses cross-island requests | “Real refused connections” **only after `scripts/check-isolation.sh` passes on the demo machine.** |
+| Distress texts → Claude → provisional task, regex fallback | `hive-interpret` | Say “Claude” only if `ANTHROPIC_API_KEY` is set and the call works; otherwise “a fallback parser”. |
+| Dashboard (`http://localhost:8000`) | Read-only observer | It reads stores, simulator and proxy. It never assigns tasks or relays messages. |
+| Benchmark | **Measured**: 270 headless runs, real `core/`, 10 seeds each (`bench/results/summary.csv`) | The numbers in §9 exactly as written. |
+| Analyst panel | Rule-based | Never say it uses a language model. |
+| Swarm “Workflow activity” panel | **Inferred** from proxy, simulator and store changes, not n8n’s execution log (the page footer says so) | For proof of n8n, open the actor’s **real n8n editor → Executions**. |
 
-Keep the prototype wording until the backend and its telemetry are connected and tested. The short replacements in §12 are for that later stage. Configuring an **Open in n8n** link alone does not make workflow activity live.
+**Not yet verified end to end:** the README lists the live Docker deployment and e2e/acceptance runs as remaining. Rehearse §2 fully before presenting. If the live stack cannot be made to run, use the fallback in §11. Do not describe the mockup as live n8n.
 
-## 2. Set the stage before the timer starts
+## 2. Set the stage (before the judges watch)
 
-Do this before the judges begin watching:
+**Bring up the stack (allow ~10 minutes; n8n instances boot one at a time):**
 
-1. Open the mockup on a desktop browser. Load the geographic map and fonts in advance.
-2. Click **Mission** → **Reset**. Reset starts the simulation running.
-3. Immediately click the **pause icon beneath the map**. Its play triangle should now be visible. This is the starting state.
-4. In the playback dropdown beside that button, choose **3×**. This accelerates the demo's logical simulation; it does not imply real-world rescue speed.
-5. Click **Fit mission**. Leave **3D** selected if it runs smoothly; use **2D** if the projector makes the tilted view harder to read. Do not spend presentation time adjusting the camera.
-6. If the right-hand analyst is open, click **Analyst** to close it. Keep attention on the actors. You can reopen it for the optional segment.
-7. Confirm the header offers **Simulate network blackout**, rather than **Restore all connections**. Confirm you are **LIVE**, not replaying recorded history.
-8. Confirm there are two drones and two rescue teams. The starting total includes **12 people already rescued before the recording**; those are not rescues performed during your pitch.
-9. Keep a screen recording of this exact route ready in another window. Close notifications and unrelated tabs.
+```bash
+node scripts/gen-compose.mjs          # all 7 actors (~5 GB Docker memory)
+docker compose up -d
+bash scripts/check-isolation.sh       # must pass before you say "real network cut"
+bash scripts/deploy-workflows.sh
+node tests/e2e/checkpoint14.mjs       # rehearsal: 3-island blackout, every island rescues, then reconverges
+```
 
-**Starting screen:** Mission, map framed, simulation paused, 3× selected, all links restored, analyst closed.
+If the laptop cannot run seven instances, use the 4-actor dev stack (`--actors drone-1,drone-2,team-1,team-2`) and say **“four of the seven actors”**. Note that under the blackout preset team-2 is then alone in its island (its drone, drone-3, is not running), so expect it to rescue only what its own sensor sees.
+
+**Open these tabs, in order:**
+
+1. `http://localhost:8000`: the dashboard.
+2. `http://drone-1.localhost:5671`: Drone 01’s own n8n editor, logged in, **Executions** list open.
+3. `http://team-1.localhost:5675`: Rescue 01’s own n8n editor, **Executions** list open.
+4. A recorded backup run of this exact route, in a separate window.
+
+The n8n editors are also reachable from the dashboard (**Open in n8n ↗** in the Swarm inspector). Actor ports: drone-1…4 → 5671–5674, team-1…3 → 5675–5677.
+
+**On the dashboard:**
+
+1. **Mission** → **Reset**. Reset restores all links and starts the simulator (same seed).
+2. Click **Fit mission**. Use **2D** if the projector makes 3D hard to read.
+3. Close the **Analyst** panel.
+4. Confirm the header shows **Simulate network blackout** (not **Restore all connections**) and that you are **LIVE**, not in a recorded session.
+5. Confirm all seven actors appear and none is marked stale.
+6. Close notifications and unrelated tabs.
 
 ### Cue sheet
 
 | Time | Screen | The one thing to establish |
 |---|---|---|
-| 0:00–0:45 | Mission | What HIVE does and the common goal |
-| 0:45–1:15 | Swarm → Agent workflows | Separate actor workflows and local decisions |
-| 1:15–2:10 | Swarm → Agent coordination | Local response continues during a partition |
-| 2:10–2:35 | Insights → Actor knowledge | Actors really hold different information |
-| 2:35–3:15 | Swarm, then Insights | Missing discoveries propagate after reconnecting |
-| 3:15–3:45 | Mission | Connect the technical behaviour to a completed rescue |
-| 3:45–4:05 | Optional analyst OR verified results | One useful explanation or one measured result |
-| 4:05–4:25 | Mission | Close on the project's contribution |
+| 0:00–0:40 | Mission | The problem, the shared goal, seven actors |
+| 0:40–1:15 | Swarm → Agent workflows → n8n editors | Each actor really is its own n8n |
+| 1:15–2:05 | Swarm → Agent coordination | Blackout; a new distress text is handled inside one island |
+| 2:05–2:30 | Insights → Actor knowledge | Actors genuinely hold different knowledge |
+| 2:30–3:10 | Swarm, then Insights | Gossip delivers the missing events; views agree again |
+| 3:10–3:50 | Insights → Performance comparison | The measured result |
+| 3:50–4:25 | Mission | Close |
 | 4:25–5:00 | Stay on Mission | Buffer / one question |
 
-## 3. Mission — the problem and the goal · 0:00–0:45
+## 3. Mission — the problem and the goal · 0:00–0:40
 
-**Click:** nothing for the opening. Point to the map.
+**Click:** nothing. Point to the map.
 
-**Say:**
+> “When floods take out communications, rescuers can be close to people who need help but cut off from dispatch. A central controller stops working at exactly that moment. HIVE is a rescue swarm with no dispatcher.
+>
+> These are seven independent actors over a flooded Manchester: four drones that search and receive distress texts, three rescue teams that bid for rescues and carry them out. They share one mission score that rewards urgent rescues and penalises delay. A drone alone saves nobody; a team alone is nearly blind. They have to work together.”
 
-> “When flooding breaks communications, a responder can still be nearby but cut off from dispatch. HIVE explores a different approach: drones and rescue teams coordinate locally, keep working in connected groups, and reconcile when links return. This is our interactive prototype.”
+**Show:** actors moving. If visible, point once at **How a rescue happens**. Do not read the stages.
 
-**Then click:** the **play triangle beneath the map**. Leave the speed at 3×.
+## 4. Inside an actor — real n8n · 0:40–1:15
 
-**Say:**
+**Click:** **Swarm** → **Agent workflows** → **Drone 01**. Then switch to the **Drone 01 n8n tab**, then the **Rescue 01 n8n tab**.
 
-> “These two drones find people. These two teams perform rescues. They share one mission: getting people to safety. The dashboard lets us see their movement and the information behind their decisions.”
+> “Each actor is its own n8n instance with its own database and its own store. They all run the same four workflows. Tick is the heartbeat: sense, decide, act. Gossip runs on each actor’s own clock and sends peers the events they are missing. Merge takes in what a peer sent. Interpret turns a distress text into a task.
+>
+> Here are two of those instances side by side. Their executions run independently. Nothing here is a central server.”
 
-**Show:** actor movement. Briefly scroll to **How a rescue happens** if it is outside the viewport. Point to **Found → Shared → Assigned → Travelling → Safe**. Do not read every stage.
+**Show:** the **Executions** list updating in each editor. Open one `hive-tick` execution only if it loads instantly; otherwise just point at the list.
 
-**Exit cue:** judges understand the roles and shared goal. Move on even if an initial rescue is still travelling.
+**Exit cue:** the judges have seen two separate n8n editors running. Do not tour every node.
 
-## 4. Swarm / Agent workflows — what is inside an actor · 0:45–1:15
+## 5. Break the network · 1:15–2:05
 
-**Click, in order:**
-
-1. **Swarm** in the top navigation.
-2. **Agent workflows**.
-3. **Drone 01** in the actor list on the left.
-4. **Gossip** in the six-workflow selector.
-5. **Rescue 01** in the left actor list.
-6. **Merge** in the workflow selector.
-
-Keep the simulation running while you explain.
-
-**Say:**
-
-> “These are the planned n8n workflows for each actor. Gossip shares discoveries with reachable peers. Merge updates the receiving actor’s local memory. In the backend design, each workflow has its own trigger and each actor makes its own decisions.”
-
-**Show:** the selected actor changes, and the canvas changes from sending to receiving. Point once to **Local task knowledge** in the inspector.
-
-**Important wording:** say **planned workflows** in the current prototype. The node shapes are not a live n8n editor, and the example bids are not measured CBBA output.
-
-**Exit cue:** the judges understand that coordination happens between actors with separate local state. Do not tour all six workflows or open JSON payloads.
-
-## 5. Swarm / Agent coordination — break the links · 1:15–2:10
-
-**Click, in order:**
-
-1. **Agent coordination**.
-2. **Pause demo** in the Swarm toolbar. It should change to **Resume demo**.
-3. **Simulate network blackout** in the page's upper action row.
-4. **Add discovery** in the Swarm toolbar.
-
-**Say while clicking:**
-
-> “Now I’ll split the swarm. Each island still has a drone and a rescue team. This is a new discovery made after the split—not a rescue assigned beforehand.”
-
-**Remember the new task ID** shown in the event feed, normally `RSC-016` after a clean reset. Call it **“this new incident”** aloud; do not rely on a particular ID.
-
-**Then click:**
-
-5. **Drone 01** in the left list. Its inspector should know the new task.
-6. **Resume demo**. Keep 3× selected from setup.
-7. **Rescue 01** in the left list.
-8. Check **Selected actor only** beside **What moved between actors?**
-
-**Say:**
-
-> “The discovery reaches the rescue team inside this island. The other island cannot receive it. This local team can still respond using the information it has.”
-
-**Show:** the delivered-task record, followed by the team’s movement/action. Allow roughly **20–25 seconds** of running time while narrating. Under the current demo, the new local rescue should complete within this window when the initial jobs are already finished.
-
-**Watch for:** a record saying **“Simulator recorded … people rescued”** for the new incident. That is your evidence of completion; moving markers alone do not prove a rescue.
-
-**Once it appears:** click **Pause demo**.
-
-**Say only if that record appeared before reconnection:**
-
-> “That rescue completed while the groups were still disconnected.”
-
-**If it has not completed by 2:10:** pause and say **“The team has received the discovery and is responding while disconnected.”** Continue. Do not wait indefinitely or claim completion.
-
-**Background activity:** the demo can generate additional discoveries during a partition. Stay with the task ID you noted. Extra rows are not a reason to reset.
-
-## 6. Insights / Actor knowledge — prove the separation · 2:10–2:35
-
-**Click:** **Insights** → **Actor knowledge**.
-
-The simulation should still be paused. Find the row for the incident introduced after the blackout.
-
-**Say:**
-
-> “This table shows each actor’s own knowledge. The drone and team in this island know about the new incident. The other two actors do not. The dashboard can observe both groups, but it does not pass information between them.”
-
-**Point to:** the two **Known** entries and the two **Not yet known** entries for that same task.
-
-**Exit cue:** judges have seen the difference between information visible to an observer and information available to an actor.
-
-## 7. Reconnect — show the missing information arriving · 2:35–3:15
-
-**Click, in order:**
+**Click, in order (back on the dashboard):**
 
 1. **Swarm** → **Agent coordination**.
-2. Uncheck **Selected actor only** if it is still checked.
-3. **Restore all links** in the Swarm toolbar.
-4. **Resume demo**.
+2. **Simulate network blackout** (top action row). The toast says *“Three islands. Each still has a drone and a rescue team.”*
+3. **Add distress text** (Swarm toolbar).
 
-**Say:**
+> “I’ve just split the swarm into three islands. The links aren’t just drawn red: every actor sits on its own private network and can only reach peers through a proxy, and that proxy is now refusing cross-island requests.
+>
+> A new distress text has just been sent, messy free text like ‘stuck on roof with two kids, water rising’. It only reaches HIVE when a drone is in range. That drone turns it into a task, which stays provisional until a sensor confirms it.”
 
-> “Restoring a link does not magically update everyone’s memory. The actors still have to exchange the missing discoveries. Here are those deliveries arriving.”
+**Note the new task ID** (`T-…`) shown in the feed and toast. Refer to it as **“this new incident”**.
 
-**Show:** new delivered-task records in **What moved between actors?** Blue packet animation is a visual aid; the timestamped records are the evidence. Do not depend on catching a brief animation.
+4. Click the drone that received it in the actor list, then the rescue team in **the same island**.
+5. Tick **Selected actor only** beside **What moved between actors?**
 
-After about **three real seconds** at 3×:
+> “The discovery reaches the rescue team in its own island. The other islands cannot hear it. This team still bids for the task and responds with the information it has.”
 
-5. Click **Pause demo**.
-6. Click **Insights** → **Actor knowledge**.
+**Show:** the delivery record, then the team acting. Watch for a rescue receipt from the simulator for that incident; moving markers alone do not prove a rescue.
 
-**Say after the same task is Known in all four columns:**
+**If it completes before 2:05:** “That rescue happened while the islands were still disconnected.”
+**If not:** “The team has the task and is responding while disconnected.” Move on. Never say “rescued” for something still travelling.
 
-> “Now all four actors know about the same incident. The local groups kept working, and reconnection brought their task knowledge back together.”
+## 6. Prove the separation · 2:05–2:30
 
-**Be precise:** the current mockup reconciles task knowledge. It does not yet prove full event-log agreement, conflict-free bids or duplicate-commit handling.
+**Click:** **Insights** → **Actor knowledge**. The badge should no longer say **Views agree**.
 
-**If any entry remains unknown:** return to **Swarm**, confirm **6 / 6 available links**, resume for a few more ticks, then return to this table. If the check still fails, report what is visible and move on.
+> “This is each actor’s own memory, read from its own store. The actors in that island know about the new incident; the others do not. The dashboard can see all of them, but it never passes information between them.”
 
-## 8. Mission — return to the people · 3:15–3:45
+**Point to:** **Known** for the island’s actors and **Not yet known** for the rest, on the same task row.
+
+## 7. Reconnect · 2:30–3:10
 
 **Click, in order:**
 
-1. **Mission**.
-2. Scroll to **How a rescue happens**.
-3. Use **Follow incident** to choose the task introduced after the blackout.
+1. **Swarm** → **Agent coordination**. Untick **Selected actor only**.
+2. **Restore all links**.
 
-**If its status is Safe, say:**
+> “Restoring links doesn’t magically update anyone. Each actor keeps a version vector, a record of the last event it has seen from every other actor, so gossip sends exactly the events a peer is missing. Duplicate or reordered messages have no effect. If two islands claimed the same task, the same deterministic rules pick one winner everywhere, and the loser replans.”
 
-> “This is the same incident: found, shared locally, responded to, and rescued. The useful result is not the animation or the number of agents. It is a local response that continued despite a wider communication failure.”
+**Show:** new delivery records in **What moved between actors?** The timestamped records are the evidence; the packet animation is decoration.
 
-**If still Travelling, say instead:**
+3. After a few gossip rounds (gossip runs every ~4 s per actor): **Insights** → **Actor knowledge**.
 
-> “This is the same incident. Its discovery reached a local responder, and the team is acting on it. The interface distinguishes a response in progress from a completed rescue.”
+> “Every actor now knows the same incident, and the badge shows their views agree. The islands kept working while apart, and the swarm healed back into one shared picture.”
 
-Point to the incident’s stage. Use the **+… during this recording** figure if you mention the mission total. Do not present the starting 12 rescues as new work.
+**If any column is still unknown:** wait one more gossip round. Do not claim agreement until the badge shows **Views agree**.
 
-**Optional:** click **Show on map** once to connect the incident to its location. Avoid further camera changes.
+## 8. Optional — the analyst
 
-## 9. One optional feature — choose before presenting · 3:45–4:05
+Skip in the main pitch. If asked: it explains observed state, is rule-based, and never controls the swarm.
 
-Use **one** of these, not both. If you are behind schedule, skip this section entirely.
+## 9. The measured result · 3:10–3:50
 
-### A. Analyst — works with the current mockup
+**Click:** **Insights** → **Performance comparison**. It loads the measured results from `bench/results/summary.json`. If it shows an error, say the numbers below and offer `bench/results/report.html` afterwards.
 
-**Click:** **Analyst** to reopen the right panel → **Explain recovery** in its suggestion buttons. Stay on Mission.
+> “We didn’t want to just claim decentralisation is better, so we built a benchmark that could prove us wrong. Same seeds, same actors, same outage, three strategies: HIVE, a naive central dispatcher, and a stronger one that finishes its existing tasks. It runs the exact decision code the n8n actors run, ten seeds per setting.
+>
+> Under this three-island blackout, HIVE rescued 29.7 of 30 people on average. Both central dispatchers rescued none. HIVE never sent two teams to the same rescue; the cost was about 107 grid cells of wasted travel.
+>
+> And to be fair to central dispatch: with every link up, it is slightly better, 90.7 against 90.2. Decentralising costs almost nothing when the network is healthy, and keeps people alive when it isn’t.”
 
-**Say:**
+**Numbers you may quote (10 seeds each, `bench/results/summary.csv`):**
 
-> “The analyst explains the observed state without controlling the swarm. In this prototype its responses are rule-based; the actors remain responsible for their own actions.”
-
-Point to the current knowledge summary or its evidence link. Do not type a fresh question or read a long answer aloud.
-
-### B. Insights / Performance comparison — only with verified results
-
-The current screen explicitly says **NOT MEASURED RESULTS**. **Skip it in the main pitch until it contains real benchmark evidence.** The sample values 18 rescues, 2 duplicate commitments and 6.2 seconds are not results you can claim.
-
-Once measured results are connected:
-
-**Click:** **Insights** → **Performance comparison**.
-
-**Say, using actual values only:**
-
-> “Across [N] identical scenario seeds under this outage, HIVE rescued [A] people, compared with [B] for central dispatch with cached assignments. The cost was [C] duplicated commitments.”
-
-Point to one comparison and its variability. Return to **Mission** before closing. If you cannot substantiate the numbers and the baseline, use option A or skip the segment.
-
-## 10. Close on Mission · 4:05–4:25
-
-Stop clicking. Leave the map or the selected rescue visible.
-
-**Say:**
-
-> “HIVE’s design combines local decisions, continued response during a split, and shared knowledge after reconnecting. Next, we connect independent n8n actors and validate the results. Losing central connectivity should not mean losing local coordination.”
-
-**Stop speaking.** Leave the remaining time for a question. Do not fill the silence with another feature tour.
-
-## 11. If the timer or demo slips
-
-| Situation | Exact response |
-|---|---|
-| You reach 3:45 before completing the core story | Skip the analyst and comparison. Finish the knowledge check, return to Mission and close. |
-| Map tiles or WebGL fail | Click **Offline** in the map footer. Say: “The geographic background is unavailable; the coordination simulation is still running.” Continue. |
-| You accidentally enter recorded history | On Mission, click **RETURN LIVE**. Replay disables scenario-changing buttons. |
-| You lose track of whether the demo is paused | In Swarm, **Resume demo** means it is paused; **Pause demo** means it is running. Check before adding a wait. |
-| The live UI becomes unreliable | Switch to your recorded demo. Say: “I’ll show the recorded run of the same scenario.” Resume at the blackout; do not spend a minute debugging. |
-| A rescue has not finished | Describe the received task and response in progress. Never substitute “rescued” for “travelling.” |
-
-### Do not spend the five minutes on
-
-- Disaster statistics, competitor lists or claims of being the first.
-- Terrain, tree models, font choices or map-library details.
-- All six workflow canvases, all actor JSON payloads, or a full architecture lecture.
-- CAP, Byzantine fault tolerance or mathematical convergence claims.
-- Sample benchmark numbers or claims that an entirely disconnected drone can reach a team.
-
-## 12. Update these lines after backend integration
-
-These are replacements for the script, not extra material to add to its length.
-
-| Where | Current wording | Replace only after verification |
+| Scenario | HIVE | Central (both) |
 |---|---|---|
-| Opening | “This is our interactive prototype.” | “This is our live simulated mission, coordinated by independent n8n actors.” |
-| Workflow segment | “These are the planned n8n workflows…” | “Each actor runs these workflows in its own n8n instance.” Show real execution identifiers or actual editor activity. |
-| Local allocation | Describe the assigned actor without claiming the fixture bids were computed | Explain one real bid using recorded urgency, travel and capacity inputs. |
-| Recovery | “Their task knowledge [came] back together.” | Describe exactly the replicated state your acceptance checks demonstrate; retain any limitations. |
-| Comparison | Skip illustrative fixtures | Use real paired-run results, seed count, variability and duplicate-work cost. |
-| Closing | “Our next step is connecting this observer…” | “We demonstrated local decisions, continued response during this partition, and [the verified recovery result].” |
+| 3-island blackout: rescued / 30 | **29.7** (score 84.0 ± 5.5) | **0** |
+| All links up: mission score | 90.2 | 90.7 |
+| Zero links: rescued / 30 | 18.0 (teams’ own sensors) | 0 |
+| One actor isolated: score | 87.1 | 85.1 |
+| Duplicate rescue commitments | **0** in every configuration | — |
+| Converged after reconnecting | every run (blackout: 4.2 rounds avg) | — |
 
-Do not say “real network cut” until delivery genuinely fails through the proxy and bypass paths have been checked. Do not say the analyst uses a language model until it actually does.
+Do not present “central strong” as a separate win: it equals the naive dispatcher here because the outage starts at tick 1, before HQ has handed out any assignment.
 
-## 13. Three short answers to likely questions
+## 10. Close · 3:50–4:25
 
-**“Is this really decentralised?”**
+**Click:** **Mission**. Optionally **Follow incident** → the new incident.
 
-> “The current UI models separate local knowledge. The backend design gives each actor its own n8n instance and store; no dispatcher assigns their tasks. The dashboard is an observer.”
+> “HIVE is seven independent n8n actors with no dispatcher. When the network split, each island kept saving people with what it knew. When links came back, they healed into one shared picture. And we measured it: under a blackout, a central system saves nobody; HIVE saves almost everyone, at a small, visible cost. Losing the network shouldn’t mean losing the rescue.”
 
-After integration, replace the design statement with the deployed evidence you can show.
+**Stop speaking.**
 
-**“What if two islands respond to the same incident?”**
+## 11. If something slips
 
-> “Disconnected groups can duplicate work. We reconcile reversible plans after reconnecting and measure repeated commitments and wasted travel. The current mockup does not yet implement that full conflict-handling path.”
+| Situation | Response |
+|---|---|
+| Behind at 3:10 | Say only the blackout line from §9 (29.7 vs 0), then close. |
+| Live stack won’t start or an actor is stale | Switch to the recorded backup: “I’ll show the recorded run of the same scenario.” |
+| No recording and no stack | Open `mockup/index.html` and say: **“This is our UI prototype on a simulated four-actor slice; the live system runs the same flow across seven n8n instances.”** The mockup’s **Performance comparison** shows illustrative numbers. Don’t open it; quote §9 instead. |
+| Distress text never reaches a drone | It only delivers when a drone is in range. Click **Add distress text** again (it is placed near a different drone each time). |
+| Map tiles / WebGL fail | Click **Offline**: “The basemap is unavailable; the swarm is still running.” |
+| Accidentally in recorded history | **RETURN LIVE** on Mission. |
+| Rescue not finished | Describe the response in progress. Never say “rescued” for “travelling”. |
 
-**“What happens with no peer links at all?”**
+### Don’t spend time on
+Disaster statistics, map/terrain/font details, every workflow node, JSON payloads, CAP/Byzantine theory lectures, or any number not in §9.
 
-> “An actor can only use its existing knowledge and its own sensing. A drone cannot send a new discovery to a separate rescue team without a surviving communication path.”
+## 12. Likely questions — short answers
 
-## 14. Rehearsal checklist
+**“Is it really decentralised?”**
+> “No dispatcher, no leader, no vote. Each actor has its own n8n, its own store and its own private network. The workflow build fails if any node calls a god-view endpoint like `/world` or `/metrics`, so an actor can’t be built to cheat. The dashboard only observes.”
 
-**Checked against the current UI:** a click-through rehearsal at 3× completed the newly introduced rescue in about 19 real seconds while the two islands remained disconnected. The incident was known to Drone 01 and Rescue 01, then reached all four actors after reconnection. Use the visible event and knowledge checks as your cues, rather than assuming the same wall-clock timing on every laptop.
+**“Why n8n?”**
+> “n8n is the actor runtime. With concurrency limited to one, each instance runs one execution at a time, so tick, gossip and merge can never overwrite each other. The decision logic is one pure JavaScript bundle injected into the Code nodes, so the benchmark measures the same code.”
 
-- Run the exact route three times with a timer; aim to finish the spoken close by **4:25**.
-- Verify the new incident can be delivered, responded to and, ideally, rescued during the partition at the chosen simulation speed.
-- Know where its task ID appears in the feed and knowledge table.
-- Check that restoration produces actual delivery records and matching task knowledge.
-- Decide in advance whether to use the optional analyst or a verified comparison.
-- Record one clean backup run after the final UI/backend changes.
-- Choose one presenter and one clicker if available. The clicker follows the cue sheet; the presenter watches the judges.
+**“What if two islands rescue the same person?”**
+> “That’s the price of staying available during a split, so we measure it. Planning is reversible; committing on arrival is not. In the benchmark that produced zero duplicate rescues, and about 107 cells of wasted travel under blackout. The simulator never counts a rescue twice.”
+
+**“What does Claude do?”**
+> “It turns messy distress texts into structured tasks: location, people, urgency. Its output is clamped and stays provisional until a drone’s sensor confirms it. If the call is slow or fails, a regex parser with a district gazetteer takes over.”
+
+**“What happens with no links at all?”**
+> “Each actor uses only its own memory and sensor. Teams have a short-range sensor, so HIVE still rescues 18 of 30 with zero links; central rescues none.”
+
+**“How do you know they actually converge?”**
+> “Each actor publishes a digest of its shared state; the dashboard compares digests. In the benchmark, every HIVE run converged after reconnection, about four gossip rounds after a three-island blackout.”
+
+## 13. Rehearsal checklist
+
+- [ ] Full stack up, `check-isolation.sh` passes, workflows deployed, no stale actors.
+- [ ] `node tests/e2e/checkpoint14.mjs` passes on this machine.
+- [ ] Both n8n editor tabs logged in and showing executions.
+- [ ] Distress text → island-local delivery → response seen at least once.
+- [ ] **Views agree** returns after **Restore all links**.
+- [ ] Performance comparison loads the measured data.
+- [ ] Route run three times with a timer; spoken close done by **4:25**.
+- [ ] Backup recording made after the final changes.
+- [ ] If presenting the 4-actor stack or the mockup, every “seven” in the script is changed accordingly.
