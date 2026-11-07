@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Starts 7 idle n8n instances with the HIVE memory caps, reports real memory use, then removes them.
-# Usage:  N8N_VERSION=2.x.y LIMIT=560m bash starter/scripts/memtest.sh
+# Usage:  N8N_VERSION=2.x.y LIMIT=560m bash scripts/memtest.sh
 set -euo pipefail
 V="${N8N_VERSION:-latest}"
 LIMIT="${LIMIT:-560m}"

@@ -12,7 +12,7 @@ let proc;
 const env = { ...process.env, ACTOR_ID: 'team-1', ROLE: 'team', PEERS: 'drone-1,drone-2', DB_PATH: join(dir, 's.db'), PORT: String(PORT) };
 
 function start() {
-  proc = spawn(process.execPath, [new URL('./server.mjs', import.meta.url).pathname], { env, stdio: 'ignore' });
+  proc = spawn(process.execPath, [new URL('../server.mjs', import.meta.url).pathname], { env, stdio: 'ignore' });
   return waitUp();
 }
 async function waitUp() {

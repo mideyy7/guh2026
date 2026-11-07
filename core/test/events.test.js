@@ -1,6 +1,6 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const E = require('./events.js');
+const E = require('../src/events.js');
 
 // Small seeded RNG so failures are reproducible.
 function rng(seed) { return () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 2 ** 32); }
