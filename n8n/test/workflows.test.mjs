@@ -124,8 +124,7 @@ test('workflows end to end: 7 actors find, share and rescue; digests converge; 0
   const found = new Set(evs.filter((e) => e.type === 'TASK_CREATED' && e.origin.startsWith('drone')).map((e) => e.data.survivor_id));
   assert.ok(evs.some((e) => e.type === 'RESCUED' && e.origin.startsWith('team') && found.has(e.data.survivor_id)));
   for (const a of ACTORS) assert.equal(h.stores[a].conflicts, 0);
-  // Phase 2 teams are greedy, so two teams may chase one survivor: the world still counts
-  // each survivor once. Zero duplicate attempts is asserted once CBBA is in (Phase 3).
+  assert.equal(h.world.duplicate_rescues, 0, 'CBBA: no two teams attempt the same survivor');
 });
 
 test('a cut link stops sync: drone-1 keeps emitting but nobody else learns', async () => {

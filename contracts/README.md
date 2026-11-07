@@ -96,7 +96,7 @@ Gossip = { from, sent_at /* ms */, vv: { origin: seq }, events: [Event], cbba: {
 | `type` | `data` |
 |---|---|
 | `TASK_CREATED` | `{task_id, survivor_id \| null, cell, people, urgency, provisional, source: "sensor" \| "text", resolves?}`. `resolves` is the `P-` ID a sensor detection confirms. |
-| `CELL_SEARCHED` | `{cell}` |
+| `CELL_SEARCHED` | `{cells: [cell]}`: every cell this actor newly searched this tick, in one event (older form `{cell}` is still accepted) |
 | `COMMITTED` | `{task_id}`. Irreversible. |
 | `ATTEMPT` | `{task_id, survivor_id, result}`, with `result ∈ "already_rescued" \| "not_here"` |
 | `RESCUED` | `{task_id, survivor_id}` |
@@ -110,6 +110,8 @@ Gossip = { from, sent_at /* ms */, vv: { origin: seq }, events: [Event], cbba: {
   "cbba": { "y": { "T-s07": 31.2 }, "z": { "T-s07": "team-1" }, "s": { "team-1": 1762516799000 } },
   "hint": { "pos": { "x": 3, "y": 3 }, "heading": { "x": 4, "y": 2 } } }
 ```
+
+`gossip.cbba` carries the CBBA tables only for open, uncommitted tasks, so finished tasks don't ping-pong.
 
 Rules: events are applied once each, in contiguous `seq` order per origin (gaps wait). At most `params.gossip_event_cap` events go in one message. Replaying a message changes nothing.
 
@@ -126,11 +128,15 @@ Rules: events are applied once each, in contiguous `seq` order per origin (gaps 
 
 `action ∈ "searching" | "travelling" | "rescuing" | "idle"`. `target` is `null` when idle. `digest` is 8 lowercase hex characters.
 
+`owners` covers every open confirmed task. A task someone has `COMMITTED` to is owned by its committer (the lowest actor ID if two committed during a partition); otherwise the owner is the CBBA winner, or `null`. `bundle` lists the team's committed task first, then its CBBA bundle (3 at most in total).
+
 ---
 
 ## C6. Core API (Dev B; the n8n shell and the benchmark call it the same way)
 
-`core/dist/hive-core.js` defines one global, `HiveCore`, plus a guarded `module.exports`. It has no `require` or `import` statements. All functions are pure: the caller passes the time in (`nowMs`) and does all the I/O.
+`core/dist/hive-core.js` defines one global, `HiveCore`, plus a guarded `module.exports`. It has no `require` or `import` statements. The functions are deterministic and do no I/O: the caller passes the time in (`nowMs`) and does all the I/O.
+
+**Ownership:** each function takes ownership of the `state` you pass in. It may modify that object and returns the new state. Copying a 135 KB state on every call took 90% of the run time, so the core doesn't copy. Both real callers already work this way: n8n parses fresh JSON on every execution, and the benchmark chains each returned state into the next call. If you need the old state afterwards, copy it yourself. Events are never modified after they're created.
 
 ```js
 HiveCore.init(config, nowMs)                         → state

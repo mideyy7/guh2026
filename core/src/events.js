@@ -17,7 +17,7 @@ const HiveEvents = (() => {
   // Effects of an event on the replicated sets. Idempotent by construction (sets).
   function applyOne(log, ev) {
     log.events[ev.id] = ev;
-    if (ev.type === 'CELL_SEARCHED') log.searched[ev.data.cell] = true;
+    if (ev.type === 'CELL_SEARCHED') for (const c of ev.data.cells || [ev.data.cell]) log.searched[c] = true;
     if (ev.type === 'RESCUED') log.rescued[ev.data.survivor_id] = true;
   }
 
@@ -45,13 +45,15 @@ const HiveEvents = (() => {
 
   // Anti-entropy: events a peer is missing, given the last version vector it told us.
   // Only applied (contiguous) events are ever sent, in seq order per origin, capped.
+  // Applied events are contiguous per origin (1..vv[origin]), so walk straight from the
+  // peer's vv instead of scanning the whole log: O(missing), not O(log).
   function missingFor(log, peerVV, limit = 200) {
     const out = [];
-    for (const ev of Object.values(log.events)) {
-      if (ev.seq > (peerVV[ev.origin] || 0)) out.push(ev);
+    for (const origin of Object.keys(log.vv).sort()) {
+      for (let q = (peerVV[origin] || 0) + 1; q <= log.vv[origin] && out.length < limit; q++) out.push(log.events[`${origin}:${q}`]);
+      if (out.length >= limit) break;
     }
-    out.sort((a, b) => (a.origin < b.origin ? -1 : a.origin > b.origin ? 1 : a.seq - b.seq));
-    return out.slice(0, limit);
+    return out;
   }
 
   return { emptyLog, emit, receive, missingFor };

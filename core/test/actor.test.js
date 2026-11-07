@@ -41,10 +41,11 @@ test('a gossip body carries vv, events, a position hint, and only what the peer 
   const { messages } = H.gossip(a, NOW);
   assert.equal(messages.length, 6);
   const body = messages[0].body;
-  assert.deepEqual(Object.keys(body).sort(), ['events', 'from', 'hint', 'sent_at', 'vv']);
-  assert.equal(body.events.length, 2);
+  assert.deepEqual(Object.keys(body).sort(), ['cbba', 'events', 'from', 'hint', 'sent_at', 'vv']);
+  assert.equal(body.events.length, 1, 'one CELL_SEARCHED event per tick');
+  assert.deepEqual(body.events[0].data.cells, ['0-0', '0-1']);
   // The peer tells us it has everything → next gossip to it is empty.
-  a = H.merge(a, { from: messages[0].to, sent_at: NOW, vv: { 'drone-1': 2 }, events: [] }, NOW);
+  a = H.merge(a, { from: messages[0].to, sent_at: NOW, vv: { 'drone-1': 1 }, events: [] }, NOW);
   assert.equal(H.gossip(a, NOW).messages.find((m) => m.to === messages[0].to).body.events.length, 0);
 });
 
@@ -68,21 +69,24 @@ test('simulated 4-actor run: after one gossip round, searched/rescued sets and d
 test('rescue receipts: rescued → RESCUED, already_rescued/not_here → ATTEMPT; the intent is cleared', () => {
   let t = H.init(cfg('team-1'), NOW);
   t = H.perceive(t, { tick: 1, sense: sense(1, { x: 2, y: 2 }, [{ survivor_id: 's1', cell: '2-2', people: 1, urgency: 3 }]) }, NOW);
+  t = H.bid(t, NOW);                                  // the tick runs perceive → bid → act
+  assert.deepEqual(t.view.bundle, ['T-s1']);
   const out = H.act(t, { hq: null }, NOW);
+  const copy = () => JSON.parse(JSON.stringify(out.state));   // core functions take ownership
   const rescue = out.actions.find((a) => a.kind === 'rescue');
   assert.equal(rescue.key, 'team-1:T-s1:rescue');
   assert.ok(out.state.intents[rescue.key], 'intent written before acting');
-  const done = H.applyReceipts(out.state, [{ action: rescue, response: { result: 'rescued', tick: 1 } }], NOW);
+  const done = H.applyReceipts(copy(), [{ action: rescue, response: { result: 'rescued', tick: 1 } }], NOW);
   assert.deepEqual(done.intents, {});
   assert.deepEqual(Object.keys(done.log.rescued), ['s1']);
   assert.equal(Object.values(done.log.events).filter((e) => e.type === 'RESCUED').length, 1);
 
-  const other = H.applyReceipts(out.state, [{ action: rescue, response: { result: 'already_rescued', tick: 1 } }], NOW);
+  const other = H.applyReceipts(copy(), [{ action: rescue, response: { result: 'already_rescued', tick: 1 } }], NOW);
   const ev = Object.values(other.log.events).find((e) => e.type === 'ATTEMPT');
   assert.equal(ev.data.result, 'already_rescued');
   assert.ok(other.gone.s1);
 
-  const failed = H.applyReceipts(out.state, [{ action: rescue, response: null }], NOW);
+  const failed = H.applyReceipts(copy(), [{ action: rescue, response: null }], NOW);
   assert.ok(failed.intents[rescue.key], 'a failed call keeps the intent so it is retried with the same key');
 });
 
