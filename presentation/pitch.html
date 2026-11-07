@@ -1,0 +1,248 @@
+<title>HIVE Pitch</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one full-height section per pitch beat; arrow keys / buttons step through; N shows speaker notes. */
+:root{
+  --bg:#f7f6f1; --panel:#ffffff; --ink:#1d2622; --muted:#5f6a64; --line:#dcdcd2;
+  --hive:#284c3f; --hive-soft:#e3ece6; --amber:#c98a2a; --amber-soft:#f6ead2; --danger:#a8432f;
+  --note-bg:#1d2622; --note-ink:#eef1ec;
+  --display:"Libre Baskerville",Georgia,"Times New Roman",serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121815; --panel:#1a221e; --ink:#e9ece7; --muted:#a1aca5; --line:#2e3833;
+  --hive:#7fc3a3; --hive-soft:#1f3229; --amber:#ecaf56; --amber-soft:#33291a; --danger:#e58a72;
+  --note-bg:#e9ece7; --note-ink:#121815; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121815; --panel:#1a221e; --ink:#e9ece7; --muted:#a1aca5; --line:#2e3833;
+  --hive:#7fc3a3; --hive-soft:#1f3229; --amber:#ecaf56; --amber-soft:#33291a; --danger:#e58a72;
+  --note-bg:#e9ece7; --note-ink:#121815; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:17px/1.55 var(--body);margin:0}
+.deck{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+section{min-height:100vh;display:flex;flex-direction:column;justify-content:center;gap:28px;max-width:1080px;margin:0 auto;padding-block:72px;border-bottom:1px solid var(--line)}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.eyebrow b{color:var(--hive);font-weight:500}
+h1,h2{font-family:var(--display);font-weight:400;text-wrap:balance;margin:0;letter-spacing:-.01em}
+h1{font-size:clamp(40px,7vw,84px);line-height:1.05}
+h2{font-size:clamp(30px,4.6vw,54px);line-height:1.1}
+h1 em,h2 em{color:var(--hive);font-style:italic}
+.lead{font-size:clamp(18px,2vw,22px);max-width:62ch;color:var(--muted);margin:0}
+.lead strong{color:var(--ink);font-weight:600}
+.quote{font-family:var(--mono);font-size:clamp(15px,1.8vw,19px);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px 20px;max-width:62ch;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.quote .sending{font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:3px 10px;display:inline-flex;gap:6px;align-items:center}
+.quote .sending i{width:7px;height:7px;border-radius:50%;background:var(--amber);animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.25}}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.stat strong{font:400 clamp(30px,4vw,42px)/1 var(--display);color:var(--ink);font-variant-numeric:tabular-nums}
+.stat span{font-size:14px;color:var(--muted)}
+.stat small{font:400 11px/1.4 var(--mono);color:var(--muted);letter-spacing:.04em}
+.two{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:28px;align-items:start}
+.points{display:grid;gap:14px;margin:0;padding:0;list-style:none}
+.points li{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start}
+.points li::before{content:"";width:10px;height:10px;margin-top:8px;border-radius:50%;background:var(--hive)}
+.demo{background:var(--hive-soft);border-radius:12px;padding:20px 22px;display:grid;gap:12px;min-width:0}
+.demo h3{margin:0;font:600 12px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--hive)}
+.demo ol{margin:0;padding-left:20px;display:grid;gap:8px}
+.demo kbd{font:500 13px/1 var(--mono);background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:2px 6px;white-space:nowrap}
+.flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.wf{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:6px;min-width:0}
+.wf code{font:500 14px/1.2 var(--mono);color:var(--hive)}
+.wf .trig{font:400 11px/1.3 var(--mono);color:var(--amber);letter-spacing:.04em;text-transform:uppercase}
+.wf p{margin:0;font-size:15px;color:var(--muted)}
+.chart{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;min-width:0;overflow-x:auto}
+.chart svg{display:block;width:100%;height:auto;min-width:300px}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+.legend span{display:inline-flex;gap:8px;align-items:center}
+.legend i{width:14px;height:4px;border-radius:2px;display:inline-block}
+.big{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+.vs{display:flex;gap:16px;align-items:baseline;flex-wrap:wrap}
+.vs strong{font:400 clamp(56px,10vw,110px)/1 var(--display);font-variant-numeric:tabular-nums}
+.vs .hive{color:var(--hive)} .vs .central{color:var(--danger)}
+.vs span{color:var(--muted);font-size:15px}
+.fine{font:400 12px/1.5 var(--mono);color:var(--muted);max-width:80ch;margin:0}
+.notes{display:none;background:var(--note-bg);color:var(--note-ink);border-radius:10px;padding:16px 18px;font-size:15px;max-width:80ch}
+.notes p{margin:0 0 6px} .notes p:last-child{margin:0}
+.notes b{font-weight:600}
+body.show-notes .notes{display:block}
+.nav{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));display:flex;gap:8px;z-index:5}
+.nav button{font:500 13px/1 var(--mono);background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px 12px;cursor:pointer}
+.nav button:focus-visible{outline:2px solid var(--hive);outline-offset:2px}
+.nav button[aria-pressed="true"]{background:var(--hive);color:var(--bg);border-color:var(--hive)}
+@media (max-width:760px){.two,.flow{grid-template-columns:1fr} section{min-height:auto;padding-block:56px}}
+@media (prefers-reduced-motion:reduce){.quote .sending i{animation:none} html{scroll-behavior:auto}}
+html{scroll-behavior:smooth}
+</style>
+
+<main class="deck">
+
+<!-- 1 -->
+<section id="story" aria-labelledby="t1">
+  <div class="eyebrow"><b>HIVE</b> · the self-healing rescue swarm · Neptune North / n8n track</div>
+  <h1 id="t1">When disaster takes out the network, <em>rescue shouldn’t go down with it.</em></h1>
+  <div class="quote"><span>“stuck on roof w/ 2 kids near the Irwell, water rising, please”</span><span class="sending"><i></i>Sending…</span></div>
+  <p class="lead">1:40 a.m., Lower Broughton, Salford. Amara’s phone mast is dead. A drone saw her eleven minutes ago, and a boat is 400 m away, but both are waiting for a central server they can no longer reach.</p>
+  <div class="stats">
+    <div class="stat"><strong>95.2%</strong><span>of Puerto Rico’s cell sites down after Hurricane Maria</span><small>FCC, 2017</small></div>
+    <div class="stat"><strong>220+</strong><span>dead in Valencia’s floods. Practically all before the alert reached phones</span><small>Spain, Oct 2024 · investigating judge</small></div>
+    <div class="stat"><strong>1.65 bn</strong><span>people affected by floods, more than 40% of all disasters</span><small>UNDRR, 2000–2019</small></div>
+    <div class="stat"><strong>6.3 m → 8 m</strong><span>English properties at flood risk, now and by 2050</span><small>Environment Agency, NaFRA 2024</small></div>
+  </div>
+  <div class="notes"><p><b>Open (20 s):</b> “You’ve seen a few drone swarms today. Ours is the one we’ve <b>measured surviving a blackout</b>: HIVE rescued 29.7 of 30 survivors; a central dispatcher rescued none.”</p><p><b>Then the story</b>, then the four numbers. End with: “Disasters take out the network first. We built a rescue swarm that keeps working when it does.”</p><p><b>Screen:</b> dashboard Mission tab, map visible.</p></div>
+</section>
+
+<!-- 2 -->
+<section id="goal" aria-labelledby="t2">
+  <div class="eyebrow"><b>Criterion 1</b> · working towards a common goal</div>
+  <h2 id="t2">Seven actors. <em>One mission score.</em></h2>
+  <div class="two">
+    <ul class="points">
+      <li><span><strong>4 drones</strong> search the flooded grid and turn sightings into rescue tasks.</span></li>
+      <li><span><strong>3 rescue teams</strong> claim tasks and bring people to safety.</span></li>
+      <li><span>Every actor maximises the same score: <strong>urgency × how fast</strong> each person is reached.</span></li>
+      <li><span>Real streets of Salford and Manchester. The flood and survivors are simulated.</span></li>
+    </ul>
+    <div class="demo"><h3>Show on the dashboard</h3><ol>
+      <li><kbd>Mission</kbd> tab: point at drones (round) and teams (square).</li>
+      <li>Orange markers are people waiting; green ticks are rescued.</li>
+      <li>“How a rescue happens” → <kbd>Follow incident</kbd>: found → shared → assigned → travelling → safe.</li>
+    </ol></div>
+  </div>
+  <div class="notes"><p><b>Say:</b> “Seven actors, one shared goal: rescue as many people as possible, most urgent first. This panel follows one rescue end to end.”</p></div>
+</section>
+
+<!-- 3 -->
+<section id="decide" aria-labelledby="t3">
+  <div class="eyebrow"><b>Criterion 2</b> · independent decision-making</div>
+  <h2 id="t3">No dispatcher. <em>Every actor decides for itself.</em></h2>
+  <div class="two">
+    <ul class="points">
+      <li><span>Each actor is its <strong>own n8n instance</strong> with its <strong>own private store</strong>.</span></li>
+      <li><span>It senses, scores tasks and bids on its own.</span></li>
+      <li><span>Peers agree using <strong>CBBA</strong>, a consensus auction with no auctioneer: higher bid wins, actor ID breaks ties, fresher information wins conflicts.</span></li>
+    </ul>
+    <div class="demo"><h3>Show on the dashboard</h3><ol>
+      <li><kbd>Swarm</kbd> → <kbd>Agent coordination</kbd> → click <kbd>Drone 02</kbd>: its own tasks, peers and group.</li>
+      <li><kbd>Insights</kbd> → <kbd>Actor knowledge</kbd>: every actor’s separate memory, side by side.</li>
+    </ol></div>
+  </div>
+  <div class="notes"><p><b>Say:</b> “This isn’t a shared database. Each column is one actor’s own belief, read from its own store.”</p></div>
+</section>
+
+<!-- 4 -->
+<section id="resilience" aria-labelledby="t4">
+  <div class="eyebrow"><b>Criterion 3</b> · resilience when communications fail</div>
+  <h2 id="t4">Cut the network. <em>The islands keep rescuing.</em></h2>
+  <div class="two">
+    <ul class="points">
+      <li><span>A <strong>chaos proxy</strong> sits between every actor. Cuts are <strong>real refused connections</strong>, not a label.</span></li>
+      <li><span>Blackout splits the swarm into <strong>three islands</strong> and cuts HQ. Each island keeps a drone and a team.</span></li>
+      <li><span>A new distress text only reaches the island whose drone is in range. Memories diverge, as they would in reality.</span></li>
+    </ul>
+    <div class="demo"><h3>Show on the dashboard</h3><ol>
+      <li><kbd>Mission</kbd> → <kbd>Simulate network blackout</kbd> (top right).</li>
+      <li>Point at “Who can still work together?”: dashed lines are cut links.</li>
+      <li><kbd>Insights</kbd> → <kbd>Add distress text</kbd>; it stays <em>Sending…</em> until a drone is in range.</li>
+      <li>Optional: <kbd>Swarm</kbd>, click any link to cut it yourself.</li>
+    </ol></div>
+  </div>
+  <div class="notes"><p><b>Say:</b> “Three islands, no HQ. Each island still has a drone and a rescue team, so it keeps searching and rescuing on its own.”</p></div>
+</section>
+
+<!-- 5 -->
+<section id="heal" aria-labelledby="t5">
+  <div class="eyebrow"><b>Criterion 4</b> · something we’re excited about</div>
+  <h2 id="t5">The swarm <em>heals itself.</em></h2>
+  <div class="two">
+    <ul class="points">
+      <li><span>Links return. Actors gossip <strong>only what each other is missing</strong>, using version vectors.</span></li>
+      <li><span>Conflicting claims are resolved by CBBA. Duplicated work is <strong>counted, never hidden</strong>.</span></li>
+      <li><span>Within seconds every actor’s view agrees again. Real distributed-systems theory, applied to saving lives.</span></li>
+    </ul>
+    <div class="demo"><h3>Show on the dashboard</h3><ol>
+      <li><kbd>Restore all connections</kbd> (top right).</li>
+      <li><kbd>Insights</kbd> → <kbd>Actor knowledge</kbd>: badge returns to “Task knowledge agrees”.</li>
+      <li>Ask the Analyst: <kbd>Explain recovery</kbd>.</li>
+    </ol></div>
+  </div>
+  <div class="notes"><p><b>Say:</b> “Planning is reversible; arriving is not. If two teams both commit, the person is rescued once and we record the duplicate. We had zero.”</p></div>
+</section>
+
+<!-- 6 -->
+<section id="n8n" aria-labelledby="t6">
+  <div class="eyebrow"><b>n8n track</b> · a real task, automated, running on its own</div>
+  <h2 id="t6">n8n <em>is</em> the dispatcher, seven times over.</h2>
+  <div class="flow">
+    <div class="wf"><code>hive-tick</code><span class="trig">webhook · every tick</span><p>Read sensors, spot survivors, bid for rescues, move, rescue.</p></div>
+    <div class="wf"><code>hive-gossip</code><span class="trig">schedule · every 4 s</span><p>Share discoveries with every team it can still reach.</p></div>
+    <div class="wf"><code>hive-merge</code><span class="trig">webhook · peer message</span><p>Merge what others found; settle who owns each rescue.</p></div>
+    <div class="wf"><code>hive-interpret</code><span class="trig">webhook · distress text</span><p>Claude turns a messy text into a structured rescue task.</p></div>
+  </div>
+  <p class="lead">The real task is <strong>rescue coordination</strong>, a human dispatcher’s job. Nobody presses run: every workflow fires itself on a schedule, a peer message or an incoming text, and keeps running when the network is cut.</p>
+  <div class="notes"><p><b>Screen:</b> second tab, Drone 02’s n8n editor (workflow list, all <b>Published</b>). Open <b>hive-tick</b> to show the canvas. <b>Don’t open Executions</b>: successful runs aren’t saved, so it looks empty.</p><p><b>If asked about the AI:</b> “If the model isn’t reachable, the workflow falls back to a rule-based parser, so it still runs on its own.”</p></div>
+</section>
+
+<!-- 7 -->
+<section id="numbers" aria-labelledby="t7">
+  <div class="eyebrow"><b>Measured</b> · 270 runs · 10 seeds per setting · same scenarios in every mode</div>
+  <h2 id="t7">Under a blackout, HIVE kept rescuing. <em>Central dispatch stopped.</em></h2>
+  <div class="vs"><strong class="hive">29.7</strong><span>of 30 survivors rescued by HIVE</span><strong class="central">0</strong><span>by central dispatch</span></div>
+  <div class="chart" role="img" aria-label="Mission score against percentage of peer links up. HIVE: 47 at 0%, 85 at 25%, 89 at 50%, 89 at 75%, 90 at 100%. Central dispatch: 0, 20, 70, 82, 91.">
+    <svg viewBox="0 0 760 330" aria-hidden="true">
+      <g font-family="IBM Plex Mono, ui-monospace, monospace" font-size="12">
+        <!-- y: score 0..100 → 280..30 ; x: 0..100% → 70..720 -->
+        <g stroke="var(--line)" stroke-width="1">
+          <line x1="70" x2="720" y1="280" y2="280"/><line x1="70" x2="720" y1="217.5" y2="217.5"/><line x1="70" x2="720" y1="155" y2="155"/><line x1="70" x2="720" y1="92.5" y2="92.5"/><line x1="70" x2="720" y1="30" y2="30"/>
+        </g>
+        <g fill="var(--muted)" text-anchor="end"><text x="60" y="284">0</text><text x="60" y="221.5">25</text><text x="60" y="159">50</text><text x="60" y="96.5">75</text><text x="60" y="34">100</text></g>
+        <g fill="var(--muted)" text-anchor="middle"><text x="70" y="302">0%</text><text x="232.5" y="302">25%</text><text x="395" y="302">50%</text><text x="557.5" y="302">75%</text><text x="720" y="302">100%</text><text x="395" y="324">peer links up</text></g>
+        <text x="18" y="155" fill="var(--muted)" transform="rotate(-90 18 155)" text-anchor="middle">mission score</text>
+        <polyline fill="none" stroke="var(--danger)" stroke-width="3" points="70,280 232.5,229.1 395,104.3 557.5,74.7 720,53.2"/>
+        <g fill="var(--panel)" stroke="var(--danger)" stroke-width="2"><circle cx="70" cy="280" r="4.5"/><circle cx="232.5" cy="229.1" r="4.5"/><circle cx="395" cy="104.3" r="4.5"/><circle cx="557.5" cy="74.7" r="4.5"/><circle cx="720" cy="53.2" r="4.5"/></g>
+        <polyline fill="none" stroke="var(--hive)" stroke-width="3.5" points="70,162.1 232.5,67.8 395,58.2 557.5,57.5 720,54.4"/>
+        <g fill="var(--hive)"><circle cx="70" cy="162.1" r="5"/><circle cx="232.5" cy="67.8" r="5"/><circle cx="395" cy="58.2" r="5"/><circle cx="557.5" cy="57.5" r="5"/><circle cx="720" cy="54.4" r="5"/></g>
+        <text x="240" y="58" fill="var(--hive)">HIVE 84.9</text><text x="240" y="246" fill="var(--danger)">central 20.4</text>
+      </g>
+    </svg>
+  </div>
+  <div class="legend"><span><i style="background:var(--hive)"></i>HIVE</span><span><i style="background:var(--danger)"></i>Central dispatch (both variants score the same here)</span></div>
+  <div class="big">
+    <div class="stat"><strong>0</strong><span>duplicated rescues in every HIVE run</span></div>
+    <div class="stat"><strong>100%</strong><span>of HIVE runs healed back into agreement</span></div>
+    <div class="stat"><strong>90.7 vs 90.2</strong><span>with every link up, central is slightly better. HIVE is built for the night it isn’t.</span></div>
+  </div>
+  <p class="fine">Mean mission score over 10 seeds, 240 ticks each, identical actors, sensors, scoring and outages per mode (bench/results/summary.csv). Central variants match because outages start at tick 1, before HQ assigns any work.</p>
+  <div class="notes"><p><b>Screen:</b> dashboard → <b>Insights</b> → <b>Performance comparison</b>, or stay on this slide.</p><p><b>Close:</b> “Most swarms keep messages flowing when the network fails. HIVE keeps <b>decisions</b> flowing. Under a blackout it rescued 29.7 of 30; central dispatch rescued none.”</p></div>
+</section>
+
+</main>
+
+<nav class="nav" aria-label="Pitch controls">
+  <button id="prev" type="button" aria-label="Previous section">↑</button>
+  <button id="next" type="button" aria-label="Next section">↓</button>
+  <button id="notes" type="button" aria-pressed="false">Notes (N)</button>
+</nav>
+
+<script>
+(() => {
+  const sections = [...document.querySelectorAll('section')];
+  const current = () => { const y = window.scrollY + window.innerHeight / 3; let i = 0; sections.forEach((s, k) => { if (s.offsetTop <= y) i = k; }); return i; };
+  const go = (d) => sections[Math.max(0, Math.min(sections.length - 1, current() + d))].scrollIntoView({ block: 'start' });
+  const notesBtn = document.getElementById('notes');
+  const setNotes = (on) => { document.body.classList.toggle('show-notes', on); notesBtn.setAttribute('aria-pressed', String(on)); try { localStorage.setItem('hive-notes', on ? '1' : '0'); } catch (e) {} };
+  try { setNotes(localStorage.getItem('hive-notes') === '1'); } catch (e) {}
+  document.getElementById('prev').onclick = () => go(-1);
+  document.getElementById('next').onclick = () => go(1);
+  notesBtn.onclick = () => setNotes(!document.body.classList.contains('show-notes'));
+  document.addEventListener('keydown', (e) => {
+    if (e.target.closest('input,textarea')) return;
+    if (['ArrowDown', 'ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); go(1); }
+    else if (['ArrowUp', 'ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); go(-1); }
+    else if (e.key.toLowerCase() === 'n') setNotes(!document.body.classList.contains('show-notes'));
+  });
+})();
+</script>
