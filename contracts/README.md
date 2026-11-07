@@ -1,0 +1,172 @@
+# HIVE contracts
+
+These shapes are **frozen** after Phase 0. A change needs both Dev A and Dev B to agree, and must be made here first, in the same commit as the code that uses it.
+
+The values in [params.json](params.json) are the only source of shared constants. The world, the core, HQ and the benchmark all read that file. Nobody hard-codes a constant from it.
+
+**Field naming:** every JSON field in every contract is `snake_case`. (The starter `events.js` used `data.survivorId` for `RESCUED`. Phase 1 renames it to `survivor_id` to match C4.)
+
+---
+
+## IDs
+
+| Thing | Format | Examples |
+|---|---|---|
+| Actor | `drone-1`…`drone-4`, `team-1`…`team-3`; `hq` (central baselines only) | `team-2` |
+| Cell | `"x-y"`, with `x, y ∈ 0..7` (from `params.grid`) | `"3-5"` |
+| Position | `{x, y}` integers | `{"x":3,"y":5}` |
+| Tick | integer starting at 0 | `17` |
+| Event | `<origin>:<seq>` | `"drone-1:17"` |
+| Confirmed task | `T-<survivor_id>` (the same on every actor that detects the survivor) | `"T-s07"` |
+| Provisional task | `P-<msg_id>` (made from a distress text, not confirmed by a sensor yet) | `"P-m12"` |
+| Action key | `<actor>:<task>:<verb>` for rescues; `<actor>:<tick>:move` for moves | `"team-1:T-s07:rescue"` |
+
+Distance is **Chebyshev** (diagonal moves allowed): `max(|dx|, |dy|)`.
+
+---
+
+## C1. Actor store (Dev A, already built: [services/store](../services/store))
+
+Each actor reaches its own store at `http://store:4000`.
+
+| Call | Request | Response |
+|---|---|---|
+| `GET /config` | — | `{actor_id, role, mode, peers[]}` |
+| `GET /state` | — | `{config, version, state}`, where `state` is `null` before the first write |
+| `PUT /state` | `{version, state}` | `200 {version}` (the new version), or `409 {error, current}` if `version` is stale |
+| `POST /reset` | — | `200 {version: 0}`. Clears state (used by the scenario runner). |
+| `GET /health` | — | `{ok, conflicts, actor_id, role, mode, peers}`. `conflicts` counts 409s since start; acceptance requires 0. |
+
+```json
+// GET /state on a fresh store
+{ "config": { "actor_id": "team-1", "role": "team", "mode": "hive", "peers": ["drone-1","drone-2","drone-3","drone-4","team-2","team-3"] },
+  "version": 0, "state": null }
+
+// PUT /state
+{ "version": 0, "state": { "view": { "actor_id": "team-1" } } }      // → 200 { "version": 1 }
+```
+
+`role ∈ {"drone","team"}`, `mode ∈ {"hive","central-naive","central-strong"}`.
+
+---
+
+## C2. Simulator (Dev A builds, actors call it at `http://sim:3000`)
+
+| Call | Request | Response |
+|---|---|---|
+| sim → actor `POST /webhook/tick` | `{tick}` | ignored. Fire-and-forget with a 1 s timeout. |
+| `GET /sense?actor=ID` | — | see below |
+| `POST /move` | `{actor, target:{x,y}, task_id?, key}` | `{ok, pos}`. One step at the next world step. A repeated `key` is ignored. |
+| `POST /rescue` | `{actor, survivor_id, key}` | `{result, tick}`, `result ∈ "rescued" \| "already_rescued" \| "not_here"`. Idempotent per `key`. |
+| sim → drone `POST /webhook/distress` | `{msg_id, text, sent_tick, delivered_tick}` | ignored |
+| Dashboard only | `GET /world`, `GET /metrics`, `POST /control/reset {seed}`, `/control/start`, `/control/pause` | **Actors must never call these.** The build lint fails if they do. |
+
+```json
+// GET /sense?actor=drone-1
+{ "tick": 12, "actor": "drone-1", "pos": { "x": 3, "y": 3 },
+  "footprint": ["1-1","2-1","3-1","4-1","5-1", "...", "5-5"],
+  "detections": [ { "survivor_id": "s07", "cell": "4-2", "people": 3, "urgency": 4 } ] }
+```
+
+`footprint` covers the cells within `sensor_radius[role]`. `detections` lists only survivors who have appeared and aren't rescued yet.
+
+---
+
+## C3. Chaos proxy (Dev A, at `http://proxy:8080`)
+
+| Call | Request | Response |
+|---|---|---|
+| `POST /send` | `{from, to, path:"merge", body}` | `202` (queued) or `503` (link down). Delivered to `http://n8n-<to>:5678/webhook/<path>` after `delay_ms`, or dropped at `drop_rate`. |
+| `POST /rpc` | `{from, to:"hq", path, body}` | HQ's response, passed through synchronously, or `503` |
+| `GET/PUT /links` | `{allowed:{from:{to:bool}}, delay_ms, drop_rate, duplicate_rate, reorder}` | same shape |
+| `POST /links/preset` | `{name, seed?, percent?}`, `name ∈ all-up \| blackout-3 \| drones-vs-teams \| isolate-one \| flapping \| percent` | the new links |
+| `GET /log?since=n` | — | `[{n, ts, from, to, path, status, bytes}]`, `status ∈ refused \| queued \| dropped \| delivered \| failed` |
+
+`blackout-3` islands: `{drone-1, drone-2, team-1}`, `{drone-3, team-2}`, `{drone-4, team-3}`. Every link to `hq` is cut.
+
+---
+
+## C4. Events and gossip (Dev B)
+
+```js
+Event  = { id: "drone-1:17", origin: "drone-1", seq: 17, type, data, tick }
+Gossip = { from, sent_at /* ms */, vv: { origin: seq }, events: [Event], cbba: { y, z, s }, hint: { pos, heading } }
+```
+
+| `type` | `data` |
+|---|---|
+| `TASK_CREATED` | `{task_id, survivor_id \| null, cell, people, urgency, provisional, source: "sensor" \| "text", resolves?}`. `resolves` is the `P-` ID a sensor detection confirms. |
+| `CELL_SEARCHED` | `{cell}` |
+| `COMMITTED` | `{task_id}`. Irreversible. |
+| `ATTEMPT` | `{task_id, survivor_id, result}`, with `result ∈ "already_rescued" \| "not_here"` |
+| `RESCUED` | `{task_id, survivor_id}` |
+
+```json
+{ "from": "drone-1", "sent_at": 1762516800000,
+  "vv": { "drone-1": 17, "team-1": 4 },
+  "events": [ { "id": "drone-1:17", "origin": "drone-1", "seq": 17, "type": "TASK_CREATED", "tick": 12,
+                "data": { "task_id": "T-s07", "survivor_id": "s07", "cell": "4-2", "people": 3, "urgency": 4,
+                          "provisional": false, "source": "sensor" } } ],
+  "cbba": { "y": { "T-s07": 31.2 }, "z": { "T-s07": "team-1" }, "s": { "team-1": 1762516799000 } },
+  "hint": { "pos": { "x": 3, "y": 3 }, "heading": { "x": 4, "y": 2 } } }
+```
+
+Rules: events are applied once each, in contiguous `seq` order per origin (gaps wait). At most `params.gossip_event_cap` events go in one message. Replaying a message changes nothing.
+
+---
+
+## C5. `state.view` (Dev B writes it; the dashboard reads **only** this)
+
+```json
+{ "actor_id": "team-1", "role": "team", "tick": 42, "pos": { "x": 2, "y": 6 },
+  "action": "travelling", "target": { "x": 4, "y": 2 },
+  "bundle": ["T-s07", "T-s12"], "owners": { "T-s07": "team-1", "T-s12": "team-1", "T-s03": null },
+  "known_tasks": 9, "digest": "a3f9c210", "vv": { "drone-1": 17, "team-1": 4 }, "provisional": 1 }
+```
+
+`action ∈ "searching" | "travelling" | "rescuing" | "idle"`. `target` is `null` when idle. `digest` is 8 lowercase hex characters.
+
+---
+
+## C6. Core API (Dev B; the n8n shell and the benchmark call it the same way)
+
+`core/dist/hive-core.js` defines one global, `HiveCore`, plus a guarded `module.exports`. It has no `require` or `import` statements. All functions are pure: the caller passes the time in (`nowMs`) and does all the I/O.
+
+```js
+HiveCore.init(config, nowMs)                         → state
+HiveCore.perceive(state, {tick, sense}, nowMs)       → state
+HiveCore.bid(state, nowMs)                           → state      // no-op unless state.dirty
+HiveCore.act(state, {hq}, nowMs)                     → {state, actions: [{kind:"move", target, task_id, key} | {kind:"rescue", survivor_id, key}]}
+HiveCore.applyReceipts(state, receipts, nowMs)       → state
+HiveCore.hqRequest(state)                            → body | null // central modes only
+HiveCore.gossip(state, nowMs)                        → {state, messages: [{to, body}]}
+HiveCore.merge(state, body, nowMs)                   → state
+HiveCore.interpret(state, parsed | null, raw, nowMs) → state      // parsed = null → regex fallback
+HiveCore.score(pos, task, bundlePath, tick, params)  → number     // shared with HQ for a fair baseline
+HiveCore.sharedDigest(state)                         → string
+HiveCore.PARAMS
+```
+
+`receipts` are the simulator's responses, each paired with the action that produced it: `[{action, response}]`.
+
+---
+
+## C7. Shared parameters
+
+See [params.json](params.json). A team speed of `0.5` means one cell every 2 ticks. `score = w1·urgency·exp(−(age+eta)/tau_ticks) − w2·eta − w3·|path|`.
+
+Two keys go beyond the plan's C7 example: `gossip_event_cap` (the 200-event gossip cap) and `commit_radius` (the Phase 3 experiment flag, default 0 = commit on arrival). Neither changes any existing value.
+
+---
+
+## Phase 0 spike results
+
+| Spike | Owner | Result | Notes |
+|---|---|---|---|
+| S1 memory under load | A | pending | |
+| S2 deploy via CLI | B | pending | needs Docker |
+| S3 concurrency = 1 serialises | B | pending | needs Docker |
+| S4 injected core in a Code node | B | see below | |
+| S5 network isolation | A | pending | |
+| S6 shared credential | B | pending | needs Docker |
+| S7 AI with Haiku 5.5 | B | see below | |
