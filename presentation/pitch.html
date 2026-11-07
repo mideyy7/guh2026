@@ -123,7 +123,7 @@ html{scroll-behavior:smooth}
     <ul class="points">
       <li><span>Each actor is its <strong>own n8n instance</strong> with its <strong>own private store</strong>.</span></li>
       <li><span>It senses, scores tasks and bids on its own.</span></li>
-      <li><span>Peers agree using <strong>CBBA</strong>, a consensus auction with no auctioneer: higher bid wins, actor ID breaks ties, fresher information wins conflicts.</span></li>
+      <li><span>Peers agree using <strong>CBBA (Consensus-Based Bundle Algorithm)</strong>: each actor builds a “bundle” of rescues it bids for, then peers reach consensus with no auctioneer. Higher bid wins, actor ID breaks ties, fresher information wins conflicts.</span></li>
     </ul>
     <div class="demo"><h3>Show on the dashboard</h3><ol>
       <li><kbd>Swarm</kbd> → <kbd>Agent coordination</kbd> → click <kbd>Drone 02</kbd>: its own tasks, peers and group.</li>
@@ -199,7 +199,7 @@ html{scroll-behavior:smooth}
   <div class="two">
     <ul class="points">
       <li><span><strong>Triggers start everything.</strong> A <strong>Schedule Trigger</strong> runs gossip every 4 seconds; <strong>Webhook</strong> triggers fire on each tick, each peer message and each distress text. Nobody presses run.</span></li>
-      <li><span><strong>Code nodes are the brain.</strong> The CBBA allocation, version-vector merging and search logic run in n8n Code nodes, the same code we unit-tested and benchmarked over 270 runs.</span></li>
+      <li><span><strong>Code nodes are the brain.</strong> The CBBA (Consensus-Based Bundle Algorithm) allocation, version-vector merging and search logic run in n8n Code nodes, the same code we unit-tested and benchmarked over 270 runs.</span></li>
       <li><span><strong>HTTP Request nodes are the senses and the radio.</strong> They read the actor’s sensors, call Claude to read distress texts, save to the actor’s own store, and send gossip through the network.</span></li>
       <li><span><strong>One execution at a time per actor.</strong> We set n8n’s concurrency limit to 1, so each instance behaves like a true actor: it handles one message at a time and never corrupts its own memory.</span></li>
     </ul>
