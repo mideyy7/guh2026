@@ -186,6 +186,33 @@ html{scroll-behavior:smooth}
   <div class="notes"><p><b>Screen:</b> second tab, Drone 02’s n8n editor (workflow list, all <b>Published</b>). Open <b>hive-tick</b> to show the canvas. <b>Don’t open Executions</b>: successful runs aren’t saved, so it looks empty.</p><p><b>If asked about the AI:</b> “If the model isn’t reachable, the workflow falls back to a rule-based parser, so it still runs on its own.”</p></div>
 </section>
 
+<!-- 6b -->
+<section id="built-on-n8n" aria-labelledby="t6b">
+  <div class="eyebrow"><b>Built on n8n</b> · not a script with n8n on the side</div>
+  <h2 id="t6b">Every decision in HIVE <em>runs inside an n8n workflow.</em></h2>
+  <div class="big">
+    <div class="stat"><strong>7</strong><span>independent n8n instances, one per drone or rescue team</span></div>
+    <div class="stat"><strong>28</strong><span>live, published workflows across the swarm (4 per actor)</span></div>
+    <div class="stat"><strong>196</strong><span>n8n nodes doing the work: 28 in every actor</span></div>
+    <div class="stat"><strong>0</strong><span>central servers. No workflow ever calls another actor’s n8n directly</span></div>
+  </div>
+  <div class="two">
+    <ul class="points">
+      <li><span><strong>Triggers start everything.</strong> A <strong>Schedule Trigger</strong> runs gossip every 4 seconds; <strong>Webhook</strong> triggers fire on each tick, each peer message and each distress text. Nobody presses run.</span></li>
+      <li><span><strong>Code nodes are the brain.</strong> The CBBA allocation, version-vector merging and search logic run in n8n Code nodes, the same code we unit-tested and benchmarked over 270 runs.</span></li>
+      <li><span><strong>HTTP Request nodes are the senses and the radio.</strong> They read the actor’s sensors, call Claude to read distress texts, save to the actor’s own store, and send gossip through the network.</span></li>
+      <li><span><strong>One execution at a time per actor.</strong> We set n8n’s concurrency limit to 1, so each instance behaves like a true actor: it handles one message at a time and never corrupts its own memory.</span></li>
+    </ul>
+    <div class="demo"><h3>Why n8n fits this problem</h3><ol>
+      <li><strong>Visible decisions.</strong> Judges, operators or a rescue coordinator can open any actor and see exactly how it decides.</li>
+      <li><strong>Independent by design.</strong> Each instance has its own triggers, memory and failures. Cut its network and it keeps running.</li>
+      <li><strong>Easy to extend.</strong> Adding a supply drone or an SMS gateway is a new workflow, not a rewrite.</li>
+      <li><strong>Identical everywhere.</strong> All seven actors run byte-identical workflows; the role comes from each actor’s own store.</li>
+    </ol></div>
+  </div>
+  <div class="notes"><p><b>Screen:</b> stay on Drone 02’s n8n editor. Open <b>hive-tick</b> and point along the canvas: Webhook → read state → sense → Perceive → Bid → Act → write state → simulator.</p><p><b>Say:</b> “Everything you saw the drones do was an n8n workflow firing on its own. Seven instances, twenty-eight workflows, no central server.”</p></div>
+</section>
+
 <!-- 7 -->
 <section id="numbers" aria-labelledby="t7">
   <div class="eyebrow"><b>Measured</b> · 270 runs · 10 seeds per setting · same scenarios in every mode</div>
