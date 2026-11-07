@@ -1,0 +1,114 @@
+{
+  "id": "hiveMerge0000001",
+  "name": "hive-merge",
+  "active": false,
+  "nodes": [
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "webhookId": "350ca8af-17ed-428f-a2b2-cc682c773877",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "merge",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "position": [
+        0,
+        0
+      ],
+      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+    },
+    {
+      "name": "Get State",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "parameters": {
+        "url": "http://store:4000/state",
+        "options": {
+          "timeout": 3000
+        }
+      },
+      "position": [
+        220,
+        0
+      ],
+      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "parameters": {
+        "jsCode": "//@@HIVE_CORE@@\nconst s = $('Get State').first().json;\nconst now = Date.now();\nconst state = HiveCore.merge(s.state ?? HiveCore.init(s.config, now), $('Webhook').first().json.body, now);\nreturn [{ json: { version: s.version, state } }];\n"
+      },
+      "position": [
+        440,
+        0
+      ],
+      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+    },
+    {
+      "name": "Put State",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "parameters": {
+        "method": "PUT",
+        "url": "http://store:4000/state",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ version: $json.version, state: $json.state }) }}",
+        "options": {
+          "timeout": 3000
+        }
+      },
+      "position": [
+        660,
+        0
+      ],
+      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get State",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get State": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Put State",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "none"
+  },
+  "pinData": {},
+  "tags": []
+}

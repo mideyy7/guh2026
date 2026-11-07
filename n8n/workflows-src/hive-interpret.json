@@ -1,0 +1,31 @@
+{
+  "id": "hiveInterpret001",
+  "name": "hive-interpret",
+  "active": false,
+  "nodes": [
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "webhookId": "350ca8af-17ed-428f-a2b2-cc682c773877",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "distress",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "position": [
+        0,
+        0
+      ],
+      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+    }
+  ],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "none"
+  },
+  "pinData": {},
+  "tags": []
+}

@@ -163,6 +163,14 @@ const HiveCore = (() => {
     return refresh(s);
   }
 
+  // ---------- central modes (Phase 4) ----------
+  // The report a team or drone sends to HQ each tick; null in hive mode (HQ isn't used).
+  function hqRequest(s) {
+    if (s.config.mode === 'hive') return null;
+    return { actor: s.config.actor_id, role: s.config.role, tick: s.tick, pos: s.pos,
+      detections: s.last_detections || [], done: [] };
+  }
+
   // ---------- gossip / merge ----------
   function gossip(state, nowMs) {
     const s = clone(state);
@@ -219,7 +227,7 @@ const HiveCore = (() => {
   }
 
   return {
-    init, perceive, bid, act, applyReceipts, gossip, merge, sharedDigest,
+    init, perceive, bid, act, applyReceipts, hqRequest, gossip, merge, sharedDigest,
     score: (pos, task, path, tick, params) => S.score(pos, task, path, tick, params || P),
     PARAMS: P,
     GAZETTEER: HIVE_GAZETTEER,
