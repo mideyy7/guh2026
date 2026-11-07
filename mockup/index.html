@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#142b29"><title>HIVE · Rescue operations</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script defer src="app.js"></script>
+</head>
+<body>
+<aside class="sidebar">
+<a class="brand" href="#" aria-label="HIVE home"><span class="brandmark">⬡</span> HIVE<span class="brand-dot">.</span></a>
+<div class="workspace"><span class="workspace-icon">M</span><div>Manchester flood response<small>TRAINING ENVIRONMENT</small></div></div>
+<div class="nav-label">MISSION CONTROL</div>
+<nav aria-label="Main navigation">
+<button class="nav-item active" data-view="operations"><i data-icon="map"></i>Overview<span class="nav-live"></span></button>
+<button class="nav-item" data-view="network"><i data-icon="network"></i>Swarm network<span class="nav-count">4</span></button>
+<button class="nav-item" data-view="beliefs"><i data-icon="layers"></i>Actor beliefs</button>
+<button class="nav-item" data-view="benchmark"><i data-icon="chart"></i>Benchmarks</button>
+</nav>
+<div class="sidebar-note"><div class="mini-orbit">✳</div><h3>One mission.<br>Many minds.</h3><p>Independent actors.<br>Shared purpose.</p><div class="sidebar-rule"></div><span class="status-dot"></span> Local decisions, always.</div>
+<div class="sidebar-bottom"><span class="avatar">GU</span><div>GreatUniHack 2026<small>Neptune North Challenge</small></div></div>
+</aside>
+<main>
+<header class="topbar"><div class="breadcrumb">Mission control <span>/</span> <strong id="breadcrumb">Overview</strong></div><div class="topbar-right"><span class="demo-tag">INTERACTIVE MOCKUP</span><span class="local-clock" id="clock"></span><button class="icon-button" id="help-button" aria-label="About this demo"><i data-icon="help"></i></button></div></header>
+<div class="page-body">
+<section class="page-heading"><div><div class="eyebrow"><span class="status-dot"></span> OPERATION IRWELL <span class="eyebrow-divider">/</span> SIMULATION</div><h1 id="page-title">Every second. Every connection.</h1><p id="page-description">A shared mission, coordinated independently. Watch the swarm work.</p></div><button class="button secondary" id="reset-button"><i data-icon="reset"></i>Reset demo</button></section>
+<section class="metrics" aria-label="Mission metrics">
+<article class="metric"><div class="metric-label">Survivors rescued<i data-icon="people"></i></div><div class="metric-number"><span id="rescued-value">12</span><span class="metric-total" id="rescued-total">/ 24</span><span class="metric-badge" id="rescued-badge">+2 this minute</span></div><div class="metric-foot"><span class="tiny-bar"><span id="rescue-progress"></span></span><span id="rescue-percent">50% of known survivors</span></div></article>
+<article class="metric"><div class="metric-label">Active actors<i data-icon="network"></i></div><div class="metric-number">4<span class="metric-total">/ 4</span><span class="small-spark">▂ ▄ ▃ ▆ ▅ █ ▆</span></div><div class="metric-foot"><span class="status-dot"></span>2 drones · 2 rescue teams</div></article>
+<article class="metric"><div class="metric-label">Mission score<i data-icon="chart"></i></div><div class="metric-number"><span id="score-value">840</span><span class="metric-unit">pts</span><span class="score-trend">↗</span></div><div class="metric-foot">Urgency weighted · time adjusted</div></article>
+<article class="metric"><div class="metric-label">Peer connectivity<i data-icon="signal"></i></div><div class="metric-number"><span id="link-value">100</span><span class="metric-unit">%</span><span class="connection-tag" id="connection-tag">Connected</span></div><div class="metric-foot" id="link-caption">6 of 6 peer links available</div></article>
+</section>
+<div id="operations-view" class="view">
+<div class="operations-grid">
+<section class="panel map-panel">
+<div class="panel-heading"><div><h2>Live operations <span class="live-pill"><span class="status-dot"></span>LIVE DEMO</span></h2><p>Manchester & Salford <span>·</span> <span id="map-status">All actors connected</span></p></div><div class="segmented" aria-label="Map display"><button class="selected" id="schematic-button">Schematic</button><button id="street-button">Street map</button></div></div>
+<div class="map-shell" id="map-shell">
+<div id="street-map" aria-label="Geographic Manchester map"></div>
+<svg id="simulation-map" viewBox="0 0 1000 610" role="img" aria-label="Illustrative Manchester rescue map with simulated actors, incidents and communication links">
+<defs><pattern id="map-grid" width="80" height="80" patternUnits="userSpaceOnUse"><path d="M80 0H0V80" fill="none" stroke="#cfdbd3" stroke-width=".8" stroke-dasharray="3 5"/></pattern><pattern id="buildings" width="110" height="84" patternUnits="userSpaceOnUse" patternTransform="rotate(-23)"><rect x="12" y="12" width="34" height="23" rx="3" fill="#e2e6de"/><rect x="58" y="12" width="40" height="23" rx="3" fill="#e2e6de"/><rect x="12" y="48" width="42" height="22" rx="3" fill="#e2e6de"/><rect x="66" y="48" width="32" height="22" rx="3" fill="#e2e6de"/></pattern><filter id="marker-shadow"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-opacity=".13"/></filter></defs>
+<rect width="1000" height="610" fill="#edf0e8"/><rect width="1000" height="610" fill="url(#buildings)" opacity=".65"/>
+<path d="M0 80L180 0H310L180 205L0 240Z M740 465L1000 410V610H850Z" fill="#dce7d9"/>
+<g fill="none" stroke="#fafbf5" stroke-width="16"><path d="M-50 490L1030 60M-40 210L1020 510M140 -30L640 650M500 -50L1000 500M300 650L760 -30"/><path d="M0 330L1000 340" stroke-width="9"/><path d="M100 0L440 610M720 0L350 610" stroke-width="7"/></g>
+<path d="M230 -30C180 100 370 130 290 245S370 360 430 440S420 565 540 650" fill="none" stroke="#c3ddd6" stroke-width="83" opacity=".5"/><path d="M230 -30C180 100 370 130 290 245S370 360 430 440S420 565 540 650" fill="none" stroke="#a3cbc5" stroke-width="29"/>
+<path d="M220 90C130 190 180 345 320 330L440 475L490 440L367 263L370 150Z" fill="#a1d3d0" opacity=".3" stroke="#79b6b3" stroke-dasharray="5 7"/>
+<g fill="none" stroke="#fafbf5" stroke-width="9"><path d="M210 80L295 105M245 245L338 245M367 375L420 355M421 470L490 445"/></g>
+<rect width="1000" height="610" fill="url(#map-grid)"/>
+<g class="district-labels"><text x="110" y="150">SALFORD</text><text x="465" y="190">GREENGATE</text><text x="740" y="130">NORTHERN QUARTER</text><text x="600" y="400" class="city-label">Manchester</text><text x="95" y="490">ORDSALL</text><text x="700" y="535">PICCADILLY</text><text x="237" y="375" transform="rotate(48 237 375)" class="river-label">RIVER IRWELL</text></g>
+<g id="island-shapes"></g><g id="route-layer"></g><g id="link-layer"></g><g id="incident-layer"></g><g id="actor-layer"></g>
+</svg>
+<div class="map-top-overlay"><span class="map-live"><span class="status-dot"></span> SIM T+<span id="sim-time">04:20</span></span><span class="map-mode-label" id="map-mode-label">ILLUSTRATIVE GEOGRAPHY</span></div>
+<div class="map-controls"><button id="zoom-in" aria-label="Zoom in">+</button><button id="zoom-out" aria-label="Zoom out">−</button><button id="recenter" aria-label="Reset map view"><i data-icon="locate"></i></button></div>
+<div class="map-legend"><span><b class="legend-drone">✳</b>Drone</span><span><b class="legend-team">▣</b>Rescue team</span><span><b class="legend-incident"></b>Incident</span><span><b class="legend-flood"></b>Flood zone</span></div>
+<div class="map-scale">━━━━<br>~500 m · schematic</div>
+</div>
+<div class="map-footer"><span><span class="status-dot"></span>Observer view <span class="muted">· ground truth visible</span></span><button id="pause-button"><i data-icon="pause"></i>Pause simulation</button></div>
+</section>
+<aside class="right-panels">
+<section class="panel network-panel"><div class="panel-heading compact"><h2>Network resilience</h2><i data-icon="signal"></i></div><div class="network-status"><span class="large-status-dot" id="network-light"></span><div><strong id="network-status-title">One connected swarm</strong><p id="network-status-description">Discoveries travel between all actors.</p></div></div><div class="network-visual" id="mini-network"></div><button class="button blackout-button" id="blackout-button"><i data-icon="bolt"></i>Simulate network blackout</button><p class="helper" id="network-helper">Cuts cross-group links. Each island retains a drone and a team.</p></section>
+<section class="panel incident-panel"><div class="panel-heading compact"><h2>Priority incident</h2><span class="urgency-badge">P1 · CRITICAL</span></div><div class="incident-title"><span class="incident-symbol">⌂</span><div><h3 id="incident-title">Family on rooftop</h3><p id="incident-location">Greengate · Sector C4</p></div></div><div class="incident-meta"><span><i data-icon="people"></i><span id="incident-people">3 people</span></span><span><i data-icon="water"></i>Rising water</span></div><div class="distress-quote" id="distress-text">“stuck on roof w/ 2 kids near the Irwell, water rising, please”</div><div class="incident-detail-line"><span>Task identity</span><code id="task-id">RSC-012</code></div><div class="incident-detail-line"><span>Current local owner</span><strong id="incident-owner">Rescue 01</strong></div><div class="rescue-timeline" id="rescue-timeline"></div><button class="text-button" id="inspect-button">Inspect bids & decision<i data-icon="arrow"></i></button></section>
+</aside>
+</div>
+<div class="lower-grid"><section class="panel actors-panel"><div class="panel-heading compact"><h2>The swarm <span class="count-tag">4 actors</span></h2><button class="text-button" data-view="beliefs">Compare beliefs<i data-icon="arrow"></i></button></div><div class="actor-cards" id="actor-cards"></div></section><section class="panel activity-panel"><div class="panel-heading compact"><h2>Live activity</h2><span class="subtle-label">ACTUAL DEMO EVENTS</span></div><div id="activity-feed" class="activity-feed" aria-live="polite" aria-relevant="additions"></div></section></div>
+</div>
+<div id="network-view" class="view" hidden><section class="panel full-panel"><div class="panel-heading"><div><h2>Peer communication topology</h2><p>Click a link to toggle delivery. Each line represents a bidirectional demo link.</p></div><button class="button secondary" id="restore-all">Restore all links</button></div><div id="topology" class="topology"></div><div id="recovery-panel" class="recovery-panel"></div><div class="section-note">The observer can see all actors. Actors only receive information across available peer links.</div></section></div>
+<div id="beliefs-view" class="view" hidden><section class="panel full-panel"><div class="panel-heading"><div><h2>Who knows what?</h2><p>Compare each actor’s own task knowledge. Differences are expected during a partition.</p></div><span id="agreement-badge" class="connection-tag">Views agree</span></div><div class="table-wrap"><table id="belief-table"></table></div><div class="belief-explainer"><i data-icon="layers"></i><div><strong>Separate memories. Shared purpose.</strong><p>Cut links, then inject an incident. Only the actor that detects it and its connected peers learn about it. Restore links to watch that knowledge propagate.</p></div><button class="button secondary" id="inject-button"><i data-icon="plus"></i>Inject incident</button></div></section></div>
+<div id="benchmark-view" class="view" hidden><section class="panel full-panel"><div class="panel-heading"><div><h2>Does local coordination make a difference?</h2><p>Illustrative fixture data · 10 example seeds per setting · balanced drone-and-team islands</p></div><span class="demo-tag">NOT MEASURED RESULTS</span></div><div class="benchmark-body"><div class="chart-legend"><span><b style="background:#167969"></b>HIVE</span><span><b style="background:#e5a35d"></b>Central + cached tasks</span><span><b style="background:#b6bdb8"></b>Central · idle on disconnect</span></div><div id="benchmark-chart"></div><div class="benchmark-cards"><article><span>Rescued during partition</span><strong>18 <small>/ 24</small></strong><p>Illustrative HIVE outcome</p></article><article><span>Duplicated commitments</span><strong>2</strong><p>Counted rather than hidden</p></article><article><span>Time to shared agreement</span><strong>6.2 <small>s</small></strong><p>Illustrative quiet-period recovery</p></article></div><div class="section-note">These numbers communicate the intended benchmark UI. They are demo fixtures, not evidence of performance. Real benchmarking must use identical scenario seeds, resources, scoring and documented outage schedules.</div></div></section></div>
+<footer class="page-footer"><span><b>HIVE</b> · Self-healing emergency response swarm</span><span>Demo data · No live emergency operations <span class="footer-dot">·</span> Local-first coordination</span></footer>
+</div>
+</main>
+<dialog id="detail-dialog"><div class="dialog-heading"><div><div class="eyebrow">TASK INSPECTOR</div><h2 id="dialog-title">Why this actor?</h2></div><button id="close-dialog" class="icon-button" aria-label="Close dialog">✕</button></div><div id="dialog-content"></div></dialog>
+<div id="toast" role="status" class="toast"></div>
+</body>
+</html>

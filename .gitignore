@@ -1,0 +1,11 @@
+# Secrets: never commit
+.env
+n8n/credentials/
+
+# Generated / local
+node_modules/
+n8n/build/
+bench/results/raw/
+docker-compose.yml
+.DS_Store
+.claude/
