@@ -1,5 +1,5 @@
 // Event log + version vectors + grow-only sets. Plain JS, no imports, so the same file
-// can be pasted into an n8n Code node and require()'d by Node tests and the headless sim.
+// can be pasted into an n8n Code node and also loaded by Node tests and the headless sim.
 const HiveEvents = (() => {
   function emptyLog() {
     return { seq: 0, vv: {}, pending: {}, events: {}, searched: {}, rescued: {} };
@@ -18,7 +18,7 @@ const HiveEvents = (() => {
   function applyOne(log, ev) {
     log.events[ev.id] = ev;
     if (ev.type === 'CELL_SEARCHED') log.searched[ev.data.cell] = true;
-    if (ev.type === 'RESCUED') log.rescued[ev.data.survivorId] = true;
+    if (ev.type === 'RESCUED') log.rescued[ev.data.survivor_id] = true;
   }
 
   // Receive events from a peer in any order, possibly duplicated.

@@ -155,7 +155,18 @@ HiveCore.PARAMS
 
 See [params.json](params.json). A team speed of `0.5` means one cell every 2 ticks. `score = w1·urgency·exp(−(age+eta)/tau_ticks) − w2·eta − w3·|path|`.
 
-Two keys go beyond the plan's C7 example: `gossip_event_cap` (the 200-event gossip cap) and `commit_radius` (the Phase 3 experiment flag, default 0 = commit on arrival). Neither changes any existing value.
+Three keys go beyond the plan's C7 example: `gossip_event_cap` (the 200-event gossip cap), `commit_radius` (the Phase 3 experiment flag, default 0 = commit on arrival) and `research_ticks` (20). Survivors appear over time, so a cell counts as searched for only `research_ticks` ticks. After that, drones search it again and emit a new `CELL_SEARCHED` event. None of them changes an existing value.
+
+---
+
+## C8. Gazetteer (proposed by Dev B, read by both)
+
+[gazetteer.json](gazetteer.json) holds the 8 districts. Each one is a 2×4 block of cells with a landmark cell and the aliases the regex fallback recognises. Dev A's `world/gazetteer.js` should read this file instead of defining its own, so a district name means the same cells in the world and in the core. The core embeds it at build time as `HiveCore.GAZETTEER`.
+
+| | x 0–1 | x 2–3 | x 4–5 | x 6–7 |
+|---|---|---|---|---|
+| **y 0–3** | Lower Broughton | Deansgate | Northern Quarter | Ancoats |
+| **y 4–7** | Salford Quays | Castlefield | Hulme | Piccadilly |
 
 ---
 

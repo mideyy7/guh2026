@@ -3,14 +3,25 @@
   "tick_ms": 2000,
   "horizon_ticks": 240,
   "gossip_ms": 4000,
-  "speed": { "drone": 1, "team": 0.5 },
-  "sensor_radius": { "drone": 2, "team": 1 },
+  "speed": {
+    "drone": 1,
+    "team": 0.5
+  },
+  "sensor_radius": {
+    "drone": 2,
+    "team": 1
+  },
   "distress_radius": 2,
   "bundle_max": 3,
   "tau_ticks": 60,
-  "weights": { "w1": 10, "w2": 1, "w3": 2 },
+  "weights": {
+    "w1": 10,
+    "w2": 1,
+    "w3": 2
+  },
   "survivors": 30,
   "appear_by_tick": 150,
   "gossip_event_cap": 200,
-  "commit_radius": 0
+  "commit_radius": 0,
+  "research_ticks": 20
 }

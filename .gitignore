@@ -9,3 +9,4 @@ bench/results/raw/
 docker-compose.yml
 .DS_Store
 .claude/
+core/dist/

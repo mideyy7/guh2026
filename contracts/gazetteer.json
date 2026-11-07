@@ -1,0 +1,21 @@
+{
+  "_note": "8x8 grid, x = west->east, y = north->south. Each district is a 2-wide x 4-tall block. Proposed by Dev B in Phase 0; Dev A's world/gazetteer.js reads this file so world and core agree.",
+  "districts": {
+    "Lower Broughton":  { "x": [0, 1], "y": [0, 3], "landmark": { "name": "Broughton Bridge",      "cell": "1-1" },
+                          "aliases": ["lower broughton", "broughton", "broughton bridge", "albert park", "cambridge industrial estate", "the racecourse"] },
+    "Deansgate":        { "x": [2, 3], "y": [0, 3], "landmark": { "name": "John Rylands Library",  "cell": "2-2" },
+                          "aliases": ["deansgate", "john rylands", "rylands library", "spinningfields", "beetham tower", "kendals"] },
+    "Northern Quarter": { "x": [4, 5], "y": [0, 3], "landmark": { "name": "Stevenson Square",      "cell": "5-1" },
+                          "aliases": ["northern quarter", "northern qtr", "nq", "stevenson square", "stevenson sq", "afflecks", "affleck's", "oldham street"] },
+    "Ancoats":          { "x": [6, 7], "y": [0, 3], "landmark": { "name": "Cutting Room Square",   "cell": "6-2" },
+                          "aliases": ["ancoats", "cutting room square", "cutting room sq", "royal mills", "new islington", "marina"] },
+    "Salford Quays":    { "x": [0, 1], "y": [4, 7], "landmark": { "name": "The Lowry",             "cell": "1-5" },
+                          "aliases": ["salford quays", "the quays", "quays", "the lowry", "lowry", "mediacity", "media city", "imperial war museum"] },
+    "Castlefield":      { "x": [2, 3], "y": [4, 7], "landmark": { "name": "Castlefield Bowl",      "cell": "2-6" },
+                          "aliases": ["castlefield", "castlefield bowl", "roman fort", "science museum", "science and industry museum", "the basin"] },
+    "Hulme":            { "x": [4, 5], "y": [4, 7], "landmark": { "name": "Hulme Arch Bridge",     "cell": "5-6" },
+                          "aliases": ["hulme", "hulme arch", "hulme park", "zion centre", "zion center", "birley fields"] },
+    "Piccadilly":       { "x": [6, 7], "y": [4, 7], "landmark": { "name": "Piccadilly Gardens",    "cell": "6-5" },
+                          "aliases": ["piccadilly", "picadilly", "piccadily", "piccadilly gardens", "piccadilly station", "picc", "the gardens"] }
+  }
+}
