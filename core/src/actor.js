@@ -49,9 +49,11 @@ const HiveCore = (() => {
       if (!cur) {
         s.tasks[d.task_id] = {
           task_id: d.task_id, survivor_id: d.survivor_id ?? null, cell: d.cell, people: d.people ?? null,
-          urgency: d.urgency, provisional: !!d.provisional, source: d.source, created_tick: ev.tick,
+          urgency: d.urgency, provisional: !!d.provisional, source: d.source, created_tick: ev.tick, found_by: ev.origin,
         };
-      } else if (ev.tick < cur.created_tick) cur.created_tick = ev.tick;   // order-independent
+      } else if (ev.tick < cur.created_tick || (ev.tick === cur.created_tick && ev.origin < cur.found_by)) {
+        cur.created_tick = ev.tick; cur.found_by = ev.origin;          // earliest finder wins, in any arrival order
+      }
       if (d.resolves) s.resolved[d.resolves] = d.task_id;
       s.dirty = true;
     } else if (ev.type === 'CELL_SEARCHED') {
@@ -61,6 +63,8 @@ const HiveCore = (() => {
       s.dirty = true;
     } else if (ev.type === 'ATTEMPT' || ev.type === 'RESCUED') {
       if (d.survivor_id) s.gone[d.survivor_id] = true;
+      if (ev.type === 'RESCUED') (s.rescue_log ||= []).push({ survivor_id: d.survivor_id, task_id: d.task_id, by: ev.origin, tick: ev.tick });
+      else s.attempts = (s.attempts || 0) + 1;
       s.dirty = true;
     }
   }
@@ -356,6 +360,15 @@ landmark: the place they mention, or null. hazards: short phrases.`,
       digest: sharedDigest(s),
       vv: { ...s.log.vv },
       provisional: Object.values(s.tasks).filter((t) => t.provisional && !s.resolved[t.task_id]).length,
+      // Additive fields for the e2e/acceptance checks and the activity feed:
+      mode: s.config.mode,
+      seq: s.log.seq,
+      attempts: s.attempts || 0,
+      committed: Object.keys(s.committed).length,
+      text_tasks: Object.values(s.tasks).filter((t) => t.provisional).length,
+      text_confirmed: Object.values(s.tasks).filter((t) => t.provisional && s.resolved[t.task_id]).length,
+      rescues: (s.rescue_log || []).slice().sort((a, b) => a.tick - b.tick || (a.survivor_id < b.survivor_id ? -1 : 1)).slice(-30)
+        .map((r) => ({ ...r, found_by: s.tasks[r.task_id]?.found_by ?? null })),
     };
     return s;
   }

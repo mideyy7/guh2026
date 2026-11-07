@@ -128,6 +128,8 @@ Rules: events are applied once each, in contiguous `seq` order per origin (gaps 
 
 `action ∈ "searching" | "travelling" | "rescuing" | "idle"`. `target` is `null` when idle. `digest` is 8 lowercase hex characters.
 
+**Additive fields** (Phase 5, for the e2e checks and the activity feed): `mode`; `seq` (this actor's own event counter, which must never go backwards); `attempts` (failed rescue attempts known); `committed` (tasks with a COMMITTED event); `text_tasks` and `text_confirmed` (provisional tasks from distress texts, and how many a sensor has confirmed); and `rescues`, the last 30 rescues as `{survivor_id, task_id, by, found_by, tick}`. `found_by` is whoever detected the survivor first.
+
 `owners` covers every open confirmed task. A task someone has `COMMITTED` to is owned by its committer (the lowest actor ID if two committed during a partition); otherwise the owner is the CBBA winner, or `null`. `bundle` lists the team's committed task first, then its CBBA bundle (3 at most in total).
 
 ---

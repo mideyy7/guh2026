@@ -8,6 +8,6 @@
   "scripts": {
     "build": "node core/build.mjs",
     "pretest": "node core/build.mjs",
-    "test": "node --test \"core/test/**/*.test.js\" \"world/test/**/*.test.js\" \"services/*/test/**/*.test.mjs\" \"n8n/test/**/*.test.mjs\""
+    "test": "node --test \"core/test/**/*.test.js\" \"core/test/**/*.test.mjs\" \"world/test/**/*.test.js\" \"services/*/test/**/*.test.mjs\" \"n8n/test/**/*.test.mjs\""
   }
 }
