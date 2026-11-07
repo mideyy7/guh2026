@@ -117,7 +117,9 @@ export function generate(params, { actors = null, withProbe = false, hasService 
   for (const s of included) {
     push(
       `  ${s.name}:`,
-      `    build: ./services/${s.name}`,
+      '    build:',
+      '      context: .',
+      `      dockerfile: services/${s.name}/Dockerfile`,
       `    image: hive-${s.name}:dev`,
       '    restart: unless-stopped',
       '    mem_limit: 128m',
