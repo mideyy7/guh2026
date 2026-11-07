@@ -7,6 +7,11 @@ import { startProxy } from '../server.mjs';
 let received = [];
 let mock, proxy, base;
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+// Poll until cond() is true (deliveries are async); fail loudly after `ms`.
+async function until(cond, ms = 2000, what = 'condition') {
+  const t0 = Date.now();
+  while (!(await cond())) { if (Date.now() - t0 > ms) throw new Error(`timed out waiting for ${what}`); await wait(20); }
+}
 const call = async (method, path, body) => {
   const r = await fetch(base + path, { method, headers: { 'content-type': 'application/json' }, body: body && JSON.stringify(body) });
   return { status: r.status, body: await r.json() };
@@ -31,7 +36,7 @@ test('link up: 202 at once, then delivered to the peer webhook with the body int
   await reset();
   const r = await sendMsg('drone-1', 'team-1', { vv: { 'drone-1': 3 } });
   assert.equal(r.status, 202); assert.equal(r.body.status, 'queued');
-  await wait(100);
+  await until(async () => received.length >= 1 && (await call('GET', '/log?since=0')).body.length >= 2, 2000, 'delivery');
   assert.deepEqual(received, [{ url: '/team-1/merge', body: { vv: { 'drone-1': 3 } } }]);
   const log = (await call('GET', '/log?since=0')).body;
   assert.deepEqual(log.map((e) => e.status), ['queued', 'delivered']);
@@ -62,7 +67,8 @@ test('duplicate_rate=1: the same message is delivered twice', async () => {
   await reset();
   await call('PUT', '/links', { duplicate_rate: 1 });
   await sendMsg('drone-3', 'team-2', { x: 1 });
-  await wait(100);
+  await until(() => received.length >= 2, 2000, 'two copies');
+  await wait(50);
   assert.equal(received.length, 2);
   assert.deepEqual(received[0].body, received[1].body);
 });
@@ -73,7 +79,7 @@ test('delay: delivery waits delay_ms; a link cut in flight drops the message', a
   await sendMsg('drone-1', 'drone-2');
   await wait(60);
   assert.equal(received.length, 0, 'not yet delivered');
-  await wait(160);
+  await until(() => received.length >= 1, 2000, 'delayed delivery');
   assert.equal(received.length, 1, 'delivered after delay');
   await sendMsg('drone-1', 'drone-2');
   await call('POST', '/links/toggle', { a: 'drone-1', b: 'drone-2', up: false });
@@ -87,7 +93,7 @@ test('reorder: with jitter, a burst can arrive out of order but none is lost', a
   await reset();
   await call('PUT', '/links', { delay_ms: 20, reorder: true });
   for (let i = 0; i < 20; i++) await sendMsg('drone-4', 'team-3', { i });
-  await wait(400);
+  await until(() => received.length >= 20, 3000, '20 deliveries');
   const order = received.map((r) => r.body.i);
   assert.equal(order.length, 20);
   assert.deepEqual([...order].sort((a, b) => a - b), [...Array(20).keys()]);
@@ -101,7 +107,8 @@ test('blackout-3 preset: within-island delivered, cross-island refused, islands 
   assert.equal((await sendMsg('drone-1', 'team-1')).status, 202);
   assert.equal((await sendMsg('drone-1', 'team-2')).status, 503);
   assert.equal((await sendMsg('drone-3', 'team-2')).status, 202);
-  await wait(80);
+  await until(() => received.length >= 2, 2000, 'both within-island deliveries');
+  await wait(50);
   assert.deepEqual(received.map((r) => r.url).sort(), ['/team-1/merge', '/team-2/merge']);
 });
 
@@ -132,7 +139,8 @@ test('validation: unknown actors, self-send, sending to hq via /send, bad settin
 
 test('log?since returns only newer entries', async () => {
   await reset();
-  await sendMsg('drone-1', 'team-1'); await wait(60);
+  await sendMsg('drone-1', 'team-1');
+  await until(async () => (await call('GET', '/log?since=0')).body.length >= 2, 2000, 'log entries');
   const all = (await call('GET', '/log?since=0')).body;
   const newer = (await call('GET', `/log?since=${all[0].n}`)).body;
   assert.equal(newer.length, all.length - 1);
