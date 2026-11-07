@@ -3,21 +3,65 @@
   "tick_ms": 2000,
   "horizon_ticks": 240,
   "gossip_ms": 4000,
-  "speed": { "drone": 1, "team": 0.5 },
-  "sensor_radius": { "drone": 2, "team": 1 },
+  "speed": {
+    "drone": 1,
+    "team": 0.5
+  },
+  "sensor_radius": {
+    "drone": 2,
+    "team": 1
+  },
   "distress_radius": 2,
   "bundle_max": 3,
   "tau_ticks": 60,
-  "weights": { "w1": 10, "w2": 1, "w3": 2 },
+  "weights": {
+    "w1": 10,
+    "w2": 1,
+    "w3": 2
+  },
   "survivors": 30,
   "appear_by_tick": 150,
   "gossip_max_events": 200,
   "actors": {
-    "drones": ["drone-1", "drone-2", "drone-3", "drone-4"],
-    "teams": ["team-1", "team-2", "team-3"]
+    "drones": [
+      "drone-1",
+      "drone-2",
+      "drone-3",
+      "drone-4"
+    ],
+    "teams": [
+      "team-1",
+      "team-2",
+      "team-3"
+    ]
   },
   "islands": {
-    "blackout-3": [["drone-1", "drone-2", "team-1"], ["drone-3", "team-2"], ["drone-4", "team-3"]]
+    "blackout-3": [
+      [
+        "drone-1",
+        "drone-2",
+        "team-1"
+      ],
+      [
+        "drone-3",
+        "team-2"
+      ],
+      [
+        "drone-4",
+        "team-3"
+      ]
+    ]
   },
-  "ports": { "store": 4000, "sim": 3000, "proxy": 8080, "hq": 3100, "dashboard": 8000, "n8n": 5678, "n8n_host_base": 5671 }
+  "ports": {
+    "store": 4000,
+    "sim": 3000,
+    "proxy": 8080,
+    "hq": 3100,
+    "dashboard": 8000,
+    "n8n": 5678,
+    "n8n_host_base": 5671
+  },
+  "gossip_event_cap": 200,
+  "commit_radius": 0,
+  "research_ticks": 20
 }

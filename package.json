@@ -3,14 +3,17 @@
   "private": true,
   "description": "HIVE: self-healing emergency-response swarm (Neptune North challenge, GreatUniHack 2026)",
   "engines": {
-    "node": ">=24"
+    "node": ">=22.13"
   },
   "scripts": {
-    "test": "node --test --test-reporter=spec \"core/test/**/*.test.js\" \"world/test/**/*.test.{js,mjs}\" \"services/*/test/**/*.test.mjs\" \"scripts/test/**/*.test.mjs\" \"bench/test/**/*.test.mjs\"",
+    "test": "node --test --test-reporter=spec \"core/test/**/*.test.js\" \"core/test/**/*.test.mjs\" \"world/test/**/*.test.{js,mjs}\" \"services/*/test/**/*.test.mjs\" \"scripts/test/**/*.test.mjs\" \"bench/test/**/*.test.mjs\" \"n8n/test/**/*.test.mjs\"",
     "test:core": "node --test \"core/test/**/*.test.js\"",
     "test:world": "node --test \"world/test/**/*.test.{js,mjs}\"",
     "test:services": "node --test \"services/*/test/**/*.test.mjs\" \"scripts/test/**/*.test.mjs\"",
     "compose": "node scripts/gen-compose.mjs",
-    "bench": "node bench/run.mjs"
-  }
+    "bench": "node bench/run.mjs",
+    "build": "node core/build.mjs",
+    "pretest": "node core/build.mjs"
+  },
+  "type": "commonjs"
 }

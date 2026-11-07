@@ -1,0 +1,316 @@
+{
+  "about": "Labelled distress texts for the Interpret workflow accuracy check. Pass: correct district for at least 18 of the 20 generated texts (implementation.md Phase 4). Urgency labels are the simulator ground truth; text cues hint at them but do not determine them exactly, so score urgency as within ±1.",
+  "districts": [
+    {
+      "name": "Pendleton",
+      "landmark": "Salford Shopping Centre"
+    },
+    {
+      "name": "Lower Broughton",
+      "landmark": "Lower Broughton Road"
+    },
+    {
+      "name": "Greengate",
+      "landmark": "Greengate Square"
+    },
+    {
+      "name": "Northern Quarter",
+      "landmark": "Stevenson Square"
+    },
+    {
+      "name": "Ordsall",
+      "landmark": "Ordsall Hall"
+    },
+    {
+      "name": "Castlefield",
+      "landmark": "Castlefield Basin"
+    },
+    {
+      "name": "Deansgate",
+      "landmark": "Deansgate Locks"
+    },
+    {
+      "name": "Piccadilly",
+      "landmark": "Piccadilly station"
+    }
+  ],
+  "generated": [
+    {
+      "id": "gen-01",
+      "source": "scenario seed 1 m04",
+      "text": "elderly neighbour trapped upstairs in Greengate pls help",
+      "expected": {
+        "district": "Greengate",
+        "people": 5,
+        "urgency": 5,
+        "cue": "elderly"
+      }
+    },
+    {
+      "id": "gen-02",
+      "source": "scenario seed 1 m05",
+      "text": "water coming in fast at Greengate. baby with us",
+      "expected": {
+        "district": "Greengate",
+        "people": 1,
+        "urgency": 4,
+        "cue": "kids"
+      }
+    },
+    {
+      "id": "gen-03",
+      "source": "scenario seed 1 m02",
+      "text": "HELP Castlefield my dad cant walk, ground floor flooded",
+      "expected": {
+        "district": "Castlefield",
+        "people": 5,
+        "urgency": 5,
+        "cue": "injury"
+      }
+    },
+    {
+      "id": "gen-04",
+      "source": "scenario seed 1 m01",
+      "text": "3 adults on 1st floor balcony Ordsall, ok for now",
+      "expected": {
+        "district": "Ordsall",
+        "people": 3,
+        "urgency": 3,
+        "cue": null
+      }
+    },
+    {
+      "id": "gen-05",
+      "source": "scenario seed 1 m03",
+      "text": "we r 4 ppl in an attic near Greengate Square. phone dying",
+      "expected": {
+        "district": "Greengate",
+        "people": 4,
+        "urgency": 4,
+        "cue": null
+      }
+    },
+    {
+      "id": "gen-06",
+      "source": "scenario seed 1 m11",
+      "text": "we r 2 ppl in an attic near Lower Broughton Road. phone dying",
+      "expected": {
+        "district": "Lower Broughton",
+        "people": 2,
+        "urgency": 3,
+        "cue": null
+      }
+    },
+    {
+      "id": "gen-07",
+      "source": "scenario seed 1 m12",
+      "text": "HELP Ordsall my dad cant walk, ground floor flooded",
+      "expected": {
+        "district": "Ordsall",
+        "people": 3,
+        "urgency": 5,
+        "cue": "injury"
+      }
+    },
+    {
+      "id": "gen-08",
+      "source": "scenario seed 1 m09",
+      "text": "elderly neighbour trapped upstairs in Deansgate pls help",
+      "expected": {
+        "district": "Deansgate",
+        "people": 4,
+        "urgency": 5,
+        "cue": "elderly"
+      }
+    },
+    {
+      "id": "gen-09",
+      "source": "scenario seed 1 m08",
+      "text": "trapped in car near Deansgate Locks, water at the windows",
+      "expected": {
+        "district": "Deansgate",
+        "people": 2,
+        "urgency": 5,
+        "cue": "injury"
+      }
+    },
+    {
+      "id": "gen-10",
+      "source": "scenario seed 1 m06",
+      "text": "we r 3 ppl in an attic near Ordsall Hall. phone dying",
+      "expected": {
+        "district": "Ordsall",
+        "people": 3,
+        "urgency": 1,
+        "cue": null
+      }
+    },
+    {
+      "id": "gen-11",
+      "source": "scenario seed 1 m07",
+      "text": "elderly neighbour trapped upstairs in Piccadilly pls help",
+      "expected": {
+        "district": "Piccadilly",
+        "people": 1,
+        "urgency": 3,
+        "cue": "elderly"
+      }
+    },
+    {
+      "id": "gen-12",
+      "source": "scenario seed 2 m01",
+      "text": "stuck on roof w/ 4 kids near Northern Quarter, water rising",
+      "expected": {
+        "district": "Northern Quarter",
+        "people": 4,
+        "urgency": 5,
+        "cue": "kids"
+      }
+    },
+    {
+      "id": "gen-13",
+      "source": "scenario seed 2 m05",
+      "text": "elderly neighbour trapped upstairs in Pendleton pls help",
+      "expected": {
+        "district": "Pendleton",
+        "people": 3,
+        "urgency": 5,
+        "cue": "elderly"
+      }
+    },
+    {
+      "id": "gen-14",
+      "source": "scenario seed 2 m04",
+      "text": "1 adults on 1st floor balcony Northern Quarter, ok for now",
+      "expected": {
+        "district": "Northern Quarter",
+        "people": 1,
+        "urgency": 3,
+        "cue": null
+      }
+    },
+    {
+      "id": "gen-15",
+      "source": "scenario seed 2 m13",
+      "text": "water coming in fast at Northern Quarter. baby with us",
+      "expected": {
+        "district": "Northern Quarter",
+        "people": 1,
+        "urgency": 4,
+        "cue": "kids"
+      }
+    },
+    {
+      "id": "gen-16",
+      "source": "scenario seed 2 m10",
+      "text": "we r 1 ppl in an attic near Castlefield Basin. phone dying",
+      "expected": {
+        "district": "Castlefield",
+        "people": 1,
+        "urgency": 1,
+        "cue": null
+      }
+    },
+    {
+      "id": "gen-17",
+      "source": "scenario seed 2 m12",
+      "text": "water coming in fast at Lower Broughton. baby with us",
+      "expected": {
+        "district": "Lower Broughton",
+        "people": 1,
+        "urgency": 4,
+        "cue": "kids"
+      }
+    },
+    {
+      "id": "gen-18",
+      "source": "scenario seed 2 m14",
+      "text": "water coming in fast at Castlefield. baby with us",
+      "expected": {
+        "district": "Castlefield",
+        "people": 4,
+        "urgency": 5,
+        "cue": "kids"
+      }
+    },
+    {
+      "id": "gen-19",
+      "source": "scenario seed 3 m08",
+      "text": "HELP Deansgate my dad cant walk, ground floor flooded",
+      "expected": {
+        "district": "Deansgate",
+        "people": 5,
+        "urgency": 4,
+        "cue": "injury"
+      }
+    },
+    {
+      "id": "gen-20",
+      "source": "scenario seed 3 m09",
+      "text": "stuck on roof w/ 2 kids near Lower Broughton, water rising",
+      "expected": {
+        "district": "Lower Broughton",
+        "people": 2,
+        "urgency": 4,
+        "cue": "kids"
+      }
+    }
+  ],
+  "messy": [
+    {
+      "id": "messy-1",
+      "source": "hand-written",
+      "text": "pls help were stuck on the roof nr picadilly station 3 kids n my mum water still risin",
+      "expected": {
+        "district": "Piccadilly",
+        "people": 4,
+        "urgency": 5,
+        "cue": "kids"
+      }
+    },
+    {
+      "id": "messy-2",
+      "source": "hand-written",
+      "text": "ORDSALL by the old hall. car park flooded. 2 of us on top of the car",
+      "expected": {
+        "district": "Ordsall",
+        "people": 2,
+        "urgency": 3,
+        "cue": null
+      }
+    },
+    {
+      "id": "messy-3",
+      "source": "hand-written",
+      "text": "grandad (87) cant get downstairs, castlefield near the basin, power out",
+      "expected": {
+        "district": "Castlefield",
+        "people": 1,
+        "urgency": 5,
+        "cue": "elderly"
+      }
+    },
+    {
+      "id": "messy-4",
+      "source": "hand-written",
+      "text": "lower broughton - by the river - water in the house, we r upstairs, 5 ppl, 1 hurt leg",
+      "expected": {
+        "district": "Lower Broughton",
+        "people": 5,
+        "urgency": 5,
+        "cue": "injury"
+      }
+    },
+    {
+      "id": "messy-5",
+      "source": "hand-written",
+      "text": "greengate near the square, think were ok for now but cant leave building x4",
+      "expected": {
+        "district": "Greengate",
+        "people": 4,
+        "urgency": 2,
+        "cue": null
+      }
+    }
+  ]
+}

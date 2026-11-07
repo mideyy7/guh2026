@@ -198,7 +198,8 @@ test('distress: a failed delivery goes back to "Sending…" and is retried', () 
   const again = w.step().find((d) => d.msg_id === m.msg_id);
   assert.ok(again, 'first retry on the next tick');
   // Repeated failures back off: retries at +1, +2, +4, +8, then every 16 ticks — never every tick.
-  const retryTicks = [];
+  const retryTicks = [w.tick];
+  w.requeueDistress(m.msg_id);
   for (let t = 0; t < 60; t++) {
     w.move('drone-1', parseCell(m.cell), null, `stay${t}`);
     for (const d of w.step()) if (d.msg_id === m.msg_id) { retryTicks.push(w.tick); w.requeueDistress(m.msg_id); }

@@ -31,5 +31,5 @@ const out = {
   districts: DISTRICTS.map((d) => ({ name: d.name, landmark: d.landmark.name })),
   generated: picked, messy,
 };
-writeFileSync(new URL('../tests/ai/fixtures.json', import.meta.url), JSON.stringify(out, null, 2) + '\n');
+writeFileSync(new URL('../tests/ai/fixtures-world.json', import.meta.url), JSON.stringify(out, null, 2) + '\n');
 console.log(`tests/ai/fixtures.json: ${picked.length} generated across ${Object.keys(perDistrict).length} districts + ${messy.length} messy`);

@@ -1,0 +1,118 @@
+{
+  "id": "hiveGossip000001",
+  "name": "hive-gossip",
+  "active": false,
+  "nodes": [
+    {
+      "name": "Every 4s",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "seconds",
+              "secondsInterval": 4
+            }
+          ]
+        }
+      },
+      "position": [
+        0,
+        0
+      ],
+      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+    },
+    {
+      "name": "Get State",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "parameters": {
+        "url": "http://store:4000/state",
+        "options": {
+          "timeout": 3000
+        }
+      },
+      "position": [
+        220,
+        0
+      ],
+      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+    },
+    {
+      "name": "Gossip",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "parameters": {
+        "jsCode": "//@@HIVE_CORE@@\nconst s = $('Get State').first().json;\nif (!s.state) return [];                                             // no tick yet\nconst { messages } = HiveCore.gossip(s.state, Date.now());\nconst from = s.state.config.actor_id;\nreturn messages.map((m) => ({ json: { from, to: m.to, path: 'merge', body: m.body } }));\n"
+      },
+      "position": [
+        440,
+        0
+      ],
+      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+    },
+    {
+      "name": "Send via proxy",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "parameters": {
+        "method": "POST",
+        "url": "http://proxy:8080/send",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ from: $json.from, to: $json.to, path: $json.path, body: $json.body }) }}",
+        "options": {
+          "timeout": 3000
+        }
+      },
+      "onError": "continueRegularOutput",
+      "position": [
+        660,
+        0
+      ],
+      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+    }
+  ],
+  "connections": {
+    "Every 4s": {
+      "main": [
+        [
+          {
+            "node": "Get State",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get State": {
+      "main": [
+        [
+          {
+            "node": "Gossip",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gossip": {
+      "main": [
+        [
+          {
+            "node": "Send via proxy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "none"
+  },
+  "pinData": {},
+  "tags": []
+}

@@ -9,7 +9,7 @@ function shuffle(arr, r) { const a = arr.slice(); for (let i = a.length - 1; i >
 function makeSource(n) {
   const src = E.emptyLog(); const evs = [];
   for (let i = 0; i < n; i++) evs.push(E.emit(src, 'drone-1', 'CELL_SEARCHED', { cell: `c${i % 7}` }, i));
-  evs.push(E.emit(src, 'drone-1', 'RESCUED', { survivorId: 's1' }, n));
+  evs.push(E.emit(src, 'drone-1', 'RESCUED', { survivor_id: 's1' }, n));
   return { src, evs };
 }
 

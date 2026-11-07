@@ -11,3 +11,4 @@ docker-compose.yml
 bench/results/
 tests/ui/shots/
 .ui-check-profile/
+core/dist/

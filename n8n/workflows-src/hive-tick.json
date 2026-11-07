@@ -1,0 +1,383 @@
+{
+  "id": "hiveTick00000001",
+  "name": "hive-tick",
+  "active": false,
+  "nodes": [
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "webhookId": "350ca8af-17ed-428f-a2b2-cc682c773877",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "tick",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "position": [
+        0,
+        0
+      ],
+      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+    },
+    {
+      "name": "Get State",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "parameters": {
+        "url": "http://store:4000/state",
+        "options": {
+          "timeout": 3000
+        }
+      },
+      "position": [
+        220,
+        0
+      ],
+      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+    },
+    {
+      "name": "Sense",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "parameters": {
+        "url": "=http://sim:3000/sense?actor={{ $json.config.actor_id }}",
+        "options": {
+          "timeout": 3000
+        }
+      },
+      "position": [
+        440,
+        0
+      ],
+      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+    },
+    {
+      "name": "Perceive",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "parameters": {
+        "jsCode": "//@@HIVE_CORE@@\nconst s = $('Get State').first().json;\nconst now = Date.now();\nlet state = s.state ?? HiveCore.init(s.config, now);\nconst tick = $('Webhook').first().json.body.tick;\nconst sense = $('Sense').first().json;\nif (typeof tick !== 'number' || tick < sense.tick - 1) return [];   // stale queued tick: drop it\nif (tick <= state.tick) return [];                                   // already handled (replayed tick)\nstate = HiveCore.perceive(state, { tick, sense }, now);\nconst hq_body = HiveCore.hqRequest(state);\nreturn [{ json: { version: s.version, state, central: state.config.mode !== 'hive', hq_body } }];\n"
+      },
+      "position": [
+        660,
+        0
+      ],
+      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+    },
+    {
+      "name": "Central mode?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "350ca8af-17ed-428f-a0b2-b0123d4bc69c",
+              "leftValue": "={{ $json.central }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "position": [
+        880,
+        0
+      ],
+      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+    },
+    {
+      "name": "HQ Sync",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "parameters": {
+        "method": "POST",
+        "url": "http://proxy:8080/rpc",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ from: $json.state.config.actor_id, to: 'hq', path: 'report', body: $json.hq_body }) }}",
+        "options": {
+          "timeout": 3000
+        }
+      },
+      "onError": "continueRegularOutput",
+      "position": [
+        1100,
+        200
+      ],
+      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+    },
+    {
+      "name": "Bid (CBBA)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "parameters": {
+        "jsCode": "//@@HIVE_CORE@@\nconst p = $('Perceive').first().json;\nlet hq = null;\nif ($('HQ Sync').isExecuted) {\n  const r = $('HQ Sync').first().json;\n  hq = r && !r.error && 'assignment' in r ? r : null;               // 503 / timeout → null\n}\nconst state = HiveCore.bid(p.state, Date.now());\nreturn [{ json: { version: p.version, state, hq } }];\n"
+      },
+      "position": [
+        1320,
+        0
+      ],
+      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+    },
+    {
+      "name": "Act",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "parameters": {
+        "jsCode": "//@@HIVE_CORE@@\nconst b = $input.first().json;\nconst out = HiveCore.act(b.state, { hq: b.hq }, Date.now());\nreturn [{ json: { version: b.version, state: out.state, actions: out.actions } }];\n"
+      },
+      "position": [
+        1540,
+        0
+      ],
+      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+    },
+    {
+      "name": "Put State",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "parameters": {
+        "method": "PUT",
+        "url": "http://store:4000/state",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ version: $json.version, state: $json.state }) }}",
+        "options": {
+          "timeout": 3000
+        }
+      },
+      "position": [
+        1760,
+        0
+      ],
+      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+    },
+    {
+      "name": "Split actions",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "parameters": {
+        "jsCode": "//@@HIVE_CORE@@\nconst a = $('Act').first().json;\nconst actor = a.state.config.actor_id;\nreturn a.actions.map((action) => {\n  const body = action.kind === 'move'\n    ? { actor, target: action.target, task_id: action.task_id, key: action.key }\n    : { actor, survivor_id: action.survivor_id, key: action.key };\n  return { json: { action, path: action.kind, body } };\n});\n"
+      },
+      "position": [
+        1980,
+        0
+      ],
+      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+    },
+    {
+      "name": "Do Action",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "parameters": {
+        "method": "POST",
+        "url": "=http://sim:3000/{{ $json.path }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.body) }}",
+        "options": {
+          "timeout": 3000
+        }
+      },
+      "onError": "continueRegularOutput",
+      "position": [
+        2200,
+        0
+      ],
+      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+    },
+    {
+      "name": "Apply receipts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "parameters": {
+        "jsCode": "//@@HIVE_CORE@@\nconst sent = $('Split actions').all();\nconst receipts = $input.all().map((it, i) => ({\n  action: sent[i].json.action,\n  response: it.json && !it.json.error ? it.json : null,\n}));\nconst state = HiveCore.applyReceipts($('Act').first().json.state, receipts, Date.now());\nreturn [{ json: { version: $('Put State').first().json.version, state } }];\n"
+      },
+      "position": [
+        2420,
+        0
+      ],
+      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+    },
+    {
+      "name": "Put State 2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "parameters": {
+        "method": "PUT",
+        "url": "http://store:4000/state",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ version: $json.version, state: $json.state }) }}",
+        "options": {
+          "timeout": 3000
+        }
+      },
+      "position": [
+        2640,
+        0
+      ],
+      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get State",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get State": {
+      "main": [
+        [
+          {
+            "node": "Sense",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sense": {
+      "main": [
+        [
+          {
+            "node": "Perceive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Perceive": {
+      "main": [
+        [
+          {
+            "node": "Central mode?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Central mode?": {
+      "main": [
+        [
+          {
+            "node": "HQ Sync",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Bid (CBBA)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HQ Sync": {
+      "main": [
+        [
+          {
+            "node": "Bid (CBBA)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bid (CBBA)": {
+      "main": [
+        [
+          {
+            "node": "Act",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Act": {
+      "main": [
+        [
+          {
+            "node": "Put State",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Put State": {
+      "main": [
+        [
+          {
+            "node": "Split actions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split actions": {
+      "main": [
+        [
+          {
+            "node": "Do Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Do Action": {
+      "main": [
+        [
+          {
+            "node": "Apply receipts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apply receipts": {
+      "main": [
+        [
+          {
+            "node": "Put State 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "none"
+  },
+  "pinData": {},
+  "tags": []
+}
