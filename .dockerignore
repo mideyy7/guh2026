@@ -1,0 +1,14 @@
+# Build context is the repo root for shared services. NEVER ship secrets or bulk into images.
+.env
+.env.*
+!.env.example
+.git
+**/node_modules
+n8n/
+bench/results/
+mockup/
+tests/
+*.pdf
+*.md
+docker-compose.yml
+**/test/

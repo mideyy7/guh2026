@@ -28,6 +28,35 @@ The two halves meet only at the **contracts** you agree in Phase 0 (§3). Inside
 
 ---
 
+## Progress (updated as work lands on `dev_a`)
+
+### Dev A status
+
+| Phase | Dev A deliverable | Status |
+|---|---|---|
+| 0 | Repo layout, `npm test`, contracts draft, compose generator, S1 (boot), S5 (isolation) | ✅ Done. S1: cold boot 5 min 41 s, staggered (D11). S5: isolation 133/133 checks |
+| 1 | World model, link presets, simulator, proxy, store, isolation script | ✅ Done and running in Docker |
+| 2 | Dashboard server + UI, `tests/e2e/lib.mjs`, infra smoke test | ✅ Done. `node tests/e2e/smoke-infra.mjs` → 11/11 |
+| 3 | Scenario generator + distress texts, BLACKOUT/RESTORE, click-to-cut, island colours, divergence badge, timed convergence check, headless runner | ✅ Done (runner uses the stub core until Dev B's core exists) |
+| 4 | HQ dispatcher (live + headless), both central baselines, metrics | ✅ Done. Live RPC path verified in Docker |
+| 5 | Benchmark matrix, summary CSV/JSON, HTML report with headline chart | ✅ Built. **Needs a rerun with the real core** for real numbers |
+| 6 | Scripted 90-second demo, "Send text" control | ✅ Built. Rehearsed infra-only |
+
+Unit tests: **84/84** (`npm test`, no Docker needed).
+
+**Still blocked on Dev B:** Gate 0 (Dev B's spikes S2, S3, S4, S6, S7 and a review of `contracts/README.md`), S1 under real load (Gate 2), real benchmark numbers, live-vs-headless parity, and filling in N and M in hack.md §8.
+
+### Hand-off notes for Dev B
+1. **Read the contracts changelog first** (`contracts/README.md`). Additive changes and two behaviour rules (D12, D13) were found while building.
+2. **Your core is plugged in automatically.** Once `core/dist/hive-core.js` exists, `bench/run.mjs`, `bench/matrix.mjs` and the HQ service use it instead of `bench/stub-core.cjs`. `loadCore()` rejects a core missing any C6 function.
+3. **Act stage:** send `POST /move` **every tick** you want to move (D12). Use a fresh key per tick, e.g. `<actor>:<tick>:move`.
+4. **Central mode:** `act(state, {hq})` must add `hq.task` to the team's known tasks (D13); `hq` is `null` when HQ is unreachable.
+5. **Headless interpret:** the benchmark calls `interpret(state, null, raw)`, i.e. the regex fallback, because it can't call the LLM. The raw object is `{msg_id, text, sent_tick, delivered_tick}`.
+6. **AI fixtures:** `tests/ai/fixtures.json` (20 generated + 5 messy, with ground-truth labels).
+7. **Driving the live stack:** `tests/e2e/lib.mjs` has every helper your checkpoint and acceptance scripts need. They talk only to the dashboard API.
+
+---
+
 ## 1. Setup: accounts, keys and installs
 
 Do this **before** the hackathon starts. Venue Wi-Fi is slow, and pulling Docker images there wastes the first hour.
@@ -63,7 +92,7 @@ You **don't** need an n8n account, licence or API key. Self-hosted n8n is free a
 | **Total** | **~7.3 GB of 8**. It fits only if nothing else big is open; see the rules below. |
 
 **Rules for 8 GB machines:**
-1. **Measure first, before the hackathon:** with Docker running, run `N8N_VERSION=<pinned> bash starter/scripts/memtest.sh`. It starts 7 idle n8n instances with HIVE's caps, prints real memory use, then removes them. **Pass:** all 7 healthy and under 3,000 MiB in total.
+1. **Measure first, before the hackathon:** with Docker running, run `N8N_VERSION=<pinned> bash scripts/memtest.sh`. It starts 7 idle n8n instances with HIVE's caps, prints real memory use, then removes them. **Pass:** all 7 healthy, no restarts, and under 3,000 MiB in total after the 3-minute settle. (Measured on this Mac with Docker at 5 GB: 2,988 MiB, with no restarts or out-of-memory kills.)
 2. **Docker Desktop → Settings → Resources:** Memory **5 GB** (set, measured below), Swap **2 GB**, CPUs 4 or more. Click *Apply & restart*.
 3. **Cap each n8n** (already in §12.2): `mem_limit: 560m` and `NODE_OPTIONS=--max-old-space-size=320`. The second setting caps Node's heap so n8n cleans up memory early instead of hitting the container limit.
 4. **Only run all 7 actors when you need them.** Unit tests and the headless benchmark run in plain Node with no Docker (under 200 MB). Day to day, run the **dev stack**: `node scripts/gen-compose.mjs --actors drone-1,drone-2,team-1,team-2`, which needs about 2 GB. Start the **full 7-actor stack** for the gate tests at hours 8, 14, 17.5 and 21, and for the demo. Nothing is cut: the gates and the demo always run all 7.
@@ -160,7 +189,7 @@ These choices follow from what n8n 2.x actually does. Some of them refine the st
 
 | # | Decision | Why |
 |---|---|---|
-| D1 | **Each actor's store is a sidecar container** (`store-<id>`, a ~80-line Node service using the built-in `node:sqlite`). Workflows reach it at `http://store:4000`. | In n8n 2.x, Code nodes run in an isolated **task runner**. Getting npm modules (such as `better-sqlite3`) or `process.env` into that runner is unreliable. A sidecar needs neither: Code nodes stay pure JavaScript, and all input and output goes through HTTP Request nodes. **Already built and tested:** [starter/services/store](starter/services/store). |
+| D1 | **Each actor's store is a sidecar container** (`store-<id>`, a ~80-line Node service using the built-in `node:sqlite`). Workflows reach it at `http://store:4000`. | In n8n 2.x, Code nodes run in an isolated **task runner**. Getting npm modules (such as `better-sqlite3`) or `process.env` into that runner is unreliable. A sidecar needs neither: Code nodes stay pure JavaScript, and all input and output goes through HTTP Request nodes. **Already built and tested:** [services/store](services/store). |
 | D2 | **`N8N_CONCURRENCY_PRODUCTION_LIMIT=1` on every instance.** | n8n then runs one production execution at a time per instance, queuing the rest first-in, first-out. Each actor handles one message at a time, like a true actor-model actor. This rules out race conditions on actor state. The store's version check (409 on a stale write) is the safety net that proves it. |
 | D3 | **Functional core, imperative shell.** All decision logic lives in one pure, plain-JS file, `core/dist/hive-core.js`, pasted into Code nodes at build time. n8n workflows only fetch, call the core and write. | The **same code** runs in n8n, in unit tests and in the headless benchmark. You can unit-test CBBA without Docker, and the benchmark measures the logic that actually ran in the demo. |
 | D4 | **Configuration comes from the store, not environment variables.** `GET http://store:4000/config` returns actor ID, role, mode and peers. | n8n 2.x blocks environment access in Code nodes by default (`N8N_BLOCK_ENV_ACCESS_IN_NODE=true`). With this design, all 7 instances run *byte-identical* workflows. |
@@ -168,7 +197,10 @@ These choices follow from what n8n 2.x actually does. Some of them refine the st
 | D6 | **The proxy is fire-and-forget.** `POST /send` returns `202` (accepted) or `503` (link down) immediately, then delivers to the peer in the background. | A sender never blocks waiting for a receiver. With D2, two actors waiting on each other would otherwise deadlock until timeout. |
 | D7 | **The simulator drives ticks** (`POST /webhook/tick` with only `{tick}`); **gossip runs on each actor's own Schedule Trigger.** | Ticks stay in order without jitter. Gossip timing stays independent per actor, which is honest decentralisation. |
 | D8 | **CBBA uses wall-clock timestamps** (`Date.now()` passed in by the shell, simulated time in the benchmark). | Convergence is checked while the simulation is paused. With tick numbers frozen, CBBA's "fresher information" rule would stall, but wall-clock time keeps moving. |
-| D9 | **CBBA uses bid warping:** a bid is never higher than the previous bid in the bundle. | **Tested:** with our travel-style scoring, CBBA *fails* to converge without warping and passes with it. See [starter/core/cbba.test.js](starter/core/cbba.test.js). |
+| D9 | **CBBA uses bid warping:** a bid is never higher than the previous bid in the bundle. | **Tested:** with our travel-style scoring, CBBA *fails* to converge without warping and passes with it. See [core/test/cbba.test.js](core/test/cbba.test.js). |
+| D11 | **n8n instances boot one at a time.** Each n8n `depends_on` the previous one passing `/healthz/readiness` (not `/healthz`, which answers before migrations finish). | **Measured:** 7 simultaneous first boots on the 8 GB Mac never finished (load 35+, none ready after 10 minutes). Staggered, a cold boot takes 5 min 41 s, and steady state is ~350 MiB and 1–12% CPU per instance. |
+| D12 | **A move command lasts one tick** (contract C2). The Act stage re-sends `POST /move` every tick; an actor that sends nothing holds position. | **Found by the benchmark:** with persistent targets, a central-naive team that lost HQ kept walking, so "idles when cut off" wasn't true. |
+| D13 | **HQ replies with the task's details**, `{assignment, task: {id, survivor_id, cell, urgency, people}}`, not just an ID. | **Found by the benchmark:** a team only knows tasks it detected itself; with a bare ID, central teams rescued 2 people instead of 20. |
 | D10 | Workflows are **deployed by CLI** (`n8n import:credentials`, `import:workflow`, `publish:workflow`) with a shared `N8N_ENCRYPTION_KEY`. | n8n 2.x replaced activate/deactivate with publish/unpublish. Importing deactivates workflows, so you must publish them afterwards. Spike S2 proves the exact script. |
 
 **How `hack.md` §5's six workflows map to n8n:** Perceive, Bid and Act run as three labelled Code nodes **inside one `hive-tick` workflow**, so they always execute in order on each tick. Interpret, Gossip and Merge are their own workflows. That gives 4 workflow files and the same 6 stages on the canvas.
@@ -187,8 +219,8 @@ hive/
 │   ├── README.md               all API shapes below, with JSON examples
 │   └── params.json             shared constants (grid, speeds, radii, weights, timing)
 ├── core/                       B   pure decision logic, no imports
-│   ├── src/events.js           ← starter/core/events.js (tested)
-│   ├── src/cbba.js             ← starter/core/cbba.js (tested)
+│   ├── src/events.js           tested (moved from the starter)
+│   ├── src/cbba.js             tested (moved from the starter)
 │   ├── src/score.js  src/search.js  src/actor.js  src/digest.js  src/text-fallback.js
 │   ├── build.mjs               concatenates src/* → dist/hive-core.js (one global: HiveCore)
 │   └── test/*.test.js          node --test
@@ -196,7 +228,7 @@ hive/
 │   ├── world.js  scenario.js  gazetteer.js  central.js
 │   └── test/*.test.js
 ├── services/
-│   ├── store/                  A   ← starter/services/store (tested)
+│   ├── store/                  A   tested (moved from the starter)
 │   ├── sim/                    A   HTTP wrapper over world/ + tick driver + distress delivery
 │   ├── proxy/                  A   chaos proxy
 │   ├── hq/                     A   central dispatcher (wraps world/central.js)
@@ -313,17 +345,16 @@ Distances use the Chebyshev metric (diagonal moves allowed). A team speed of 0.5
 **Goal:** agree every interface, then *prove* each risky n8n assumption on real containers before building on it. Each spike has a pass condition and a fallback.
 
 ### Together (first 30 minutes)
-1. Create the repo layout (§3.1) and copy in the starter files.
-2. Write `contracts/README.md` (C1–C7 with example JSON) and `contracts/params.json`.
-3. Run `npm test`: the 9 starter tests must pass (6 in core, 3 in the store).
+1. Create the repo layout (§3.1) and move the starter files into it. **✅ Done (Dev A).**
+2. Write `contracts/README.md` (C1–C7 with example JSON) and `contracts/params.json`. **✅ Drafted by Dev A; Dev B must review before Gate 0.**
+3. Run `npm test`: every unit suite must pass. **✅ 17/17** (6 core, 3 store, 8 compose generator).
 
 ### Dev A
-- **Compose skeleton:** one n8n plus its store on `net-drone-1`, using the settings in §12.2.
-- **S1 — Memory under load.** `memtest.sh` (§1.2) already measured idle memory before the event. Now measure under load: with the full stack running the real workflows for 5 minutes at `TICK_MS=2000`, run `docker stats --no-stream`.
-  **Pass:** no container restarts (`docker compose ps` shows none restarting), every n8n stays under 90% of its 560 MB, and macOS memory pressure stays out of the red.
-  **Fallback:** the steps under "If the memory test fails" in §1.2.
-- **S5 — Network isolation.** Put two dummy containers on separate networks and the proxy on both.
-  **Pass:** a direct call from one actor to the other fails, and a call through the proxy works.
+- **Compose skeleton** **✅ Done:** `scripts/gen-compose.mjs` generates the full 7-actor stack (§12.2) from `params.json`, with `--actors` for the dev stack and `--with-probe` for the Phase 0 stand-in proxy.
+- **S1 — Memory and boot.** **✅ Pass.** Cold boot with fresh volumes via a plain `docker compose up -d`: all 7 n8n ready in **5 min 41 s**, then 345–362 MiB and 1–12% CPU each; `memtest.sh` gives 7/7 ready at 2,533 MiB total.
+  **Finding:** booting all 7 at once **never finishes** on an 8 GB machine (load 35+, none ready after 10 minutes, because all 7 run their first-boot migrations at once). The fix is decision D11: n8n instances boot one at a time.
+  **Still to do:** measure under real load at Gate 2 (the full stack running real workflows for 5 minutes at `TICK_MS=2000`). Pass: no restarts, every n8n under 90% of 560 MB, macOS memory pressure out of the red.
+- **S5 — Network isolation.** **✅ Pass: 105/105 checks.** `scripts/check-isolation.sh` runs inside every actor. Calls to every other actor's n8n and store are blocked; the actor's own `store` alias returns its own ID; the shared service is reachable both ways.
 
 ### Dev B (on a single n8n instance)
 - **S2 — Deploy via CLI.** In the editor, build a trivial workflow: Webhook `POST /webhook/ping` → Code node returning `{ok:true}`. Export it with `n8n export:workflow --all --separate --output=/hive/workflows-src/`, then write `deploy-workflows.sh` (§12.4) and run it against a **fresh** instance.
@@ -332,7 +363,7 @@ Distances use the Chebyshev metric (diagonal moves allowed). A team speed of 0.5
 - **S3 — Concurrency limit serialises.** Build a webhook workflow that reads a counter from the store, waits 1 s in a Wait node, then writes counter+1. Fire 10 requests in parallel.
   **Pass:** the counter ends at exactly 10, and the store's `conflicts` counter is 0.
   **Fallback:** if Wait nodes break concurrency=1 (a Wait offloads the execution), take the Wait out. Our real workflows have no Wait nodes.
-- **S4 — Injected core runs in a Code node.** Paste `starter/core/events.js` and `cbba.js` into a Code node, followed by `return [{json: {ok: typeof HiveCBBA.receive === 'function'}}]`.
+- **S4 — Injected core runs in a Code node.** Paste `core/src/events.js` and `core/src/cbba.js` into a Code node, followed by `return [{json: {ok: typeof HiveCBBA.receive === 'function'}}]`.
   **Pass:** `ok: true`. Also time a 300 KB JSON round-trip through the node: it must take under 200 ms.
   **Fallback:** if `module` handling breaks, change the guard to `try { module.exports = X } catch (e) {}`.
 - **S6 — Shared credential.** In drone-1's editor (http://drone-1.localhost:5671), create an **Anthropic** credential with the key. Export it with `n8n export:credentials --all --output=/hive/credentials/anthropic.json`, then import it into a second instance that has the same `N8N_ENCRYPTION_KEY`.
@@ -354,12 +385,12 @@ Both devs build their half against the contracts, with **no live dependency on e
 
 1. **`world/` (pure, seeded, no I/O):**
    - `scenario.js`: from a seed, generate 30 survivors (`survivor_id`, cell, people 1–5, urgency 1–5, `appear_tick` ≤ 150). Weight placement toward low-lying "flooded" districts. Also generate starting positions (drones at the central HQ cell, teams spread out) and a distress-text schedule.
-   - `gazetteer.js`: 8 districts on the grid (Piccadilly, Northern Quarter, Ancoats, Deansgate, Castlefield, Hulme, Salford Quays, Lower Broughton), each with its cells and a landmark cell.
+   - `gazetteer.js`: 8 real districts laid over a real geographic box around the Irwell (Pendleton, Lower Broughton, Greengate, Northern Quarter, Ordsall, Castlefield, Deansgate, Piccadilly), each with its cells and a landmark cell. Each district's real centre lies inside its own rectangle, so the live map is geographically correct.
    - `world.js`: `step()` applies queued moves in actor-ID order at the configured speed; `sense(actor)`; `move()` and `rescue()`, both idempotent by `key`; `metrics()` (score, rescued, unrescued and their urgency, duplicate attempts, wasted travel per actor, attributed using `task_id`).
    - Use a seeded RNG everywhere. **Never** call `Math.random()`.
 2. **`services/sim`:** an HTTP wrapper over `world` (contract C2). A tick loop every `TICK_MS`: `world.step()`, then fire `POST /webhook/tick {tick}` at all 7 actors with a 1 s timeout, ignoring errors. A distress text is delivered to the **nearest drone within `distress_radius`** of its cell. If no drone is in range, the message keeps "Sending…" and is retried every tick.
 3. **`services/proxy`** (contract C3): the link matrix, presets, an in-memory delivery log (ring buffer of 50k entries), and the chaos modes (delay, drop, duplicate, reorder).
-4. **`services/store`:** copy the starter as-is (server, tests and Dockerfile). It already has the `conflicts` counter.
+4. **`services/store`:** already in place from Phase 0 (server, tests and Dockerfile), including the `conflicts` counter.
 5. **`scripts/gen-compose.mjs`:** generates `docker-compose.yml` from the actor list (§12.2), with 7 n8n services, 7 stores, sim, proxy, hq and dashboard. It takes an `--actors` flag for the 4-actor dev stack (§1.2). The default is all 7. Every other service reads the actor list from the generated file, so nothing else changes.
 6. **`scripts/check-isolation.sh`:** for every ordered pair of actors, `docker compose exec -T n8n-A node -e "fetch('http://n8n-B:5678/healthz').then(()=>process.exit(1),()=>process.exit(0))"` must exit 0. Every actor must also reach `http://store:4000/health`, `http://proxy:8080/links` and `http://sim:3000/sense?actor=<self>`.
 
@@ -373,7 +404,7 @@ Both devs build their half against the contracts, with **no live dependency on e
 
 ### Dev B — Core logic
 
-1. Move `starter/core/events.js` and `cbba.js` into `core/src`. `build.mjs` concatenates `core/src/*.js` into `dist/hive-core.js`, which exposes one global, `HiveCore`, plus the `module.exports` guard.
+1. `core/src/events.js` and `cbba.js` are already in place (Phase 0). `build.mjs` concatenates `core/src/*.js` into `dist/hive-core.js`, which exposes one global, `HiveCore`, plus the `module.exports` guard.
 2. **`score.js`:** `score(pos, task, path, tick)` = `w1·urgency·exp(−(age+eta)/τ) − w2·eta − w3·|path|`, where `eta` is the travel time along the path in ticks at team speed.
 3. **`actor.js`:**
    - `init`.
@@ -645,10 +676,14 @@ n8n-drone-1:
     - ./n8n/build:/hive/build:ro
     - ./n8n/credentials:/hive/credentials
   networks: [net-drone-1]
+  depends_on:
+    store-drone-1: { condition: service_healthy }
+    # every n8n after the first also waits for the previous n8n (D11), e.g. n8n-drone-2 → n8n-drone-1
   healthcheck:
-    test: ["CMD", "node", "-e", "fetch('http://localhost:5678/healthz').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
+    test: ["CMD", "node", "-e", "fetch('http://localhost:5678/healthz/readiness').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
     interval: 10s
-    retries: 12
+    start_period: 180s
+    retries: 18
 
 store-drone-1:
   build: ./services/store
@@ -694,13 +729,13 @@ Spike S2 proves this script as written. If S2 needed its fallback, update the sc
 {
   "model": "claude-haiku-5-5",
   "max_tokens": 1024,
-  "system": "You turn flood distress texts into JSON. Districts: Piccadilly, Northern Quarter, Ancoats, Deansgate, Castlefield, Hulme, Salford Quays, Lower Broughton. Urgency 1-5: raise it for children, elderly, injury or rising water.",
+  "system": "You turn flood distress texts into JSON. Districts (landmark): Pendleton (Salford Shopping Centre), Lower Broughton (Lower Broughton Road), Greengate (Greengate Square), Northern Quarter (Stevenson Square), Ordsall (Ordsall Hall), Castlefield (Castlefield Basin), Deansgate (Deansgate Locks), Piccadilly (Piccadilly station). Urgency 1-5: raise it for children, elderly, injury or rising water.",
   "messages": [{ "role": "user", "content": "{{ $json.body.text }}" }],
   "output_config": { "format": { "type": "json_schema", "schema": {
     "type": "object", "additionalProperties": false,
     "required": ["district", "landmark", "people", "urgency", "hazards"],
     "properties": {
-      "district": { "type": "string", "enum": ["Piccadilly","Northern Quarter","Ancoats","Deansgate","Castlefield","Hulme","Salford Quays","Lower Broughton"] },
+      "district": { "type": "string", "enum": ["Pendleton","Lower Broughton","Greengate","Northern Quarter","Ordsall","Castlefield","Deansgate","Piccadilly"] },
       "landmark": { "type": ["string", "null"] },
       "people":   { "type": ["integer", "null"] },
       "urgency":  { "type": "integer" },
@@ -722,6 +757,8 @@ Spike S2 proves this script as written. If S2 needed its fallback, update the sc
 | An island never converges | Gossip blocked by a 503, or a CBBA bug | The proxy log shows `refused` or `dropped`; reproduce headless with the same seed and links |
 | AI node returns 400 | A sampling parameter (temperature, top-p, top-k) is being sent | Switch to the §12.5 HTTP fallback |
 | Docker freezes or OOM-kills containers | Out of memory | `docker stats`; raise Docker's memory or lower `mem_limit`; close the browser tabs you don't need |
+| n8n never becomes ready, load stays very high | Several n8n instances doing first-boot migrations at once | Don't start n8n containers by hand in parallel; use `docker compose up -d`, which boots them one at a time (D11). A cold boot takes about 6 minutes |
+| `docker pull` fails with `docker-credential-desktop: executable file not found` | Docker Desktop's helper folder isn't on the PATH | Add `export PATH="$PATH:/Applications/Docker.app/Contents/Resources/bin"` to `~/.zshrc` |
 | `docker info` hangs | Docker Desktop is still starting or stuck | Quit and reopen Docker Desktop, then wait for "Engine running" |
 
 ---

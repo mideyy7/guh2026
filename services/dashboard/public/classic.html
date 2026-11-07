@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HIVE Control</title>
+  <link rel="stylesheet" href="classic.css">
+</head>
+<body>
+  <header class="bar">
+    <div class="brand"><strong>HIVE</strong> <span class="muted">observer: reads state, never assigns</span></div>
+    <div class="status" aria-live="polite">
+      <span id="tick" class="pill">tick –</span>
+      <span id="runstate" class="pill">–</span>
+      <span id="preset" class="pill">links –</span>
+      <span id="conv" class="pill">–</span>
+    </div>
+  </header>
+
+  <section class="controls" aria-label="Scenario and outage controls">
+    <div class="group">
+      <button id="btn-start">Start</button>
+      <button id="btn-pause">Pause</button>
+      <button id="btn-step" title="Advance one tick (paused only)">Step</button>
+      <label>Seed <input id="seed" type="number" value="1" min="1" max="99999"></label>
+      <button id="btn-reset">Reset</button>
+    </div>
+    <div class="group">
+      <button id="btn-blackout" class="danger">BLACKOUT</button>
+      <button id="btn-restore" class="ok">RESTORE</button>
+      <label>Preset
+        <select id="preset-select">
+          <option>all-up</option><option>blackout-3</option><option>drones-vs-teams</option>
+          <option>isolate-one</option><option>flapping</option><option value="percent">percent…</option>
+        </select>
+      </label>
+      <button id="btn-converge" title="Pause the sim and time how long until every actor's shared state matches">Pause &amp; check convergence</button>
+    </div>
+    <form class="group" id="inject-form" aria-label="Send a distress text">
+      <label>Distress text <input id="inject-text" type="text" maxlength="280" size="42" value="stuck on roof w/ 2 kids near the Irwell, water rising"></label>
+      <label>from <select id="inject-district"></select></label>
+      <button type="submit">Send text</button>
+    </form>
+  </section>
+
+  <main class="layout">
+    <section class="map-wrap" aria-label="Map">
+      <canvas id="map" width="640" height="640" aria-label="Grid map of the flooded area. Click a link to cut or restore it."></canvas>
+      <p class="legend muted">
+        <span><i class="sw drone"></i>drone</span>
+        <span><i class="sw team"></i>team</span>
+        <span><i class="sw surv"></i>survivor (ground truth)</span>
+        <span><i class="sw cut"></i>cut link</span>
+        <span>Click a link to cut / restore it.</span>
+      </p>
+    </section>
+
+    <section class="side">
+      <div class="metrics" id="metrics" aria-label="Mission metrics"></div>
+      <h2>Actors <span class="muted small">each card is that actor's own belief</span></h2>
+      <div class="cards" id="cards"></div>
+    </section>
+
+    <section class="feed-wrap" aria-label="Activity feed">
+      <h2>Activity</h2>
+      <ol class="feed" id="feed"></ol>
+    </section>
+  </main>
+
+  <footer class="muted small" id="errors"></footer>
+  <script src="classic.js"></script>
+</body>
+</html>

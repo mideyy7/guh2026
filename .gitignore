@@ -5,7 +5,9 @@ n8n/credentials/
 # Generated / local
 node_modules/
 n8n/build/
-bench/results/raw/
 docker-compose.yml
 .DS_Store
 .claude/
+bench/results/
+tests/ui/shots/
+.ui-check-profile/
