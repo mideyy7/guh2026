@@ -63,7 +63,7 @@ You **don't** need an n8n account, licence or API key. Self-hosted n8n is free a
 | **Total** | **~7.3 GB of 8**. It fits only if nothing else big is open; see the rules below. |
 
 **Rules for 8 GB machines:**
-1. **Measure first, before the hackathon:** with Docker running, run `N8N_VERSION=<pinned> bash starter/scripts/memtest.sh`. It starts 7 idle n8n instances with HIVE's caps, prints real memory use, then removes them. **Pass:** all 7 healthy and under 3,000 MiB in total.
+1. **Measure first, before the hackathon:** with Docker running, run `N8N_VERSION=<pinned> bash starter/scripts/memtest.sh`. It starts 7 idle n8n instances with HIVE's caps, prints real memory use, then removes them. **Pass:** all 7 healthy, no restarts, and under 3,000 MiB in total after the 3-minute settle. (Measured on this Mac with Docker at 5 GB: 2,988 MiB, with no restarts or out-of-memory kills.)
 2. **Docker Desktop → Settings → Resources:** Memory **5 GB** (set, measured below), Swap **2 GB**, CPUs 4 or more. Click *Apply & restart*.
 3. **Cap each n8n** (already in §12.2): `mem_limit: 560m` and `NODE_OPTIONS=--max-old-space-size=320`. The second setting caps Node's heap so n8n cleans up memory early instead of hitting the container limit.
 4. **Only run all 7 actors when you need them.** Unit tests and the headless benchmark run in plain Node with no Docker (under 200 MB). Day to day, run the **dev stack**: `node scripts/gen-compose.mjs --actors drone-1,drone-2,team-1,team-2`, which needs about 2 GB. Start the **full 7-actor stack** for the gate tests at hours 8, 14, 17.5 and 21, and for the demo. Nothing is cut: the gates and the demo always run all 7.

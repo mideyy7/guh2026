@@ -18,8 +18,8 @@ for i in 1 2 3 4 5 6 7; do
     -e N8N_CONCURRENCY_PRODUCTION_LIMIT=1 -e NODE_OPTIONS="--max-old-space-size=$HEAP" \
     "n8nio/n8n:$V" >/dev/null
 done
-echo "Started 7 instances. Waiting 90 s for them to boot..."
-sleep 90
+echo "Started 7 instances. Waiting 180 s for them to settle (startup spikes memory and CPU)..."
+sleep 180
 
 echo; docker stats --no-stream --format 'table {{.Name}}\t{{.MemUsage}}\t{{.MemPerc}}\t{{.CPUPerc}}' $(docker ps -q --filter name=hive-memtest)
 ok=0
