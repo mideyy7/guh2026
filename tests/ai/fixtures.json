@@ -1,0 +1,316 @@
+{
+  "about": "Labelled distress texts for the Interpret workflow accuracy check. Pass: correct district for at least 18 of the 20 generated texts (implementation.md Phase 4). Urgency labels are the simulator ground truth; text cues hint at them but do not determine them exactly, so score urgency as within ±1.",
+  "districts": [
+    {
+      "name": "Lower Broughton",
+      "landmark": "Broughton Bridge"
+    },
+    {
+      "name": "Northern Quarter",
+      "landmark": "Stevenson Square"
+    },
+    {
+      "name": "Piccadilly",
+      "landmark": "Piccadilly Gardens"
+    },
+    {
+      "name": "Ancoats",
+      "landmark": "Cutting Room Square"
+    },
+    {
+      "name": "Salford Quays",
+      "landmark": "MediaCityUK"
+    },
+    {
+      "name": "Castlefield",
+      "landmark": "Castlefield Basin"
+    },
+    {
+      "name": "Deansgate",
+      "landmark": "Deansgate Locks"
+    },
+    {
+      "name": "Hulme",
+      "landmark": "Hulme Arch Bridge"
+    }
+  ],
+  "generated": [
+    {
+      "id": "gen-01",
+      "source": "scenario seed 1 m04",
+      "text": "elderly neighbour trapped upstairs in Ancoats pls help",
+      "expected": {
+        "district": "Ancoats",
+        "people": 5,
+        "urgency": 5,
+        "cue": "elderly"
+      }
+    },
+    {
+      "id": "gen-02",
+      "source": "scenario seed 1 m05",
+      "text": "water coming in fast at Ancoats. baby with us",
+      "expected": {
+        "district": "Ancoats",
+        "people": 1,
+        "urgency": 4,
+        "cue": "kids"
+      }
+    },
+    {
+      "id": "gen-03",
+      "source": "scenario seed 1 m02",
+      "text": "HELP Castlefield my dad cant walk, ground floor flooded",
+      "expected": {
+        "district": "Castlefield",
+        "people": 5,
+        "urgency": 5,
+        "cue": "injury"
+      }
+    },
+    {
+      "id": "gen-04",
+      "source": "scenario seed 1 m01",
+      "text": "3 adults on 1st floor balcony Salford Quays, ok for now",
+      "expected": {
+        "district": "Salford Quays",
+        "people": 3,
+        "urgency": 3,
+        "cue": null
+      }
+    },
+    {
+      "id": "gen-05",
+      "source": "scenario seed 1 m03",
+      "text": "we r 4 ppl in an attic near Piccadilly Gardens. phone dying",
+      "expected": {
+        "district": "Piccadilly",
+        "people": 4,
+        "urgency": 4,
+        "cue": null
+      }
+    },
+    {
+      "id": "gen-06",
+      "source": "scenario seed 1 m11",
+      "text": "we r 2 ppl in an attic near Stevenson Square. phone dying",
+      "expected": {
+        "district": "Northern Quarter",
+        "people": 2,
+        "urgency": 3,
+        "cue": null
+      }
+    },
+    {
+      "id": "gen-07",
+      "source": "scenario seed 1 m09",
+      "text": "elderly neighbour trapped upstairs in Deansgate pls help",
+      "expected": {
+        "district": "Deansgate",
+        "people": 4,
+        "urgency": 5,
+        "cue": "elderly"
+      }
+    },
+    {
+      "id": "gen-08",
+      "source": "scenario seed 1 m08",
+      "text": "trapped in car near Deansgate Locks, water at the windows",
+      "expected": {
+        "district": "Deansgate",
+        "people": 2,
+        "urgency": 5,
+        "cue": "injury"
+      }
+    },
+    {
+      "id": "gen-09",
+      "source": "scenario seed 1 m06",
+      "text": "we r 3 ppl in an attic near MediaCityUK. phone dying",
+      "expected": {
+        "district": "Salford Quays",
+        "people": 3,
+        "urgency": 1,
+        "cue": null
+      }
+    },
+    {
+      "id": "gen-10",
+      "source": "scenario seed 1 m10",
+      "text": "stuck on roof w/ 4 kids near Salford Quays, water rising",
+      "expected": {
+        "district": "Salford Quays",
+        "people": 4,
+        "urgency": 4,
+        "cue": "kids"
+      }
+    },
+    {
+      "id": "gen-11",
+      "source": "scenario seed 1 m07",
+      "text": "elderly neighbour trapped upstairs in Hulme pls help",
+      "expected": {
+        "district": "Hulme",
+        "people": 1,
+        "urgency": 3,
+        "cue": "elderly"
+      }
+    },
+    {
+      "id": "gen-12",
+      "source": "scenario seed 2 m01",
+      "text": "stuck on roof w/ 4 kids near Ancoats, water rising",
+      "expected": {
+        "district": "Ancoats",
+        "people": 4,
+        "urgency": 5,
+        "cue": "kids"
+      }
+    },
+    {
+      "id": "gen-13",
+      "source": "scenario seed 2 m05",
+      "text": "elderly neighbour trapped upstairs in Lower Broughton pls help",
+      "expected": {
+        "district": "Lower Broughton",
+        "people": 3,
+        "urgency": 5,
+        "cue": "elderly"
+      }
+    },
+    {
+      "id": "gen-14",
+      "source": "scenario seed 2 m08",
+      "text": "2 of us on the bus shelter by Piccadilly Gardens, water up to the seats",
+      "expected": {
+        "district": "Piccadilly",
+        "people": 2,
+        "urgency": 3,
+        "cue": null
+      }
+    },
+    {
+      "id": "gen-15",
+      "source": "scenario seed 2 m10",
+      "text": "we r 1 ppl in an attic near Castlefield Basin. phone dying",
+      "expected": {
+        "district": "Castlefield",
+        "people": 1,
+        "urgency": 1,
+        "cue": null
+      }
+    },
+    {
+      "id": "gen-16",
+      "source": "scenario seed 2 m12",
+      "text": "water coming in fast at Lower Broughton. baby with us",
+      "expected": {
+        "district": "Lower Broughton",
+        "people": 1,
+        "urgency": 4,
+        "cue": "kids"
+      }
+    },
+    {
+      "id": "gen-17",
+      "source": "scenario seed 2 m14",
+      "text": "water coming in fast at Castlefield. baby with us",
+      "expected": {
+        "district": "Castlefield",
+        "people": 4,
+        "urgency": 5,
+        "cue": "kids"
+      }
+    },
+    {
+      "id": "gen-18",
+      "source": "scenario seed 3 m07",
+      "text": "2 adults on 1st floor balcony Piccadilly, ok for now",
+      "expected": {
+        "district": "Piccadilly",
+        "people": 2,
+        "urgency": 1,
+        "cue": null
+      }
+    },
+    {
+      "id": "gen-19",
+      "source": "scenario seed 3 m08",
+      "text": "HELP Deansgate my dad cant walk, ground floor flooded",
+      "expected": {
+        "district": "Deansgate",
+        "people": 5,
+        "urgency": 4,
+        "cue": "injury"
+      }
+    },
+    {
+      "id": "gen-20",
+      "source": "scenario seed 3 m09",
+      "text": "stuck on roof w/ 2 kids near Lower Broughton, water rising",
+      "expected": {
+        "district": "Lower Broughton",
+        "people": 2,
+        "urgency": 4,
+        "cue": "kids"
+      }
+    }
+  ],
+  "messy": [
+    {
+      "id": "messy-1",
+      "source": "hand-written",
+      "text": "pls help were stuck on the roof nr picadilly gardens 3 kids n my mum water still risin",
+      "expected": {
+        "district": "Piccadilly",
+        "people": 4,
+        "urgency": 5,
+        "cue": "kids"
+      }
+    },
+    {
+      "id": "messy-2",
+      "source": "hand-written",
+      "text": "SALFORD QUAYS by mediacity. car park flooded. 2 of us on top of the car",
+      "expected": {
+        "district": "Salford Quays",
+        "people": 2,
+        "urgency": 3,
+        "cue": null
+      }
+    },
+    {
+      "id": "messy-3",
+      "source": "hand-written",
+      "text": "grandad (87) cant get downstairs, castlefield near the basin, power out",
+      "expected": {
+        "district": "Castlefield",
+        "people": 1,
+        "urgency": 5,
+        "cue": "elderly"
+      }
+    },
+    {
+      "id": "messy-4",
+      "source": "hand-written",
+      "text": "lower broughton - by the bridge - water in the house, we r upstairs, 5 ppl, 1 hurt leg",
+      "expected": {
+        "district": "Lower Broughton",
+        "people": 5,
+        "urgency": 5,
+        "cue": "injury"
+      }
+    },
+    {
+      "id": "messy-5",
+      "source": "hand-written",
+      "text": "ancoats near cutting room sq, think were ok for now but cant leave building x4",
+      "expected": {
+        "district": "Ancoats",
+        "people": 4,
+        "urgency": 2,
+        "cue": null
+      }
+    }
+  ]
+}
