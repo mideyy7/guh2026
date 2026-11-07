@@ -1,0 +1,9 @@
+{
+  "name": "hive",
+  "private": true,
+  "type": "commonjs",
+  "engines": { "node": ">=22.13" },
+  "scripts": {
+    "test": "node --test \"core/test/**/*.test.js\" \"world/test/**/*.test.js\" \"services/*/test/**/*.test.mjs\""
+  }
+}

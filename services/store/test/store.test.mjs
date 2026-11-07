@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const PORT = 4999;
 const base = `http://127.0.0.1:${PORT}`;
@@ -12,7 +13,7 @@ let proc;
 const env = { ...process.env, ACTOR_ID: 'team-1', ROLE: 'team', PEERS: 'drone-1,drone-2', DB_PATH: join(dir, 's.db'), PORT: String(PORT) };
 
 function start() {
-  proc = spawn(process.execPath, [new URL('./server.mjs', import.meta.url).pathname], { env, stdio: 'ignore' });
+  proc = spawn(process.execPath, [fileURLToPath(new URL('../server.mjs', import.meta.url))], { env, stdio: 'ignore' });
   return waitUp();
 }
 async function waitUp() {
