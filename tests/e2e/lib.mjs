@@ -28,6 +28,7 @@ export const status = () => req('GET', '/sim/status');
 export const world = () => req('GET', '/sim/world');
 export const metrics = () => req('GET', '/sim/metrics');
 export const events = (since = 0) => req('GET', `/sim/events?since=${since}`);
+export const inject = ({ cell, people, urgency, text }) => req('POST', '/sim/control/inject', { cell, people, urgency, text });
 
 // ── outages ────────────────────────────────────────────────────────────
 export const preset = (name, opts = {}) => req('POST', '/proxy/preset', { name, ...opts });

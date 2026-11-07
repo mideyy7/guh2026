@@ -89,6 +89,12 @@ export async function startSim(env = process.env) {
       for (let i = 0; i < Math.min(500, Number(n)); i++) tickOnce();
       send(res, 200, status());
     },
+    'POST /control/inject': async (req, res) => {
+      const body = await readJson(req);
+      const r = guard(() => st.world.inject(body));
+      event({ kind: 'distress_injected', ...r, text: body.text });
+      send(res, 200, r);
+    },
     'POST /control/speed': async (req, res) => {
       const { tick_ms } = await readJson(req);
       const v = Number(tick_ms);

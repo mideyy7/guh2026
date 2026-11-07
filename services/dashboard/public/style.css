@@ -23,6 +23,7 @@ h2 { font-size: 14px; margin: 14px 0 8px; }
 .group { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 button, select, input { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 5px 10px; }
 input[type=number] { width: 72px; }
+#inject-text { max-width: 100%; }
 button { cursor: pointer; } button:hover { border-color: var(--muted); }
 button.danger { background: var(--bad); color: #fff; border-color: var(--bad); font-weight: 600; }
 button.ok { background: var(--ok); color: #fff; border-color: var(--ok); font-weight: 600; }

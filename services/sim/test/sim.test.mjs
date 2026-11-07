@@ -115,3 +115,13 @@ test('world/metrics/status are available for the dashboard', async () => {
   assert.ok('score' in m && 'rescued' in m && 'wasted_travel' in m);
   assert.equal((await call('POST', '/control/speed', { tick_ms: 5 })).status, 400);
 });
+
+test('inject (dashboard-only): adds a survivor and a "Sending…" text; bad input → 400', async () => {
+  await call('POST', '/control/reset', { seed: 11 });
+  const r = await call('POST', '/control/inject', { cell: '1-1', people: 2, urgency: 5, text: 'stuck on roof w/ 2 kids near the Irwell, water rising' });
+  assert.equal(r.status, 200); assert.equal(r.body.district, 'Lower Broughton');
+  const w = (await call('GET', '/world')).body;
+  assert.equal(w.distress.find((m) => m.msg_id === r.body.msg_id).state, 'sending');
+  assert.equal((await call('POST', '/control/inject', { cell: '1-1', text: '' })).status, 400);
+  assert.ok((await call('GET', '/events?since=0')).body.some((e) => e.kind === 'distress_injected'));
+});

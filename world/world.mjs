@@ -2,6 +2,7 @@
 // Pure and deterministic: no I/O, no clock, no Math.random. The sim service and the headless
 // benchmark both drive it through the same methods.
 import { makeScenario } from './scenario.mjs';
+import { districtOf } from './gazetteer.mjs';
 import { cellId, parseCell, dist, samePos, stepToward, cellsWithin } from './grid.mjs';
 
 export function createWorld(seed, params, actorIds) {
@@ -174,6 +175,22 @@ export function createWorld(seed, params, actorIds) {
     };
   }
 
+  // Demo / judge control (dashboard only): a new survivor appears now at `cell` and sends `text`.
+  // The text is then delivered like any other: only once a drone is within range.
+  function inject({ cell, people = 2, urgency = 5, text }) {
+    const p = typeof cell === 'string' ? parseCell(cell) : null;
+    if (!p || !Number.isInteger(p.x) || !Number.isInteger(p.y) || p.x < 0 || p.y < 0 || p.x >= G || p.y >= G)
+      throw Object.assign(new Error('cell must be "x-y" inside the grid'), { status: 400 });
+    if (!text || typeof text !== 'string' || text.length > 280) throw Object.assign(new Error('text must be 1-280 characters'), { status: 400 });
+    const n = Object.keys(survivors).length + 1;
+    const id = `s${String(n).padStart(2, '0')}`;
+    const c = cellId(p);
+    survivors[id] = { id, cell: c, pos: p, people: Math.max(1, Math.min(9, Number(people) || 1)), urgency: Math.max(1, Math.min(5, Number(urgency) || 3)), appear_tick: st.tick, district: districtOf(c)?.name ?? null, injected: true };
+    const msg_id = `m${String(st.distress.length + 1).padStart(2, '0')}`;
+    st.distress.push({ msg_id, survivor_id: id, cell: c, text, district: survivors[id].district, cue: null, sent_tick: st.tick, delivered_to: null, delivered_tick: null });
+    return { survivor_id: id, msg_id, cell: c, district: survivors[id].district };
+  }
+
   // Delivery failed (the drone's n8n was unreachable): the phone keeps trying, so the text goes back
   // to "Sending…" and is retried on later ticks.
   function requeueDistress(msg_id) {
@@ -187,5 +204,5 @@ export function createWorld(seed, params, actorIds) {
     return JSON.stringify({ t: st.tick, a: ids.map((i) => [i, actors[i].pos, actors[i].target, actors[i].travel]), r: st.rescued, at: st.attempts });
   }
 
-  return { step, sense, move, rescue, metrics, snapshot, hash, requeueDistress, get tick() { return st.tick; }, actorIds: ids, scenario: sc };
+  return { step, sense, move, rescue, metrics, snapshot, hash, requeueDistress, inject, get tick() { return st.tick; }, actorIds: ids, scenario: sc };
 }

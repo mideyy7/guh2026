@@ -170,6 +170,7 @@
       else if (e.kind === 'rescue_attempt') addFeed(e.tick, `${e.actor} rescue ${e.survivor_id}: ${e.result}`, e.result === 'rescued' ? 'ok' : 'bad');
       else if (e.kind === 'distress_retry') addFeed(e.tick, `text to ${e.to} failed, still sending (${e.reason})`, 'bad');
       else if (e.kind === 'horizon_reached') addFeed(e.tick, 'horizon reached, run complete', 'ok');
+      else if (e.kind === 'distress_injected') addFeed(e.tick, `new text from ${e.district} (${e.cell}): "${e.text}" … sending until a drone is in range`, 'warn');
     }
     for (const a of next.actors) {
       const v = a.view, p = prevViews[a.actor_id];
@@ -202,6 +203,16 @@
   };
   $('btn-converge').onclick = async () => { await api('POST', '/api/sim/control/pause'); convCheck = { started: Date.now(), done: false }; addFeed(snap?.world?.tick, 'paused; timing convergence (budget: 10 gossip intervals)', 'warn'); };
 
+  $('inject-form').onsubmit = (e) => {
+    e.preventDefault();
+    const d = config.districts.find((x) => x.name === $('inject-district').value);
+    api('POST', '/api/sim/control/inject', { cell: d.landmark.cell, people: 2, urgency: 5, text: $('inject-text').value });
+  };
+
   window.addEventListener('resize', draw);
-  fetch('/api/config').then((r) => r.json()).then((c) => { config = c; poll(); setInterval(poll, 1000); });
+  fetch('/api/config').then((r) => r.json()).then((c) => {
+    config = c;
+    $('inject-district').innerHTML = c.districts.map((d) => `<option${d.name === 'Lower Broughton' ? ' selected' : ''}>${d.name}</option>`).join('');
+    poll(); setInterval(poll, 1000);
+  });
 })();

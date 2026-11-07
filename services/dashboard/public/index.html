@@ -36,6 +36,11 @@
       </label>
       <button id="btn-converge" title="Pause the sim and time how long until every actor's shared state matches">Pause &amp; check convergence</button>
     </div>
+    <form class="group" id="inject-form" aria-label="Send a distress text">
+      <label>Distress text <input id="inject-text" type="text" maxlength="280" size="42" value="stuck on roof w/ 2 kids near the Irwell, water rising"></label>
+      <label>from <select id="inject-district"></select></label>
+      <button type="submit">Send text</button>
+    </form>
   </section>
 
   <main class="layout">

@@ -209,3 +209,19 @@ test('a move lasts one tick: an actor that sends nothing holds position', () => 
   w.move('team-1', { x: 1, y: 6 }, null, 't2'); w.step();
   assert.deepEqual(w.sense('team-1').pos, { x: 1, y: 3 });
 });
+
+test('inject (demo control): new survivor appears now; its text waits until a drone is in range', () => {
+  const w = createWorld(1, params);
+  w.step();
+  const r = w.inject({ cell: '0-1', people: 3, urgency: 5, text: 'stuck on roof w/ 2 kids near the Irwell, water rising' });
+  assert.equal(r.district, 'Lower Broughton');
+  const snap = w.snapshot();
+  assert.equal(snap.survivors.find((x) => x.id === r.survivor_id).state, 'waiting');
+  // Drones start at 3-3 (distance 3 > radius 2): nothing delivered yet.
+  assert.deepEqual(w.step().filter((d) => d.msg_id === r.msg_id), []);
+  let got = null;
+  for (let t = 0; t < 6 && !got; t++) { w.move('drone-1', { x: 1, y: 1 }, null, `inj${t}`); got = w.step().find((d) => d.msg_id === r.msg_id); }
+  assert.equal(got?.to, 'drone-1');
+  assert.throws(() => w.inject({ cell: '9-9', text: 'x' }), /inside the grid/);
+  assert.throws(() => w.inject({ cell: '1-1', text: '' }), /1-280/);
+});

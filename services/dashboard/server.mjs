@@ -119,6 +119,7 @@ export async function startDashboard(env = process.env) {
     'POST /api/sim/control/pause': simPass('POST', '/control/pause'),
     'POST /api/sim/control/step': simPass('POST', '/control/step'),
     'POST /api/sim/control/speed': simPass('POST', '/control/speed'),
+    'POST /api/sim/control/inject': simPass('POST', '/control/inject'),
     // Proxy (outage settings + delivery records).
     'GET /api/proxy/links': proxyPass('GET', '/links'),
     'PUT /api/proxy/links': proxyPass('PUT', '/links'),
