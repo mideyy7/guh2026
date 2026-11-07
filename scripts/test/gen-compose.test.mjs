@@ -49,7 +49,8 @@ test('isolation: each actor is on exactly its own network, and no two actors sha
   assert.deepEqual(netsOf(s.hq), ['net-hq']);
   assert.ok(netsOf(s.proxy).includes('net-hq'));
   assert.ok(!netsOf(s.sim).includes('net-hq'));
-  assert.ok(!netsOf(s.dashboard).includes('net-hq'));
+  assert.ok(netsOf(s.dashboard).includes('net-hq'), 'dashboard observes/resets HQ');
+  for (const a of [...params.actors.drones, ...params.actors.teams]) assert.ok(!netsOf(s[`n8n-${a}`]).includes('net-hq'), 'no actor is on net-hq');
 });
 
 test('stores get role, mode and the peer list (everyone but themselves)', () => {

@@ -111,7 +111,8 @@ export function generate(params, { actors = null, withProbe = false, hasService 
     { name: 'sim', port: params.ports.sim, nets: actorNets, env: ['SEED: "1"', 'TICK_MS: ${TICK_MS:-2000}', `ACTORS: "${chosen.join(',')}"`] },
     { name: 'proxy', port: params.ports.proxy, nets: [...actorNets, 'net-hq'], env: [`ACTORS: "${chosen.join(',')}"`] },
     { name: 'hq', port: params.ports.hq, nets: ['net-hq'], env: ['MODE: ${MODE:-hive}'] },
-    { name: 'dashboard', port: params.ports.dashboard, nets: actorNets, env: [`ACTORS: "${chosen.join(',')}"`], publish: true },
+    // The dashboard also joins net-hq so it can reset/observe HQ. It is an observer, not an actor.
+    { name: 'dashboard', port: params.ports.dashboard, nets: [...actorNets, 'net-hq'], env: [`ACTORS: "${chosen.join(',')}"`], publish: true },
   ];
   const included = shared.filter((s) => hasService(s.name));
   for (const s of included) {

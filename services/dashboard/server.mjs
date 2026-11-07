@@ -34,6 +34,7 @@ export async function startDashboard(env = process.env) {
   const PORT = Number(env.PORT || params.ports.dashboard);
   const SIM = env.SIM_URL || `http://sim:${params.ports.sim}`;
   const PROXY = env.PROXY_URL || `http://proxy:${params.ports.proxy}`;
+  const HQ = env.HQ_URL || `http://hq:${params.ports.hq}`;
   const storeUrls = env.STORE_URLS ? JSON.parse(env.STORE_URLS) : {};
   const storeUrl = (id) => storeUrls[id] || (env.STORE_URL_TEMPLATE || `http://store-{id}:${params.ports.store}`).replace('{id}', id);
   const STALE_MS = Number(env.STALE_MS || 3000);
@@ -130,9 +131,11 @@ export async function startDashboard(env = process.env) {
       const sim = await postJson(`${SIM}/control/reset`, seed === undefined ? {} : { seed });
       const stores = await Promise.all(ACTORS.map((id) => postJson(`${storeUrl(id)}/reset`, {})));
       const proxy = await postJson(`${PROXY}/reset`, {});
+      const hq = await postJson(`${HQ}/reset`, {}, 2000); // HQ only runs in the central baselines; absence is fine
       const failed = [!sim.ok && 'sim', !proxy.ok && 'proxy', ...stores.map((s, i) => !s.ok && `store-${ACTORS[i]}`)].filter(Boolean);
-      send(res, failed.length ? 502 : 200, { ok: !failed.length, failed, seed: sim.body?.seed });
+      send(res, failed.length ? 502 : 200, { ok: !failed.length, failed, seed: sim.body?.seed, hq_reset: hq.ok });
     },
+    'GET /api/hq/state': async (req, res) => { const r = await getJson(`${HQ}/state`, 1500); send(res, r.ok ? 200 : 502, r.ok ? r.body : { error: 'hq not running (only used by the central baselines)' }); },
     'GET /api/islands': async (req, res) => {
       const l = await getJson(`${PROXY}/links`);
       send(res, l.ok ? 200 : 502, l.ok ? { islands: islands(l.body.allowed) } : { error: 'proxy unreachable' });

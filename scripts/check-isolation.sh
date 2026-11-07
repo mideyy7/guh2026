@@ -2,6 +2,7 @@
 # S5 / acceptance check: proves actors can only talk to each other through shared services.
 # For every running actor A, from INSIDE n8n-A:
 #   must FAIL : http://n8n-B:5678/healthz and http://store-B:4000/health   for every other actor B
+#   must FAIL : http://hq:3100/health  (actors reach HQ only through the proxy's /rpc)
 #   must WORK : http://store:4000/health and it must report actor_id == A  (alias resolves to OWN store)
 #   must WORK : every shared service that is running (proxy, sim, probe)
 # And from each shared service on the actor networks: every n8n-X must be reachable.
@@ -23,12 +24,13 @@ for a in $actors; do
   others=$(echo "$actors" | grep -vx "$a" | tr '\n' ' ')
   out=$(docker compose exec -T "n8n-$a" node -e '
     const [self, others, shared] = [process.argv[1], process.argv[2].trim().split(/\s+/).filter(Boolean), process.argv[3].trim().split(/\s+/).filter(Boolean)];
-    const get = (u) => fetch(u, { signal: AbortSignal.timeout(3000) }).then(async r => ({ ok: r.ok, body: await r.text() }), e => ({ ok: false, err: e.cause?.code || e.name }));
+    const get = (u) => fetch(u, { signal: AbortSignal.timeout(5000) }).then(async r => ({ ok: r.ok, body: await r.text() }), e => ({ ok: false, err: e.cause?.code || e.name }));
     (async () => {
       const lines = [];
       for (const b of others) for (const u of [`http://n8n-${b}:5678/healthz`, `http://store-${b}:4000/health`]) {
         const r = await get(u); lines.push((r.ok ? "FAIL reachable " : "ok   blocked   ") + u + (r.err ? " (" + r.err + ")" : ""));
       }
+      { const u = "http://hq:3100/health"; const r = await get(u); lines.push((r.ok ? "FAIL reachable " : "ok   blocked   ") + u + (r.err ? " (" + r.err + ")" : "")); }
       const own = await get("http://store:4000/health");
       let id = null; try { id = JSON.parse(own.body).actor_id } catch {}
       lines.push((own.ok && id === self ? "ok   own store " : "FAIL own store ") + "http://store:4000 -> " + id);
@@ -44,12 +46,13 @@ done
 # Shared services must reach every actor's n8n (they sit on all actor networks).
 for svc in probe proxy sim dashboard; do
   echo "$running" | grep -qx "$svc" || continue
+  svc_fail=0
   for a in $actors; do
     checks=$((checks + 1))
-    if docker compose exec -T "$svc" node -e "fetch('http://n8n-$a:5678/healthz',{signal:AbortSignal.timeout(3000)}).then(r=>process.exit(r.ok?0:1),()=>process.exit(1))" >/dev/null 2>&1; then :; else
-      echo "[$svc] FAIL cannot reach n8n-$a"; fail=$((fail + 1)); fi
+    if docker compose exec -T "$svc" node -e "fetch('http://n8n-$a:5678/healthz',{signal:AbortSignal.timeout(5000)}).then(r=>process.exit(r.ok?0:1),()=>process.exit(1))" >/dev/null 2>&1; then :; else
+      echo "[$svc] FAIL cannot reach n8n-$a"; fail=$((fail + 1)); svc_fail=$((svc_fail + 1)); fi
   done
-  echo "[$svc] reaches all $(echo "$actors" | wc -w | tr -d ' ') actors"
+  [ "$svc_fail" -eq 0 ] && echo "[$svc] reaches all $(echo "$actors" | wc -w | tr -d ' ') actors"
 done
 
 echo "----"
