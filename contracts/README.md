@@ -182,3 +182,7 @@ See [params.json](params.json). Notes:
 
 ## Changelog
 - Phase 0: initial draft (Dev A). Awaiting Dev B review.
+- Phase 1 (Dev A), **additive only**, nothing existing changed:
+  - Proxy: `POST /links/toggle {a, b, up?}` (click-to-cut, both directions), `POST /reset`, `GET /health`. Log entries also carry `msg` (message id, shared by a message's queued/delivered/dropped entries) and `reason` on dropped/failed. A message whose link is cut while in flight is logged `dropped`.
+  - Sim: `GET /events?since=n`, `GET /status`, `POST /control/step {n}` (only while paused), `POST /control/speed {tick_ms}`. The run stops by itself at `horizon_ticks`. `POST /rescue` from a drone returns 400. A distress text whose delivery fails goes back to "Sending…" and is retried.
+  - Presets: the HQ reachability policy per preset is defined in `world/links.mjs` (blackout-3, drones-vs-teams and flapping cut HQ; isolate-one cuts only the isolated actor; percent decides each actor's HQ link with probability p).
