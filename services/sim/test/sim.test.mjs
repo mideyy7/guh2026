@@ -95,7 +95,7 @@ test('distress: delivered to a drone webhook; a failed delivery is retried until
   assert.ok(tries.every((t) => t.id === 'drone-1'), 'only drone-1 was in range');
 
   failDrone = null;
-  for (let t = 0; t < 2; t++) { await call('POST', '/move', { actor: 'drone-1', target: { x, y }, key: `stay-${t}` }); await call('POST', '/control/step', { n: 1 }); await wait(60); }
+  for (let t = 0; t < 18; t++) { await call('POST', '/move', { actor: 'drone-1', target: { x, y }, key: `stay-${t}` }); await call('POST', '/control/step', { n: 1 }); await wait(30); }
   await wait(120);
   const after = hits.filter((h) => h.path === 'distress' && h.body.msg_id === m.msg_id);
   const delivered = (await call('GET', '/world')).body.distress.find((d) => d.msg_id === m.msg_id);

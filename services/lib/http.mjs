@@ -21,9 +21,10 @@ export async function readJson(req, limit = 4 * 1024 * 1024) {
 // routes: { 'GET /path': async (req, res, url) => ... }. Errors with .status map to that status.
 export function serve(port, routes, name) {
   const server = http.createServer(async (req, res) => {
-    const url = new URL(req.url, 'http://x');
+    let url;
+    try { url = new URL(req.url, 'http://x'); } catch { return send(res, 400, { error: 'malformed request URL' }); }
     if (req.method === 'OPTIONS') return send(res, 204, '', { 'access-control-allow-methods': 'GET,POST,PUT', 'access-control-allow-headers': 'content-type' });
-    const h = routes[`${req.method} ${url.pathname}`];
+    const h = routes[`${req.method} ${url.pathname}`] ?? (req.method === 'GET' ? routes['GET *'] : undefined);
     if (!h) return send(res, 404, { error: `no route ${req.method} ${url.pathname}` });
     try { await h(req, res, url); }
     catch (e) { if (!res.headersSent) send(res, e.status || 500, { error: String(e.message || e) }); }

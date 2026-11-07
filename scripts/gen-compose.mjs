@@ -128,6 +128,7 @@ export function generate(params, { actors = null, withProbe = false, hasService 
       `      PORT: "${s.port}"`,
       ...s.env.map((e) => `      ${e}`),
       ...(s.publish ? [`    ports: ["${s.port}:${s.port}"]`] : []),
+      ...(s.name === 'dashboard' ? ['    volumes:', '      - ./bench/results:/app/bench/results:ro'] : []),
       `    networks: [${s.nets.join(', ')}]`,
       '',
     );

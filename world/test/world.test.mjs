@@ -196,7 +196,16 @@ test('distress: a failed delivery goes back to "Sending…" and is retried', () 
   assert.equal(w.requeueDistress(m.msg_id), true);
   assert.equal(w.snapshot().distress.find((x) => x.msg_id === m.msg_id).state, 'sending');
   const again = w.step().find((d) => d.msg_id === m.msg_id);
-  assert.ok(again, 'redelivered on the next tick');
+  assert.ok(again, 'first retry on the next tick');
+  // Repeated failures back off: retries at +1, +2, +4, +8, then every 16 ticks — never every tick.
+  const retryTicks = [];
+  for (let t = 0; t < 60; t++) {
+    w.move('drone-1', parseCell(m.cell), null, `stay${t}`);
+    for (const d of w.step()) if (d.msg_id === m.msg_id) { retryTicks.push(w.tick); w.requeueDistress(m.msg_id); }
+  }
+  const gaps = retryTicks.slice(1).map((t, i) => t - retryTicks[i]);
+  assert.deepEqual(gaps.slice(0, 4), [2, 4, 8, 16], `gaps ${gaps}`);
+  assert.ok(gaps.every((g) => g <= 16));
 });
 
 test('a move lasts one tick: an actor that sends nothing holds position', () => {

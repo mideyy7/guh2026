@@ -1,73 +1,71 @@
 <!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>HIVE Control</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <header class="bar">
-    <div class="brand"><strong>HIVE</strong> <span class="muted">observer: reads state, never assigns</span></div>
-    <div class="status" aria-live="polite">
-      <span id="tick" class="pill">tick –</span>
-      <span id="runstate" class="pill">–</span>
-      <span id="preset" class="pill">links –</span>
-      <span id="conv" class="pill">–</span>
-    </div>
-  </header>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#fafaf8"><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%278%27 fill=%27%23284c3f%27/%3E%3Ctext x=%2716%27 y=%2724%27 text-anchor=%27middle%27 font-size=%2725%27 fill=%27%23fafaf8%27%3E%E2%AC%A1%3C/text%3E%3C/svg%3E"><title>HIVE · Mission studio</title>
+<link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="studio.css"><link rel="stylesheet" href="panels.css"><link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.6.1/dist/maplibre-gl.css"><link rel="stylesheet" href="theme.css"><link rel="stylesheet" href="swarm.css">
+<script defer src="https://unpkg.com/maplibre-gl@5.6.1/dist/maplibre-gl.js"></script><script defer src="https://unpkg.com/three@0.160.1/build/three.min.js"></script><script defer src="vegetation.js"></script><script defer src="map.js"></script><script defer src="swarm-data.js"></script><script defer src="app.js"></script><script defer src="panels.js"></script><script defer src="studio.js"></script><script defer src="swarm.js"></script>
+</head><body class="mission-studio">
+<header class="studio-header"><a href="#" class="studio-brand"><span class="studio-logo">⬡</span>HIVE</a><nav aria-label="Workspace"><button class="nav-item active" data-view="operations"><i data-icon="map"></i>Mission</button><button class="nav-item" data-view="network"><i data-icon="network"></i>Swarm</button><button class="nav-item" data-view="insights"><i data-icon="chart"></i>Insights</button></nav><div class="header-actions"><button id="analyst-toggle" class="active" aria-pressed="true">✧ Analyst</button><button id="help-button" class="icon-button" aria-label="About this view"><i data-icon="help"></i></button></div></header>
+<div class="studio-layout"><main class="mission-workspace"><div class="workspace-title"><div><span class="status-dot"></span><strong>Rescue operations</strong><span id="breadcrumb">Overview</span><span id="clock"></span></div><div class="workspace-actions"><button id="mission-details">Mission details</button><button id="reset-button"><i data-icon="reset"></i>Reset</button><button id="blackout-button" class="outage-action"><i data-icon="bolt"></i>Simulate network blackout</button></div></div><div class="sr-only"><h1 id="page-title">HIVE mission studio</h1><p id="page-description">Live rescue coordination</p></div>
+<div id="operations-view" class="view">
+<section class="panel map-panel" aria-label="Mission map">
+<div class="map-chrome"><div class="place-switch"><button id="place-manchester" class="active">Manchester</button><button id="place-salford">Salford</button><button id="fit-mission-top">Fit mission</button><span class="chrome-divider"></span><label for="follow-actor">Follow <select id="follow-actor"><option value="">None</option></select></label></div><div class="map-perspective"><button id="perspective-2d" aria-pressed="false">2D</button><button id="perspective-3d" class="active" aria-pressed="true">3D</button></div></div>
+<div class="map-shell" id="map-shell">
+<div id="street-map" aria-label="Geographic Manchester map"></div>
+<svg id="simulation-map" viewBox="0 0 1000 610" role="img" aria-label="Illustrative Manchester rescue map with simulated actors, incidents and communication links">
+<defs><pattern id="map-grid" width="80" height="80" patternUnits="userSpaceOnUse"><path d="M80 0H0V80" fill="none" stroke="#cfdbd3" stroke-width=".8" stroke-dasharray="3 5"/></pattern><pattern id="buildings" width="110" height="84" patternUnits="userSpaceOnUse" patternTransform="rotate(-23)"><rect x="12" y="12" width="34" height="23" rx="3" fill="#e2e6de"/><rect x="58" y="12" width="40" height="23" rx="3" fill="#e2e6de"/><rect x="12" y="48" width="42" height="22" rx="3" fill="#e2e6de"/><rect x="66" y="48" width="32" height="22" rx="3" fill="#e2e6de"/></pattern><filter id="marker-shadow"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-opacity=".13"/></filter></defs>
+<rect width="1000" height="610" fill="#edf0e8"/><rect width="1000" height="610" fill="url(#buildings)" opacity=".65"/>
+<path d="M0 80L180 0H310L180 205L0 240Z M740 465L1000 410V610H850Z" fill="#dce7d9"/>
+<g fill="none" stroke="#fafbf5" stroke-width="16"><path d="M-50 490L1030 60M-40 210L1020 510M140 -30L640 650M500 -50L1000 500M300 650L760 -30"/><path d="M0 330L1000 340" stroke-width="9"/><path d="M100 0L440 610M720 0L350 610" stroke-width="7"/></g>
+<path d="M230 -30C180 100 370 130 290 245S370 360 430 440S420 565 540 650" fill="none" stroke="#c3ddd6" stroke-width="83" opacity=".5"/><path d="M230 -30C180 100 370 130 290 245S370 360 430 440S420 565 540 650" fill="none" stroke="#a3cbc5" stroke-width="29"/>
+<path id="flood-layer" d="M220 90C130 190 180 345 320 330L440 475L490 440L367 263L370 150Z" fill="#a1d3d0" opacity=".3" stroke="#79b6b3" stroke-dasharray="5 7"/>
+<g fill="none" stroke="#fafbf5" stroke-width="9"><path d="M210 80L295 105M245 245L338 245M367 375L420 355M421 470L490 445"/></g>
+<rect width="1000" height="610" fill="url(#map-grid)"/>
+<g class="district-labels"><text x="110" y="150">SALFORD</text><text x="465" y="190">GREENGATE</text><text x="740" y="130">NORTHERN QUARTER</text><text x="600" y="400" class="city-label">Manchester</text><text x="95" y="490">ORDSALL</text><text x="700" y="535">PICCADILLY</text><text x="237" y="375" transform="rotate(48 237 375)" class="river-label">RIVER IRWELL</text></g>
+<g id="island-shapes"></g><g id="route-layer"></g><g id="link-layer"></g><g id="incident-layer"></g><g id="actor-layer"></g>
+</svg>
+<div class="map-top-overlay"><span class="map-live"><span class="status-dot"></span> SIM T+<span id="sim-time">00:00</span></span><span class="map-mode-label" id="map-mode-label">GEOGRAPHIC BASEMAP · LIVE OPERATIONS</span></div>
+<div class="map-layer-control"><button id="layers-button" aria-expanded="false" aria-controls="map-layer-menu"><i data-icon="layers"></i>Layers<span>⌄</span></button><div id="map-layer-menu" hidden><strong>MAP LAYERS</strong><label><input type="checkbox" data-map-layer="actors" checked>Actors</label><label><input type="checkbox" data-map-layer="incidents" checked>Incidents</label><label><input type="checkbox" data-map-layer="flood" checked>Simulated flooding</label><label><input type="checkbox" data-map-layer="routes" checked>Movement & routes</label><label><input type="checkbox" data-map-layer="trees" checked>Illustrated vegetation</label><label><input type="checkbox" data-map-layer="communication">Communication links</label><p>Actors, incidents and routes are live. The flood boundary is illustrative.</p></div></div>
+<div class="map-controls"><button id="zoom-in" aria-label="Zoom in">+</button><button id="zoom-out" aria-label="Zoom out">−</button><button id="recenter" aria-label="Fit entire mission" title="Fit mission"><i data-icon="locate"></i></button><button id="fullscreen-map" aria-label="Expand map" title="Expand map"><i data-icon="expand"></i></button></div>
+<div class="map-legend"><span><b class="legend-drone">✳</b>Drone</span><span><b class="legend-team">▣</b>Rescue team</span><span><b class="legend-incident"></b>Incident</span><span><b class="legend-flood"></b>Flood zone</span></div>
+<div class="map-notice" id="map-notice" role="status">Loading Manchester geography…</div>
+<div class="map-selection" id="map-selection" hidden></div>
+<div class="map-scale">━━━━<br>~500 m · schematic</div>
+</div>
+<div class="map-footer"><span><span class="status-dot"></span><span id="map-status">All actors connected</span></span><div class="segmented"><button id="street-button" class="selected" aria-pressed="true">Live map</button><button id="schematic-button" aria-pressed="false">Offline</button></div><span class="map-observer-label">OBSERVER VIEW · SIMULATED FLOOD</span></div>
+</section>
+<div class="mission-transport"><div class="transport-playback"><button id="previous-frame" aria-label="Previous recorded frame">Ⅰ◀</button><button id="pause-button" class="transport-play" aria-label="Pause simulation"><i data-icon="pause"></i></button><button id="next-frame" aria-label="Next recorded frame">▶Ⅰ</button><select id="playback-speed" aria-label="Playback speed"><option value="1">1×</option><option value="2">2×</option><option value="3">3×</option></select></div><span class="transport-time" id="transport-time">T+00:00</span><div class="timeline-wrap"><input id="mission-timeline" type="range" min="0" max="0" value="0" aria-label="Recorded mission timeline"><div class="timeline-labels"><span id="timeline-start">00:00</span><span>RECORDED SESSION</span><span id="timeline-end">00:00</span></div></div><button id="live-button" class="live-indicator"><span class="status-dot"></span>LIVE</button></div>
+<section class="metrics" aria-label="Supplementary demo metrics" hidden>
+<article class="metric"><div class="metric-label">Survivors rescued<i data-icon="people"></i></div><div class="metric-number"><span id="rescued-value">12</span><span class="metric-total" id="rescued-total">/ 24</span><span class="metric-badge" id="rescued-badge">+2 this minute</span></div><div class="metric-foot"><span class="tiny-bar"><span id="rescue-progress"></span></span><span id="rescue-percent">50% of known survivors</span></div></article>
+<article class="metric"><div class="metric-label">Active actors<i data-icon="network"></i></div><div class="metric-number">4<span class="metric-total">/ 4</span><span class="small-spark">▂ ▄ ▃ ▆ ▅ █ ▆</span></div><div class="metric-foot"><span class="status-dot"></span>2 drones · 2 rescue teams</div></article>
+<article class="metric"><div class="metric-label">Mission score<i data-icon="chart"></i></div><div class="metric-number"><span id="score-value">840</span><span class="metric-unit">pts</span><span class="score-trend">↗</span></div><div class="metric-foot">Urgency weighted · time adjusted</div></article>
+<article class="metric"><div class="metric-label">Peer connectivity<i data-icon="signal"></i></div><div class="metric-number"><span id="link-value">100</span><span class="metric-unit">%</span><span class="connection-tag" id="connection-tag">Connected</span></div><div class="metric-foot" id="link-caption">6 of 6 peer links available</div></article>
+</section>
+<section class="mission-proof" aria-label="Rescue response and local coordination">
+<article class="proof-panel rescue-proof" id="rescue-proof"><header><span class="proof-number">01 / RESPONSE</span><span class="proof-badge" id="rescue-proof-badge">RESCUE JOURNEY</span></header><h2>How a rescue happens</h2><p class="proof-lead" id="rescue-proof-summary">Follow a discovery all the way to safety.</p><div class="rescue-task-choice"><label for="proof-task-select">Follow incident</label><select id="proof-task-select" aria-label="Follow a rescue incident"></select><button class="proof-text-button" id="proof-show-task">Show on map ↗</button></div><div class="rescue-journey" id="rescue-journey" aria-label="Rescue stages"></div><div class="proof-stage-explanation" id="rescue-stage-explanation" aria-live="polite"></div><div class="rescue-proof-outcome" id="rescue-proof-outcome"></div><footer><button class="proof-text-button" id="proof-inspect-bid">Inspect bids →</button><span>Stages read from the actors’ own stores</span></footer></article>
+<article class="proof-panel connection-proof" id="connection-proof"><header><span class="proof-number">02 / COORDINATION</span><span class="proof-badge" id="connection-proof-badge">CONNECTED</span></header><h2>Who can still work together?</h2><p class="proof-lead" id="connection-proof-summary">Discoveries can reach both rescue teams.</p><div class="proof-topology" id="proof-topology"></div><div class="proof-link-key"><span><i></i>Available link</span><span class="cut"><i></i>Cut link</span></div><div class="proof-stage-explanation" id="connection-proof-explanation"></div><footer><button class="proof-text-button" id="proof-toggle-links">Try a blackout →</button><button class="proof-text-button subdued" data-view="network">Inspect links ↗</button></footer></article>
+</section></div>
+<div id="network-view" class="view" hidden>
+<section class="swarm-workspace" aria-label="Swarm coordination and workflows">
+<header class="swarm-heading"><div><div class="eyebrow">THE ACTORS AT WORK</div><h2>Independent minds. Visible cooperation.</h2><p>Follow a discovery between actors, then look inside the workflows that support it.</p></div><span class="swarm-source-badge">LIVE OBSERVER · PROXY, SIMULATOR &amp; ACTOR STORES</span></header>
+<div class="swarm-toolbar"><div class="swarm-tabs" role="tablist" aria-label="Swarm view"><button id="coordination-tab" role="tab" aria-selected="true" aria-controls="swarm-coordination-panel" data-swarm-tab="coordination">Agent coordination</button><button id="workflows-tab" role="tab" aria-selected="false" aria-controls="swarm-workflows-panel" tabindex="-1" data-swarm-tab="workflows">Agent workflows</button></div><div class="swarm-toolbar-actions"><span id="swarm-tick">SIM T+00:00</span><button class="button secondary" id="swarm-pause">Pause mission</button><button class="button secondary" id="swarm-inject">Add distress text</button><button class="button secondary" id="restore-all">Restore all links</button></div></div>
+<div class="swarm-body"><aside class="swarm-roster" aria-label="Select an actor"><div class="swarm-section-label">LOCAL ACTORS</div><div id="swarm-actor-list"></div><div class="swarm-instance-note"><strong>One actor. One instance.</strong><p>Each actor runs its own n8n workflows and keeps its own durable store.</p><span>Live: one n8n + one store per actor</span></div></aside>
+<div class="swarm-stage"><section id="swarm-coordination-panel" role="tabpanel" aria-labelledby="coordination-tab"><div class="swarm-stage-heading"><div><h3 id="swarm-topology-title">One shared mission</h3><p id="swarm-topology-caption">Actors exchange discoveries over available peer links.</p></div><span class="swarm-diagram-hint">Click an actor to inspect · click a link to cut</span></div><div id="topology" class="swarm-topology"></div><div class="swarm-graph-key"><span><b class="available-link"></b>Available peer link</span><span><b class="cut-link"></b>Cut link</span><span><b class="delivery-dot"></b>New task delivered</span></div><div id="recovery-panel" class="swarm-health-strip"></div></section>
+<section id="swarm-workflows-panel" role="tabpanel" aria-labelledby="workflows-tab" hidden><div class="swarm-stage-heading"><div><h3 id="workflow-canvas-title">Inside Drone 01</h3><p>Six independently triggered workflow stages. Select one to inspect its nodes.</p></div><span class="workflow-canvas-badge">PLANNED n8n CANVAS</span></div><div class="workflow-picker" id="workflow-picker"></div><div class="workflow-canvas" id="workflow-canvas"></div><div class="workflow-trigger-note" id="workflow-trigger-note"></div></section>
+<section class="swarm-exchange"><div class="swarm-stage-heading"><div><h3>What moved between actors?</h3><p>Delivery records from the chaos proxy, with sender, recipient and task identity.</p></div><label class="exchange-filter"><input id="swarm-selected-only" type="checkbox">Selected actor only</label></div><div id="swarm-message-feed" class="swarm-message-feed"></div></section></div>
+<aside class="swarm-inspector" aria-label="Selected actor details"><div class="swarm-section-label">ACTOR INSPECTOR</div><div id="swarm-actor-inspector"></div><div class="swarm-inspector-heading"><h3>Workflow activity</h3><span>OBSERVED</span></div><div id="swarm-workflow-activity"></div><div class="swarm-inspector-heading"><h3>Selected record</h3></div><div id="swarm-record-detail"></div><button id="swarm-open-n8n" class="button secondary" disabled>Open in n8n ↗</button><p id="swarm-n8n-hint" class="swarm-n8n-hint">Opens this actor’s own n8n editor.</p></aside></div>
+<footer class="swarm-footnote">The dashboard observes the mission. It never dispatches work between actors. Workflow activity is inferred from proxy deliveries, simulator receipts and actor-store changes, not read from n8n’s execution log.</footer>
+</section></div>
+<div id="insights-view" class="view" hidden><section class="insights-heading"><div><div class="eyebrow">INSIDE THE RESULTS</div><h2>Understand what the swarm knows—and achieves.</h2><p>Inspect local task knowledge, then compare response strategies.</p></div><div class="insights-tabs" role="tablist" aria-label="Insights view"><button id="insights-knowledge-tab" role="tab" aria-selected="true" aria-controls="beliefs-view" data-insights-section="beliefs" data-view="beliefs">Actor knowledge</button><button id="insights-comparison-tab" role="tab" aria-selected="false" aria-controls="benchmark-view" tabindex="-1" data-insights-section="benchmark" data-view="benchmark">Performance comparison</button></div></section><div id="beliefs-view" role="tabpanel" aria-labelledby="insights-knowledge-tab"><section class="panel full-panel"><div class="panel-heading"><div><h2>Who knows what?</h2><p>Compare each actor’s own task knowledge. Differences are expected during a partition.</p></div><span id="agreement-badge" class="connection-tag">Views agree</span></div><div class="table-wrap"><table id="belief-table"></table></div><div class="belief-explainer"><i data-icon="layers"></i><div><strong>Separate memories. Shared purpose.</strong><p>Cut links, then add a distress text. Only the drone that hears it and its connected peers learn about it. Restore links to watch that knowledge propagate.</p></div><button class="button secondary" id="inject-button"><i data-icon="plus"></i>Add distress text</button></div></section></div>
+<div id="benchmark-view" role="tabpanel" aria-labelledby="insights-comparison-tab" hidden><section class="panel full-panel"><div class="panel-heading"><div><h2>Does local coordination make a difference?</h2><p id="bench-subtitle">Loading benchmark results…</p></div><span class="demo-tag" id="bench-tag">LOADING</span></div><div class="benchmark-body"><div class="chart-legend"><span><b style="background:#284c3f"></b>HIVE</span><span><b style="background:#ecaf56"></b>Central + cached tasks</span><span><b style="background:#b4b0ac"></b>Central · idle on disconnect</span></div><div id="benchmark-chart"></div><div class="benchmark-cards" id="bench-cards"></div><div class="section-note" id="bench-note"></div></div></section></div>
 
-  <section class="controls" aria-label="Scenario and outage controls">
-    <div class="group">
-      <button id="btn-start">Start</button>
-      <button id="btn-pause">Pause</button>
-      <button id="btn-step" title="Advance one tick (paused only)">Step</button>
-      <label>Seed <input id="seed" type="number" value="1" min="1" max="99999"></label>
-      <button id="btn-reset">Reset</button>
-    </div>
-    <div class="group">
-      <button id="btn-blackout" class="danger">BLACKOUT</button>
-      <button id="btn-restore" class="ok">RESTORE</button>
-      <label>Preset
-        <select id="preset-select">
-          <option>all-up</option><option>blackout-3</option><option>drones-vs-teams</option>
-          <option>isolate-one</option><option>flapping</option><option value="percent">percent…</option>
-        </select>
-      </label>
-      <button id="btn-converge" title="Pause the sim and time how long until every actor's shared state matches">Pause &amp; check convergence</button>
-    </div>
-    <form class="group" id="inject-form" aria-label="Send a distress text">
-      <label>Distress text <input id="inject-text" type="text" maxlength="280" size="42" value="stuck on roof w/ 2 kids near the Irwell, water rising"></label>
-      <label>from <select id="inject-district"></select></label>
-      <button type="submit">Send text</button>
-    </form>
-  </section>
-
-  <main class="layout">
-    <section class="map-wrap" aria-label="Map">
-      <canvas id="map" width="640" height="640" aria-label="Grid map of the flooded area. Click a link to cut or restore it."></canvas>
-      <p class="legend muted">
-        <span><i class="sw drone"></i>drone</span>
-        <span><i class="sw team"></i>team</span>
-        <span><i class="sw surv"></i>survivor (ground truth)</span>
-        <span><i class="sw cut"></i>cut link</span>
-        <span>Click a link to cut / restore it.</span>
-      </p>
-    </section>
-
-    <section class="side">
-      <div class="metrics" id="metrics" aria-label="Mission metrics"></div>
-      <h2>Actors <span class="muted small">each card is that actor's own belief</span></h2>
-      <div class="cards" id="cards"></div>
-    </section>
-
-    <section class="feed-wrap" aria-label="Activity feed">
-      <h2>Activity</h2>
-      <ol class="feed" id="feed"></ol>
-    </section>
-  </main>
-
-  <footer class="muted small" id="errors"></footer>
-  <script src="app.js"></script>
+</div>
+<footer class="studio-footer"><span>HIVE · Neptune North Challenge / GreatUniHack 2026</span><span>Independent actors. Shared purpose. <b>LIVE DATA</b></span></footer></main>
+<aside class="analyst-panel" id="analyst-panel" aria-label="Mission analyst"><header class="analyst-heading"><div><span class="analyst-star">✧</span><strong>HIVE analyst</strong><span class="analyst-role">OBSERVER</span></div><button id="clear-chat" class="icon-button" aria-label="Clear analyst conversation"><i data-icon="reset"></i></button></header><div class="analyst-context"><span class="status-dot"></span><span id="analyst-context-text">Reading mission snapshot</span><span class="context-badge">LIVE</span></div><div id="analyst-conversation" class="analyst-conversation" role="log" aria-label="Analyst conversation"></div><div class="analyst-suggestions" id="analyst-suggestions"><button data-ask="Who owns this rescue?">Why this allocation?</button><button data-ask="Which actors are isolated?">Check connectivity</button><button data-ask="What changed after reconnection?">Explain recovery</button></div><form id="analyst-form" class="analyst-composer"><label class="sr-only" for="analyst-input">Ask about this mission</label><textarea id="analyst-input" rows="2" maxlength="800" placeholder="Ask about a rescue, an actor, a decision…"></textarea><div><span>Snapshot analyst <b>·</b> Rule-based</span><button id="ask-button" type="submit" aria-label="Ask mission analyst">↑</button></div></form><p class="analyst-disclaimer">Explains observed state. Never dispatches or controls actors.</p></aside></div>
+<dialog id="mission-details-dialog"><div class="dialog-heading"><div><div class="eyebrow">MISSION DETAILS</div><h2>Network & priority incident</h2></div><button class="icon-button" id="close-mission-details" aria-label="Close mission details">✕</button></div><section class="scenario-details" aria-label="Scenario context"><div><span>SCENARIO</span><strong>Operation Irwell</strong></div><div><span>LOCATION</span><strong>Manchester & Salford</strong></div><div><span>ENVIRONMENT</span><strong>Live simulation</strong></div></section><aside class="right-panels">
+<section class="panel network-panel"><div class="panel-heading compact"><h2>Network resilience</h2><i data-icon="signal"></i></div><div class="network-status"><span class="large-status-dot" id="network-light"></span><div><strong id="network-status-title">One connected swarm</strong><p id="network-status-description">Discoveries travel between all actors.</p></div></div><div class="network-visual" id="mini-network"></div><button class="button blackout-button" id="details-blackout-button"><i data-icon="bolt"></i>Simulate network blackout</button><p class="helper" id="network-helper">Splits the swarm into three islands. Each keeps a drone and a team.</p></section>
+<section class="panel incident-panel"><div class="panel-heading compact"><h2>Priority incident</h2><span class="urgency-badge">P1 · CRITICAL</span></div><div class="incident-title"><span class="incident-symbol">⌂</span><div><h3 id="incident-title">Family on rooftop</h3><p id="incident-location">Greengate · Sector C4</p></div></div><div class="incident-meta"><span><i data-icon="people"></i><span id="incident-people">3 people</span></span><span><i data-icon="water"></i>Rising water</span></div><div class="distress-quote" id="distress-text">“stuck on roof w/ 2 kids near the Irwell, water rising, please”</div><div class="incident-detail-line"><span>Task identity</span><code id="task-id">RSC-012</code></div><div class="incident-detail-line"><span>Current local owner</span><strong id="incident-owner">Rescue 01</strong></div><div class="rescue-timeline" id="rescue-timeline"></div><button class="text-button" id="inspect-button">Inspect bids & decision<i data-icon="arrow"></i></button></section>
+</aside>
+<div class="mission-log-details"><div class="mission-log-heading"><h3>Fleet & recorded events</h3><p>Actor status and timestamped evidence behind the mission views.</p></div><div class="mission-log-grid"><section class="panel actors-panel"><div class="panel-heading compact"><h2>The swarm <span class="count-tag" id="actors-count">actors</span></h2><button class="text-button" data-view="beliefs">Inspect actor knowledge<i data-icon="arrow"></i></button></div><div class="actor-cards" id="actor-cards"></div></section><section class="panel activity-panel"><div class="panel-heading compact"><h2>Live activity</h2><span class="subtle-label">LIVE EVENTS</span></div><div id="activity-feed" class="activity-feed" aria-live="polite" aria-relevant="additions"></div></section></div></div></dialog>
+<dialog id="detail-dialog"><div class="dialog-heading"><div><div class="eyebrow">TASK INSPECTOR</div><h2 id="dialog-title">Why this actor?</h2></div><button id="close-dialog" class="icon-button" aria-label="Close dialog">✕</button></div><div id="dialog-content"></div></dialog>
+<div id="toast" role="status" class="toast"></div>
 </body>
 </html>

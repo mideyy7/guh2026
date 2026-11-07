@@ -9,3 +9,5 @@ docker-compose.yml
 .DS_Store
 .claude/
 bench/results/
+tests/ui/shots/
+.ui-check-profile/

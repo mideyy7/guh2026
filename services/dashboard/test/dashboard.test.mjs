@@ -112,8 +112,23 @@ test('a dead store shows as stale and unreachable, keeping its last view', async
 
 test('static UI is served; path traversal is refused', async () => {
   const idx = await call('GET', '/');
-  assert.equal(idx.status, 200); assert.match(idx.type, /text\/html/); assert.match(idx.body, /<title>HIVE Control<\/title>/);
-  assert.equal((await call('GET', '/app.js')).status, 200);
+  assert.equal(idx.status, 200); assert.match(idx.type, /text\/html/); assert.match(idx.body, /<title>HIVE · Mission studio<\/title>/);
+  for (const f of ['/app.js', '/map.js', '/studio.js', '/panels.js', '/swarm.js', '/swarm-data.js', '/styles.css', '/theme.css', '/classic.html', '/fonts/ibm-plex-sans.woff2']) assert.equal((await call('GET', f)).status, 200, f);
+  assert.equal((await call('GET', '/fonts/ibm-plex-sans.woff2')).type, 'font/woff2');
+  assert.equal((await call('GET', '/nope.js')).status, 404);
   assert.equal((await fetch(base + '/..%2F..%2Fserver.mjs')).status, 404);
   assert.equal((await fetch(base + '/%2e%2e/%2e%2e/.env')).status, 404);
+});
+
+test('config carries the geographic box and n8n editor ports for the live map', async () => {
+  const c = (await call('GET', '/api/config')).body;
+  assert.ok(c.geo.west < c.geo.east && c.geo.south < c.geo.north);
+  assert.equal(c.n8n_host_base, 5671);
+  assert.equal(c.districts.length, 8);
+});
+
+test('bench: 404 with a clear message until results exist', async () => {
+  const r = await call('GET', '/api/bench');
+  assert.ok(r.status === 404 || r.status === 200);
+  if (r.status === 404) assert.match(r.body.error, /bench\/matrix/);
 });

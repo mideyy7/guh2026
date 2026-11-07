@@ -58,7 +58,7 @@ export function createWorld(seed, params, actorIds) {
   function deliverDistress() {
     const out = [];
     for (const m of st.distress) {
-      if (m.delivered_to || m.sent_tick > st.tick || st.rescued[m.survivor_id]) continue;
+      if (m.delivered_to || m.sent_tick > st.tick || st.rescued[m.survivor_id] || (m.retry_at ?? 0) > st.tick) continue;
       const from = parseCell(m.cell);
       let best = null;
       for (const id of ids) {
@@ -192,11 +192,15 @@ export function createWorld(seed, params, actorIds) {
   }
 
   // Delivery failed (the drone's n8n was unreachable): the phone keeps trying, so the text goes back
-  // to "Sending…" and is retried on later ticks.
+  // to "Sending…" and is retried later, backing off 1, 2, 4, 8, then every 16 ticks (like a real phone,
+  // and so an offline actor is not flooded).
   function requeueDistress(msg_id) {
     const m = st.distress.find((x) => x.msg_id === msg_id);
-    if (m) { m.delivered_to = null; m.delivered_tick = null; }
-    return !!m;
+    if (!m) return false;
+    m.failures = (m.failures || 0) + 1;
+    m.delivered_to = null; m.delivered_tick = null;
+    m.retry_at = st.tick + Math.min(16, 2 ** (m.failures - 1));
+    return true;
   }
 
   // Canonical state string for determinism tests.

@@ -7,10 +7,10 @@ import { join, extname, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { serve, send, readJson, postJson, loadParams, isMain } from '../lib/http.mjs';
 import { islands } from '../../world/links.mjs';
-import { DISTRICTS, HQ_CELL } from '../../world/gazetteer.mjs';
+import { DISTRICTS, HQ_CELL, GEO } from '../../world/gazetteer.mjs';
 
 const PUBLIC = join(fileURLToPath(new URL('.', import.meta.url)), 'public');
-const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml' };
+const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.txt': 'text/plain; charset=utf-8', '.json': 'application/json' };
 
 async function getJson(url, timeoutMs = 1500) {
   try {
@@ -90,7 +90,7 @@ export async function startDashboard(env = process.env) {
   const routes = {
     'GET /api/health': (req, res) => send(res, 200, { ok: true, actors: ACTORS, sim: SIM, proxy: PROXY }),
     'GET /api/config': (req, res) => send(res, 200, {
-      actors: ACTORS, grid: params.grid, hq_cell: HQ_CELL, tick_ms: params.tick_ms, gossip_ms: params.gossip_ms,
+      actors: ACTORS, grid: params.grid, hq_cell: HQ_CELL, tick_ms: params.tick_ms, gossip_ms: params.gossip_ms, geo: GEO, n8n_host_base: params.ports.n8n_host_base,
       islands: params.islands, districts: DISTRICTS.map((d) => ({ name: d.name, x: d.x, y: d.y, landmark: d.landmark, flood: d.flood })),
     }),
     'GET /api/actors': async (req, res) => send(res, 200, await pollAll()),
@@ -136,6 +136,12 @@ export async function startDashboard(env = process.env) {
       const failed = [!sim.ok && 'sim', !proxy.ok && 'proxy', ...stores.map((s, i) => !s.ok && `store-${ACTORS[i]}`)].filter(Boolean);
       send(res, failed.length ? 502 : 200, { ok: !failed.length, failed, seed: sim.body?.seed, hq_reset: hq.ok });
     },
+    // Benchmark results written by bench/matrix.mjs (mounted read-only in Docker). 404 until it has run.
+    'GET /api/bench': (req, res) => {
+      const f = join(env.BENCH_DIR || fileURLToPath(new URL('../../bench/results', import.meta.url)), 'summary.json');
+      if (!existsSync(f)) return send(res, 404, { error: 'no benchmark results yet: run node bench/matrix.mjs' });
+      try { send(res, 200, JSON.parse(readFileSync(f, 'utf8'))); } catch { send(res, 500, { error: 'summary.json is not valid JSON' }); }
+    },
     'GET /api/hq/state': async (req, res) => { const r = await getJson(`${HQ}/state`, 1500); send(res, r.ok ? 200 : 502, r.ok ? r.body : { error: 'hq not running (only used by the central baselines)' }); },
     'GET /api/islands': async (req, res) => {
       const l = await getJson(`${PROXY}/links`);
@@ -153,7 +159,7 @@ export async function startDashboard(env = process.env) {
     res.writeHead(200, { 'content-type': TYPES[extname(file)] || 'application/octet-stream', 'cache-control': 'no-cache' });
     res.end(body);
   };
-  for (const f of ['/', '/index.html', '/app.js', '/style.css']) routes[`GET ${f}`] = staticHandler;
+  routes['GET *'] = staticHandler; // every file under public/ (UI, styles, fonts); path traversal refused
 
   const server = await serve(PORT, routes, env.QUIET ? null : `dashboard on :${PORT} (${ACTORS.length} actors)`);
   return { server, port: server.address().port, close: () => server.close() };
