@@ -341,7 +341,7 @@ For each topology we document how it affects both peer reachability and dispatch
 | 25–35 s | Press **SIMULATE NETWORK BLACKOUT**. Links turn red and the network splits into 3 islands: {drone-1, drone-2, team-1}, {drone-3, team-2}, {drone-4, team-3} |
 | 35–60 s | New incidents arrive. Each island keeps searching and rescuing. The per-actor views **visibly diverge** |
 | 60–75 s | Restore links. Gossip flows back, conflicting claims resolve, duplicated work is flagged and counted, and the shared task views **converge** |
-| 75–90 s | Benchmark chart: HIVE against both central baselines under the same outage. Close with the measured result: "Under this outage, HIVE rescued N more people, at a cost of M duplicated trips." |
+| 75–90 s | Benchmark chart: HIVE against both central baselines under the same outage. Close with the measured result: "Under this blackout, HIVE rescued 29.7 of 30 survivors on average; both central dispatchers rescued none. Zero duplicated rescues; the cost was about 107 cells of wasted travel." (10 seeds, `bench/results/summary.csv`) |
 
 **Interactive bit:** let the judges click individual links on the map to cut them themselves.
 

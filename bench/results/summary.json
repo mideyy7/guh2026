@@ -1,0 +1,2583 @@
+{
+  "generated_at": "2026-11-07T17:09:03.533Z",
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "core": "core/dist/hive-core.js",
+  "summary": [
+    {
+      "mode": "hive",
+      "topology": "blackout-3",
+      "percent": null,
+      "runs": 10,
+      "core": "core/dist/hive-core.js",
+      "score": {
+        "n": 10,
+        "mean": 83.98,
+        "sd": 5.53,
+        "min": 77.57,
+        "max": 92.13
+      },
+      "rescued": {
+        "n": 10,
+        "mean": 29.7,
+        "sd": 0.67,
+        "min": 28,
+        "max": 30
+      },
+      "unrescued": {
+        "n": 10,
+        "mean": 0.3,
+        "sd": 0.67,
+        "min": 0,
+        "max": 2
+      },
+      "unrescued_urgency": {
+        "n": 10,
+        "mean": 0.3,
+        "sd": 0.67,
+        "min": 0,
+        "max": 2
+      },
+      "urgency_weighted_time_to_rescue": {
+        "n": 10,
+        "mean": 13.38,
+        "sd": 1.6,
+        "min": 9.8,
+        "max": 15.47
+      },
+      "duplicate_attempts": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "wasted_travel": {
+        "n": 10,
+        "mean": 106.6,
+        "sd": 15.39,
+        "min": 77,
+        "max": 122
+      },
+      "bytes": {
+        "n": 10,
+        "mean": 1300990.3,
+        "sd": 57282.86,
+        "min": 1234324,
+        "max": 1432062
+      },
+      "convergence_rounds": {
+        "n": 10,
+        "mean": 4.2,
+        "sd": 1.03,
+        "min": 3,
+        "max": 5
+      },
+      "converged_fraction": 1,
+      "seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "per_seed_score": [
+        90.901,
+        80.722,
+        82.64,
+        91.989,
+        79.377,
+        82.175,
+        82.356,
+        77.567,
+        92.126,
+        79.988
+      ]
+    },
+    {
+      "mode": "hive",
+      "topology": "drones-vs-teams",
+      "percent": null,
+      "runs": 10,
+      "core": "core/dist/hive-core.js",
+      "score": {
+        "n": 10,
+        "mean": 47,
+        "sd": 13,
+        "min": 24.34,
+        "max": 67.64
+      },
+      "rescued": {
+        "n": 10,
+        "mean": 17.4,
+        "sd": 4.74,
+        "min": 9,
+        "max": 22
+      },
+      "unrescued": {
+        "n": 10,
+        "mean": 12.6,
+        "sd": 4.74,
+        "min": 8,
+        "max": 21
+      },
+      "unrescued_urgency": {
+        "n": 10,
+        "mean": 44.3,
+        "sd": 15.3,
+        "min": 29,
+        "max": 71
+      },
+      "urgency_weighted_time_to_rescue": {
+        "n": 10,
+        "mean": 17.86,
+        "sd": 12.35,
+        "min": 6.41,
+        "max": 41.32
+      },
+      "duplicate_attempts": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "wasted_travel": {
+        "n": 10,
+        "mean": 7,
+        "sd": 4.55,
+        "min": 4,
+        "max": 18
+      },
+      "bytes": {
+        "n": 10,
+        "mean": 1467241.2,
+        "sd": 26637.21,
+        "min": 1430231,
+        "max": 1518777
+      },
+      "convergence_rounds": {
+        "n": 10,
+        "mean": 5,
+        "sd": 0,
+        "min": 5,
+        "max": 5
+      },
+      "converged_fraction": 1,
+      "seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "per_seed_score": [
+        58.301,
+        54.258,
+        45.824,
+        67.64,
+        40.562,
+        55.044,
+        46.11,
+        24.335,
+        48.021,
+        29.938
+      ]
+    },
+    {
+      "mode": "hive",
+      "topology": "isolate-one",
+      "percent": null,
+      "runs": 10,
+      "core": "core/dist/hive-core.js",
+      "score": {
+        "n": 10,
+        "mean": 87.07,
+        "sd": 6.69,
+        "min": 80.81,
+        "max": 99.76
+      },
+      "rescued": {
+        "n": 10,
+        "mean": 29.7,
+        "sd": 0.67,
+        "min": 28,
+        "max": 30
+      },
+      "unrescued": {
+        "n": 10,
+        "mean": 0.3,
+        "sd": 0.67,
+        "min": 0,
+        "max": 2
+      },
+      "unrescued_urgency": {
+        "n": 10,
+        "mean": 0.3,
+        "sd": 0.67,
+        "min": 0,
+        "max": 2
+      },
+      "urgency_weighted_time_to_rescue": {
+        "n": 10,
+        "mean": 11.06,
+        "sd": 1.1,
+        "min": 9.34,
+        "max": 12.32
+      },
+      "duplicate_attempts": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "wasted_travel": {
+        "n": 10,
+        "mean": 25,
+        "sd": 9.14,
+        "min": 16,
+        "max": 44
+      },
+      "bytes": {
+        "n": 10,
+        "mean": 4069263.8,
+        "sd": 317193.7,
+        "min": 3566488,
+        "max": 4567976
+      },
+      "convergence_rounds": {
+        "n": 10,
+        "mean": 7,
+        "sd": 0,
+        "min": 7,
+        "max": 7
+      },
+      "converged_fraction": 1,
+      "seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "per_seed_score": [
+        87.742,
+        83.996,
+        85.998,
+        99.759,
+        83.317,
+        84.452,
+        83.839,
+        80.809,
+        98.716,
+        82.104
+      ]
+    },
+    {
+      "mode": "hive",
+      "topology": "flapping",
+      "percent": null,
+      "runs": 10,
+      "core": "core/dist/hive-core.js",
+      "score": {
+        "n": 10,
+        "mean": 87.42,
+        "sd": 6.36,
+        "min": 80.98,
+        "max": 98.75
+      },
+      "rescued": {
+        "n": 10,
+        "mean": 29.9,
+        "sd": 0.32,
+        "min": 29,
+        "max": 30
+      },
+      "unrescued": {
+        "n": 10,
+        "mean": 0.1,
+        "sd": 0.32,
+        "min": 0,
+        "max": 1
+      },
+      "unrescued_urgency": {
+        "n": 10,
+        "mean": 0.1,
+        "sd": 0.32,
+        "min": 0,
+        "max": 1
+      },
+      "urgency_weighted_time_to_rescue": {
+        "n": 10,
+        "mean": 10.86,
+        "sd": 1.11,
+        "min": 9.43,
+        "max": 12.92
+      },
+      "duplicate_attempts": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "wasted_travel": {
+        "n": 10,
+        "mean": 73.6,
+        "sd": 11.22,
+        "min": 62,
+        "max": 94
+      },
+      "bytes": {
+        "n": 10,
+        "mean": 5449306.2,
+        "sd": 144892.76,
+        "min": 5240786,
+        "max": 5669166
+      },
+      "convergence_rounds": {
+        "n": 10,
+        "mean": 0.8,
+        "sd": 0.42,
+        "min": 0,
+        "max": 1
+      },
+      "converged_fraction": 1,
+      "seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "per_seed_score": [
+        90.047,
+        87.603,
+        86.729,
+        98.747,
+        83.214,
+        84.335,
+        83.378,
+        80.983,
+        97.767,
+        81.358
+      ]
+    },
+    {
+      "mode": "hive",
+      "topology": "percent",
+      "percent": 100,
+      "runs": 10,
+      "core": "core/dist/hive-core.js",
+      "score": {
+        "n": 10,
+        "mean": 90.24,
+        "sd": 7.33,
+        "min": 82.64,
+        "max": 103.7
+      },
+      "rescued": {
+        "n": 10,
+        "mean": 30,
+        "sd": 0,
+        "min": 30,
+        "max": 30
+      },
+      "unrescued": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "unrescued_urgency": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "urgency_weighted_time_to_rescue": {
+        "n": 10,
+        "mean": 9.01,
+        "sd": 1.73,
+        "min": 6.91,
+        "max": 11.3
+      },
+      "duplicate_attempts": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "wasted_travel": {
+        "n": 10,
+        "mean": 36.6,
+        "sd": 12.38,
+        "min": 21,
+        "max": 57
+      },
+      "bytes": {
+        "n": 10,
+        "mean": 5489678.5,
+        "sd": 157124.52,
+        "min": 5227585,
+        "max": 5729628
+      },
+      "convergence_rounds": {
+        "n": 10,
+        "mean": 0.4,
+        "sd": 0.52,
+        "min": 0,
+        "max": 1
+      },
+      "converged_fraction": 1,
+      "seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "per_seed_score": [
+        90.404,
+        90.324,
+        91.494,
+        103.699,
+        87.223,
+        84.489,
+        85.367,
+        82.644,
+        102.24,
+        84.466
+      ]
+    },
+    {
+      "mode": "hive",
+      "topology": "percent",
+      "percent": 75,
+      "runs": 10,
+      "core": "core/dist/hive-core.js",
+      "score": {
+        "n": 10,
+        "mean": 89.01,
+        "sd": 7.53,
+        "min": 79,
+        "max": 101.56
+      },
+      "rescued": {
+        "n": 10,
+        "mean": 30,
+        "sd": 0,
+        "min": 30,
+        "max": 30
+      },
+      "unrescued": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "unrescued_urgency": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "urgency_weighted_time_to_rescue": {
+        "n": 10,
+        "mean": 9.84,
+        "sd": 1.51,
+        "min": 8.27,
+        "max": 12.76
+      },
+      "duplicate_attempts": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "wasted_travel": {
+        "n": 10,
+        "mean": 47.3,
+        "sd": 9.23,
+        "min": 26,
+        "max": 58
+      },
+      "bytes": {
+        "n": 10,
+        "mean": 4336575.3,
+        "sd": 367671.22,
+        "min": 3841782,
+        "max": 4948279
+      },
+      "convergence_rounds": {
+        "n": 10,
+        "mean": 1.9,
+        "sd": 0.32,
+        "min": 1,
+        "max": 2
+      },
+      "converged_fraction": 1,
+      "seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "per_seed_score": [
+        91.381,
+        89.118,
+        91.587,
+        101.561,
+        82.066,
+        86.915,
+        85.572,
+        82.429,
+        100.495,
+        79
+      ]
+    },
+    {
+      "mode": "hive",
+      "topology": "percent",
+      "percent": 50,
+      "runs": 10,
+      "core": "core/dist/hive-core.js",
+      "score": {
+        "n": 10,
+        "mean": 88.73,
+        "sd": 6.51,
+        "min": 79.98,
+        "max": 99.76
+      },
+      "rescued": {
+        "n": 10,
+        "mean": 30,
+        "sd": 0,
+        "min": 30,
+        "max": 30
+      },
+      "unrescued": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "unrescued_urgency": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "urgency_weighted_time_to_rescue": {
+        "n": 10,
+        "mean": 10.02,
+        "sd": 1.31,
+        "min": 8.78,
+        "max": 12.72
+      },
+      "duplicate_attempts": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "wasted_travel": {
+        "n": 10,
+        "mean": 46.5,
+        "sd": 11.58,
+        "min": 34,
+        "max": 66
+      },
+      "bytes": {
+        "n": 10,
+        "mean": 2952339,
+        "sd": 574946.04,
+        "min": 1972916,
+        "max": 3779062
+      },
+      "convergence_rounds": {
+        "n": 10,
+        "mean": 2.4,
+        "sd": 1.65,
+        "min": 1,
+        "max": 7
+      },
+      "converged_fraction": 1,
+      "seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "per_seed_score": [
+        91.961,
+        88.069,
+        91.653,
+        99.756,
+        79.984,
+        85.353,
+        88.043,
+        81.329,
+        97.308,
+        83.875
+      ]
+    },
+    {
+      "mode": "hive",
+      "topology": "percent",
+      "percent": 25,
+      "runs": 10,
+      "core": "core/dist/hive-core.js",
+      "score": {
+        "n": 10,
+        "mean": 84.9,
+        "sd": 5.81,
+        "min": 74.78,
+        "max": 97.48
+      },
+      "rescued": {
+        "n": 10,
+        "mean": 29.3,
+        "sd": 0.82,
+        "min": 28,
+        "max": 30
+      },
+      "unrescued": {
+        "n": 10,
+        "mean": 0.7,
+        "sd": 0.82,
+        "min": 0,
+        "max": 2
+      },
+      "unrescued_urgency": {
+        "n": 10,
+        "mean": 1.1,
+        "sd": 1.45,
+        "min": 0,
+        "max": 4
+      },
+      "urgency_weighted_time_to_rescue": {
+        "n": 10,
+        "mean": 12.32,
+        "sd": 1.94,
+        "min": 10.33,
+        "max": 16.46
+      },
+      "duplicate_attempts": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "wasted_travel": {
+        "n": 10,
+        "mean": 37.9,
+        "sd": 23.11,
+        "min": 9,
+        "max": 71
+      },
+      "bytes": {
+        "n": 10,
+        "mean": 1457580.7,
+        "sd": 571633.54,
+        "min": 771747,
+        "max": 2592532
+      },
+      "convergence_rounds": {
+        "n": 10,
+        "mean": 5.7,
+        "sd": 1.64,
+        "min": 2,
+        "max": 7
+      },
+      "converged_fraction": 1,
+      "seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "per_seed_score": [
+        87.476,
+        85.156,
+        85.506,
+        97.483,
+        74.775,
+        84.331,
+        84.648,
+        81.704,
+        87.352,
+        80.552
+      ]
+    },
+    {
+      "mode": "hive",
+      "topology": "percent",
+      "percent": 0,
+      "runs": 10,
+      "core": "core/dist/hive-core.js",
+      "score": {
+        "n": 10,
+        "mean": 47.18,
+        "sd": 14,
+        "min": 19.81,
+        "max": 67.16
+      },
+      "rescued": {
+        "n": 10,
+        "mean": 18,
+        "sd": 4.57,
+        "min": 8,
+        "max": 26
+      },
+      "unrescued": {
+        "n": 10,
+        "mean": 12,
+        "sd": 4.57,
+        "min": 4,
+        "max": 22
+      },
+      "unrescued_urgency": {
+        "n": 10,
+        "mean": 42.3,
+        "sd": 14.7,
+        "min": 16,
+        "max": 74
+      },
+      "urgency_weighted_time_to_rescue": {
+        "n": 10,
+        "mean": 22.43,
+        "sd": 13.92,
+        "min": 7.51,
+        "max": 45.19
+      },
+      "duplicate_attempts": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "wasted_travel": {
+        "n": 10,
+        "mean": 0.2,
+        "sd": 0.63,
+        "min": 0,
+        "max": 2
+      },
+      "bytes": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "convergence_rounds": {
+        "n": 10,
+        "mean": 3,
+        "sd": 0,
+        "min": 3,
+        "max": 3
+      },
+      "converged_fraction": 1,
+      "seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "per_seed_score": [
+        54.865,
+        47.257,
+        43.443,
+        63.708,
+        38.375,
+        56.751,
+        39.062,
+        19.81,
+        67.158,
+        41.352
+      ]
+    },
+    {
+      "mode": "central-naive",
+      "topology": "blackout-3",
+      "percent": null,
+      "runs": 10,
+      "core": "core/dist/hive-core.js",
+      "score": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "rescued": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "unrescued": {
+        "n": 10,
+        "mean": 30,
+        "sd": 0,
+        "min": 30,
+        "max": 30
+      },
+      "unrescued_urgency": {
+        "n": 10,
+        "mean": 104.1,
+        "sd": 6.76,
+        "min": 97,
+        "max": 116
+      },
+      "urgency_weighted_time_to_rescue": {
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "min": null,
+        "max": null
+      },
+      "duplicate_attempts": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "wasted_travel": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "bytes": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "convergence_rounds": {
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "min": null,
+        "max": null
+      },
+      "converged_fraction": null,
+      "seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "per_seed_score": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "mode": "central-naive",
+      "topology": "drones-vs-teams",
+      "percent": null,
+      "runs": 10,
+      "core": "core/dist/hive-core.js",
+      "score": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "rescued": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "unrescued": {
+        "n": 10,
+        "mean": 30,
+        "sd": 0,
+        "min": 30,
+        "max": 30
+      },
+      "unrescued_urgency": {
+        "n": 10,
+        "mean": 104.1,
+        "sd": 6.76,
+        "min": 97,
+        "max": 116
+      },
+      "urgency_weighted_time_to_rescue": {
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "min": null,
+        "max": null
+      },
+      "duplicate_attempts": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "wasted_travel": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "bytes": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "convergence_rounds": {
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "min": null,
+        "max": null
+      },
+      "converged_fraction": null,
+      "seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "per_seed_score": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "mode": "central-naive",
+      "topology": "isolate-one",
+      "percent": null,
+      "runs": 10,
+      "core": "core/dist/hive-core.js",
+      "score": {
+        "n": 10,
+        "mean": 85.08,
+        "sd": 5.92,
+        "min": 79.88,
+        "max": 96.96
+      },
+      "rescued": {
+        "n": 10,
+        "mean": 30,
+        "sd": 0,
+        "min": 30,
+        "max": 30
+      },
+      "unrescued": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "unrescued_urgency": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "urgency_weighted_time_to_rescue": {
+        "n": 10,
+        "mean": 12.98,
+        "sd": 1.79,
+        "min": 10.41,
+        "max": 15.97
+      },
+      "duplicate_attempts": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "wasted_travel": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "bytes": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "convergence_rounds": {
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "min": null,
+        "max": null
+      },
+      "converged_fraction": null,
+      "seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "per_seed_score": [
+        82.565,
+        80.93,
+        86.795,
+        94.15,
+        82.998,
+        83.949,
+        82.688,
+        79.891,
+        96.96,
+        79.876
+      ]
+    },
+    {
+      "mode": "central-naive",
+      "topology": "flapping",
+      "percent": null,
+      "runs": 10,
+      "core": "core/dist/hive-core.js",
+      "score": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "rescued": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "unrescued": {
+        "n": 10,
+        "mean": 30,
+        "sd": 0,
+        "min": 30,
+        "max": 30
+      },
+      "unrescued_urgency": {
+        "n": 10,
+        "mean": 104.1,
+        "sd": 6.76,
+        "min": 97,
+        "max": 116
+      },
+      "urgency_weighted_time_to_rescue": {
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "min": null,
+        "max": null
+      },
+      "duplicate_attempts": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "wasted_travel": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "bytes": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "convergence_rounds": {
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "min": null,
+        "max": null
+      },
+      "converged_fraction": null,
+      "seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "per_seed_score": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "mode": "central-naive",
+      "topology": "percent",
+      "percent": 100,
+      "runs": 10,
+      "core": "core/dist/hive-core.js",
+      "score": {
+        "n": 10,
+        "mean": 90.74,
+        "sd": 6.37,
+        "min": 84.27,
+        "max": 103.89
+      },
+      "rescued": {
+        "n": 10,
+        "mean": 30,
+        "sd": 0,
+        "min": 30,
+        "max": 30
+      },
+      "unrescued": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "unrescued_urgency": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "urgency_weighted_time_to_rescue": {
+        "n": 10,
+        "mean": 8.52,
+        "sd": 1.14,
+        "min": 6.74,
+        "max": 10.89
+      },
+      "duplicate_attempts": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "wasted_travel": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "bytes": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "convergence_rounds": {
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "min": null,
+        "max": null
+      },
+      "converged_fraction": null,
+      "seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "per_seed_score": [
+        91.94,
+        88.427,
+        92.956,
+        103.894,
+        87.392,
+        88.454,
+        85.63,
+        85.425,
+        98.966,
+        84.27
+      ]
+    },
+    {
+      "mode": "central-naive",
+      "topology": "percent",
+      "percent": 75,
+      "runs": 10,
+      "core": "core/dist/hive-core.js",
+      "score": {
+        "n": 10,
+        "mean": 82.14,
+        "sd": 9.55,
+        "min": 65.19,
+        "max": 96.31
+      },
+      "rescued": {
+        "n": 10,
+        "mean": 30,
+        "sd": 0,
+        "min": 30,
+        "max": 30
+      },
+      "unrescued": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "unrescued_urgency": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "urgency_weighted_time_to_rescue": {
+        "n": 10,
+        "mean": 17.78,
+        "sd": 11.63,
+        "min": 8.77,
+        "max": 39.62
+      },
+      "duplicate_attempts": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "wasted_travel": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "bytes": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "convergence_rounds": {
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "min": null,
+        "max": null
+      },
+      "converged_fraction": null,
+      "seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "per_seed_score": [
+        82.565,
+        80.93,
+        68.746,
+        93.83,
+        82.935,
+        65.188,
+        81.547,
+        85.078,
+        96.313,
+        84.27
+      ]
+    },
+    {
+      "mode": "central-naive",
+      "topology": "percent",
+      "percent": 50,
+      "runs": 10,
+      "core": "core/dist/hive-core.js",
+      "score": {
+        "n": 10,
+        "mean": 70.27,
+        "sd": 26.4,
+        "min": 0,
+        "max": 96.15
+      },
+      "rescued": {
+        "n": 10,
+        "mean": 27,
+        "sd": 9.49,
+        "min": 0,
+        "max": 30
+      },
+      "unrescued": {
+        "n": 10,
+        "mean": 3,
+        "sd": 9.49,
+        "min": 0,
+        "max": 30
+      },
+      "unrescued_urgency": {
+        "n": 10,
+        "mean": 10.1,
+        "sd": 31.94,
+        "min": 0,
+        "max": 101
+      },
+      "urgency_weighted_time_to_rescue": {
+        "n": 9,
+        "mean": 24.05,
+        "sd": 15.06,
+        "min": 10.45,
+        "max": 46.47
+      },
+      "duplicate_attempts": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "wasted_travel": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "bytes": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "convergence_rounds": {
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "min": null,
+        "max": null
+      },
+      "converged_fraction": null,
+      "seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "per_seed_score": [
+        82.49,
+        67.372,
+        73.654,
+        74.949,
+        82.935,
+        0,
+        62.241,
+        81.57,
+        96.153,
+        81.356
+      ]
+    },
+    {
+      "mode": "central-naive",
+      "topology": "percent",
+      "percent": 25,
+      "runs": 10,
+      "core": "core/dist/hive-core.js",
+      "score": {
+        "n": 10,
+        "mean": 20.35,
+        "sd": 33.18,
+        "min": 0,
+        "max": 80.5
+      },
+      "rescued": {
+        "n": 10,
+        "mean": 9,
+        "sd": 14.49,
+        "min": 0,
+        "max": 30
+      },
+      "unrescued": {
+        "n": 10,
+        "mean": 21,
+        "sd": 14.49,
+        "min": 0,
+        "max": 30
+      },
+      "unrescued_urgency": {
+        "n": 10,
+        "mean": 72.2,
+        "sd": 50.1,
+        "min": 0,
+        "max": 116
+      },
+      "urgency_weighted_time_to_rescue": {
+        "n": 3,
+        "mean": 39.08,
+        "sd": 11.44,
+        "min": 25.89,
+        "max": 46.14
+      },
+      "duplicate_attempts": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "wasted_travel": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "bytes": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "convergence_rounds": {
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "min": null,
+        "max": null
+      },
+      "converged_fraction": null,
+      "seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "per_seed_score": [
+        62.828,
+        0,
+        0,
+        0,
+        60.149,
+        0,
+        0,
+        0,
+        80.504,
+        0
+      ]
+    },
+    {
+      "mode": "central-naive",
+      "topology": "percent",
+      "percent": 0,
+      "runs": 10,
+      "core": "core/dist/hive-core.js",
+      "score": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "rescued": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "unrescued": {
+        "n": 10,
+        "mean": 30,
+        "sd": 0,
+        "min": 30,
+        "max": 30
+      },
+      "unrescued_urgency": {
+        "n": 10,
+        "mean": 104.1,
+        "sd": 6.76,
+        "min": 97,
+        "max": 116
+      },
+      "urgency_weighted_time_to_rescue": {
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "min": null,
+        "max": null
+      },
+      "duplicate_attempts": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "wasted_travel": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "bytes": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "convergence_rounds": {
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "min": null,
+        "max": null
+      },
+      "converged_fraction": null,
+      "seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "per_seed_score": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "mode": "central-strong",
+      "topology": "blackout-3",
+      "percent": null,
+      "runs": 10,
+      "core": "core/dist/hive-core.js",
+      "score": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "rescued": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "unrescued": {
+        "n": 10,
+        "mean": 30,
+        "sd": 0,
+        "min": 30,
+        "max": 30
+      },
+      "unrescued_urgency": {
+        "n": 10,
+        "mean": 104.1,
+        "sd": 6.76,
+        "min": 97,
+        "max": 116
+      },
+      "urgency_weighted_time_to_rescue": {
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "min": null,
+        "max": null
+      },
+      "duplicate_attempts": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "wasted_travel": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "bytes": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "convergence_rounds": {
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "min": null,
+        "max": null
+      },
+      "converged_fraction": null,
+      "seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "per_seed_score": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "mode": "central-strong",
+      "topology": "drones-vs-teams",
+      "percent": null,
+      "runs": 10,
+      "core": "core/dist/hive-core.js",
+      "score": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "rescued": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "unrescued": {
+        "n": 10,
+        "mean": 30,
+        "sd": 0,
+        "min": 30,
+        "max": 30
+      },
+      "unrescued_urgency": {
+        "n": 10,
+        "mean": 104.1,
+        "sd": 6.76,
+        "min": 97,
+        "max": 116
+      },
+      "urgency_weighted_time_to_rescue": {
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "min": null,
+        "max": null
+      },
+      "duplicate_attempts": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "wasted_travel": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "bytes": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "convergence_rounds": {
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "min": null,
+        "max": null
+      },
+      "converged_fraction": null,
+      "seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "per_seed_score": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "mode": "central-strong",
+      "topology": "isolate-one",
+      "percent": null,
+      "runs": 10,
+      "core": "core/dist/hive-core.js",
+      "score": {
+        "n": 10,
+        "mean": 85.08,
+        "sd": 5.92,
+        "min": 79.88,
+        "max": 96.96
+      },
+      "rescued": {
+        "n": 10,
+        "mean": 30,
+        "sd": 0,
+        "min": 30,
+        "max": 30
+      },
+      "unrescued": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "unrescued_urgency": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "urgency_weighted_time_to_rescue": {
+        "n": 10,
+        "mean": 12.98,
+        "sd": 1.79,
+        "min": 10.41,
+        "max": 15.97
+      },
+      "duplicate_attempts": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "wasted_travel": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "bytes": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "convergence_rounds": {
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "min": null,
+        "max": null
+      },
+      "converged_fraction": null,
+      "seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "per_seed_score": [
+        82.565,
+        80.93,
+        86.795,
+        94.15,
+        82.998,
+        83.949,
+        82.688,
+        79.891,
+        96.96,
+        79.876
+      ]
+    },
+    {
+      "mode": "central-strong",
+      "topology": "flapping",
+      "percent": null,
+      "runs": 10,
+      "core": "core/dist/hive-core.js",
+      "score": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "rescued": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "unrescued": {
+        "n": 10,
+        "mean": 30,
+        "sd": 0,
+        "min": 30,
+        "max": 30
+      },
+      "unrescued_urgency": {
+        "n": 10,
+        "mean": 104.1,
+        "sd": 6.76,
+        "min": 97,
+        "max": 116
+      },
+      "urgency_weighted_time_to_rescue": {
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "min": null,
+        "max": null
+      },
+      "duplicate_attempts": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "wasted_travel": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "bytes": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "convergence_rounds": {
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "min": null,
+        "max": null
+      },
+      "converged_fraction": null,
+      "seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "per_seed_score": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "mode": "central-strong",
+      "topology": "percent",
+      "percent": 100,
+      "runs": 10,
+      "core": "core/dist/hive-core.js",
+      "score": {
+        "n": 10,
+        "mean": 90.74,
+        "sd": 6.37,
+        "min": 84.27,
+        "max": 103.89
+      },
+      "rescued": {
+        "n": 10,
+        "mean": 30,
+        "sd": 0,
+        "min": 30,
+        "max": 30
+      },
+      "unrescued": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "unrescued_urgency": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "urgency_weighted_time_to_rescue": {
+        "n": 10,
+        "mean": 8.52,
+        "sd": 1.14,
+        "min": 6.74,
+        "max": 10.89
+      },
+      "duplicate_attempts": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "wasted_travel": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "bytes": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "convergence_rounds": {
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "min": null,
+        "max": null
+      },
+      "converged_fraction": null,
+      "seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "per_seed_score": [
+        91.94,
+        88.427,
+        92.956,
+        103.894,
+        87.392,
+        88.454,
+        85.63,
+        85.425,
+        98.966,
+        84.27
+      ]
+    },
+    {
+      "mode": "central-strong",
+      "topology": "percent",
+      "percent": 75,
+      "runs": 10,
+      "core": "core/dist/hive-core.js",
+      "score": {
+        "n": 10,
+        "mean": 82.14,
+        "sd": 9.55,
+        "min": 65.19,
+        "max": 96.31
+      },
+      "rescued": {
+        "n": 10,
+        "mean": 30,
+        "sd": 0,
+        "min": 30,
+        "max": 30
+      },
+      "unrescued": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "unrescued_urgency": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "urgency_weighted_time_to_rescue": {
+        "n": 10,
+        "mean": 17.78,
+        "sd": 11.63,
+        "min": 8.77,
+        "max": 39.62
+      },
+      "duplicate_attempts": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "wasted_travel": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "bytes": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "convergence_rounds": {
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "min": null,
+        "max": null
+      },
+      "converged_fraction": null,
+      "seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "per_seed_score": [
+        82.565,
+        80.93,
+        68.746,
+        93.83,
+        82.935,
+        65.188,
+        81.547,
+        85.078,
+        96.313,
+        84.27
+      ]
+    },
+    {
+      "mode": "central-strong",
+      "topology": "percent",
+      "percent": 50,
+      "runs": 10,
+      "core": "core/dist/hive-core.js",
+      "score": {
+        "n": 10,
+        "mean": 70.27,
+        "sd": 26.4,
+        "min": 0,
+        "max": 96.15
+      },
+      "rescued": {
+        "n": 10,
+        "mean": 27,
+        "sd": 9.49,
+        "min": 0,
+        "max": 30
+      },
+      "unrescued": {
+        "n": 10,
+        "mean": 3,
+        "sd": 9.49,
+        "min": 0,
+        "max": 30
+      },
+      "unrescued_urgency": {
+        "n": 10,
+        "mean": 10.1,
+        "sd": 31.94,
+        "min": 0,
+        "max": 101
+      },
+      "urgency_weighted_time_to_rescue": {
+        "n": 9,
+        "mean": 24.05,
+        "sd": 15.06,
+        "min": 10.45,
+        "max": 46.47
+      },
+      "duplicate_attempts": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "wasted_travel": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "bytes": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "convergence_rounds": {
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "min": null,
+        "max": null
+      },
+      "converged_fraction": null,
+      "seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "per_seed_score": [
+        82.49,
+        67.372,
+        73.654,
+        74.949,
+        82.935,
+        0,
+        62.241,
+        81.57,
+        96.153,
+        81.356
+      ]
+    },
+    {
+      "mode": "central-strong",
+      "topology": "percent",
+      "percent": 25,
+      "runs": 10,
+      "core": "core/dist/hive-core.js",
+      "score": {
+        "n": 10,
+        "mean": 20.35,
+        "sd": 33.18,
+        "min": 0,
+        "max": 80.5
+      },
+      "rescued": {
+        "n": 10,
+        "mean": 9,
+        "sd": 14.49,
+        "min": 0,
+        "max": 30
+      },
+      "unrescued": {
+        "n": 10,
+        "mean": 21,
+        "sd": 14.49,
+        "min": 0,
+        "max": 30
+      },
+      "unrescued_urgency": {
+        "n": 10,
+        "mean": 72.2,
+        "sd": 50.1,
+        "min": 0,
+        "max": 116
+      },
+      "urgency_weighted_time_to_rescue": {
+        "n": 3,
+        "mean": 39.08,
+        "sd": 11.44,
+        "min": 25.89,
+        "max": 46.14
+      },
+      "duplicate_attempts": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "wasted_travel": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "bytes": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "convergence_rounds": {
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "min": null,
+        "max": null
+      },
+      "converged_fraction": null,
+      "seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "per_seed_score": [
+        62.828,
+        0,
+        0,
+        0,
+        60.149,
+        0,
+        0,
+        0,
+        80.504,
+        0
+      ]
+    },
+    {
+      "mode": "central-strong",
+      "topology": "percent",
+      "percent": 0,
+      "runs": 10,
+      "core": "core/dist/hive-core.js",
+      "score": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "rescued": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "unrescued": {
+        "n": 10,
+        "mean": 30,
+        "sd": 0,
+        "min": 30,
+        "max": 30
+      },
+      "unrescued_urgency": {
+        "n": 10,
+        "mean": 104.1,
+        "sd": 6.76,
+        "min": 97,
+        "max": 116
+      },
+      "urgency_weighted_time_to_rescue": {
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "min": null,
+        "max": null
+      },
+      "duplicate_attempts": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "wasted_travel": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "bytes": {
+        "n": 10,
+        "mean": 0,
+        "sd": 0,
+        "min": 0,
+        "max": 0
+      },
+      "convergence_rounds": {
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "min": null,
+        "max": null
+      },
+      "converged_fraction": null,
+      "seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "per_seed_score": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ]
+}
