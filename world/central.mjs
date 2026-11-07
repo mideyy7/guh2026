@@ -15,8 +15,10 @@ export function createHQ(score, params) {
     st.tick = Math.max(st.tick, Number(tick) || 0);
     for (const sid of done) st.done.add(sid);
     for (const d of detections) {
-      if (!d.task_id || st.done.has(d.survivor_id)) continue;
-      st.tasks[d.task_id] ??= { id: d.task_id, survivor_id: d.survivor_id, cell: d.cell, urgency: d.urgency, people: d.people, created_tick: st.tick };
+      // Raw sensor detections carry no task_id: derive the canonical one (same rule as the actors).
+      const tid = d.task_id || (d.survivor_id ? `T-${d.survivor_id}` : null);
+      if (!tid || st.done.has(d.survivor_id)) continue;
+      st.tasks[tid] ??= { id: tid, survivor_id: d.survivor_id, cell: d.cell, urgency: d.urgency, people: d.people, created_tick: st.tick };
     }
     if (role === 'team') {
       const t = (st.teams[actor] ??= { id: actor, pos, assignment: null });

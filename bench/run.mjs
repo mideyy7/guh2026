@@ -110,8 +110,9 @@ export function runOne(opts) {
       s = r.state;
       const receipts = [];
       for (const a of r.actions) {
-        if (a.kind === 'move') receipts.push({ key: a.key, kind: 'move', response: world.move(id, a.target, a.task_id, a.key) });
-        else if (a.kind === 'rescue') receipts.push({ key: a.key, kind: 'rescue', response: world.rescue(id, a.survivor_id, a.key) });
+        // Same receipt shape the n8n hive-tick workflow builds: {action, response} (+ key/kind for the stub).
+        if (a.kind === 'move') receipts.push({ action: a, key: a.key, kind: 'move', response: world.move(id, a.target, a.task_id, a.key) });
+        else if (a.kind === 'rescue') receipts.push({ action: a, key: a.key, kind: 'rescue', response: world.rescue(id, a.survivor_id, a.key) });
       }
       state[id] = core.applyReceipts(s, receipts, now);
     });

@@ -7,7 +7,7 @@
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "webhookId": "350ca8af-17ed-428f-a2b2-cc682c773877",
+      "webhookId": "d162cbbd-452c-4fb8-ac03-5dbb4175a586",
       "parameters": {
         "httpMethod": "POST",
         "path": "distress",
@@ -18,7 +18,7 @@
         0,
         0
       ],
-      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+      "id": "675aa296-f7b8-4b67-a357-b4245657bd85"
     },
     {
       "name": "Build AI request",
@@ -31,7 +31,7 @@
         220,
         0
       ],
-      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+      "id": "8ab9567e-6bb6-4531-abfc-fad0e801c5cb"
     },
     {
       "name": "Claude (Haiku 5.5)",
@@ -69,7 +69,7 @@
         440,
         0
       ],
-      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+      "id": "c60924b8-5a43-47b3-ae08-281aadc8680d"
     },
     {
       "name": "Read reply",
@@ -82,7 +82,7 @@
         660,
         0
       ],
-      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+      "id": "e6c03d89-dc5c-444e-a37a-83b7c5239804"
     },
     {
       "name": "Get State",
@@ -98,7 +98,7 @@
         880,
         0
       ],
-      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+      "id": "20db6e36-a75d-4fd3-ad6f-b8d85d46202d"
     },
     {
       "name": "Interpret",
@@ -111,7 +111,7 @@
         1100,
         0
       ],
-      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+      "id": "258fc5ea-fa52-47fb-a086-5280534040a1"
     },
     {
       "name": "Put State",
@@ -131,7 +131,7 @@
         1320,
         0
       ],
-      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+      "id": "4319e7af-1a1b-44a2-ac4f-1ef5180a5cf0"
     }
   ],
   "connections": {

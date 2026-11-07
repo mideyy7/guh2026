@@ -21,7 +21,7 @@
         0,
         0
       ],
-      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+      "id": "1ee3bcaf-cbb4-4ae0-ac4f-92551967b706"
     },
     {
       "name": "Get State",
@@ -37,7 +37,7 @@
         220,
         0
       ],
-      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+      "id": "734a12bc-a367-4b95-a97d-f3c2bc76c32b"
     },
     {
       "name": "Gossip",
@@ -50,7 +50,7 @@
         440,
         0
       ],
-      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+      "id": "90e5442a-425f-44b1-a3ab-2b4c41e4f143"
     },
     {
       "name": "Send via proxy",
@@ -71,7 +71,7 @@
         660,
         0
       ],
-      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+      "id": "83cf3e2d-3389-49de-a592-4d03b99c7ffc"
     }
   ],
   "connections": {

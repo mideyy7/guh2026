@@ -7,7 +7,7 @@
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "webhookId": "350ca8af-17ed-428f-a2b2-cc682c773877",
+      "webhookId": "fdf484f3-9d34-40d2-a6b0-aa5149e7c7c0",
       "parameters": {
         "httpMethod": "POST",
         "path": "tick",
@@ -18,7 +18,7 @@
         0,
         0
       ],
-      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+      "id": "cf1b271c-2e9a-47dd-a6b7-7b8ee5a0db87"
     },
     {
       "name": "Get State",
@@ -34,7 +34,7 @@
         220,
         0
       ],
-      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+      "id": "4b8e7bb0-03f7-4c65-a3f9-29cedf6a16b3"
     },
     {
       "name": "Sense",
@@ -50,7 +50,7 @@
         440,
         0
       ],
-      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+      "id": "d7a4a167-d31f-4c7a-acad-7751bf82093c"
     },
     {
       "name": "Perceive",
@@ -63,7 +63,7 @@
         660,
         0
       ],
-      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+      "id": "38a59e38-d42c-4633-a919-65ee7394e341"
     },
     {
       "name": "Central mode?",
@@ -78,7 +78,7 @@
           },
           "conditions": [
             {
-              "id": "350ca8af-17ed-428f-a0b2-b0123d4bc69c",
+              "id": "4700407b-52e3-4df2-ae68-a53dc0956324",
               "leftValue": "={{ $json.central }}",
               "rightValue": true,
               "operator": {
@@ -96,7 +96,7 @@
         880,
         0
       ],
-      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+      "id": "09c23a0c-97f4-43c5-a148-40560d17011f"
     },
     {
       "name": "HQ Sync",
@@ -117,7 +117,7 @@
         1100,
         200
       ],
-      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+      "id": "0dc03aa3-1fae-4502-a237-3cadf547042c"
     },
     {
       "name": "Bid (CBBA)",
@@ -130,7 +130,7 @@
         1320,
         0
       ],
-      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+      "id": "365aeb91-4356-429e-a762-fbf38f417080"
     },
     {
       "name": "Act",
@@ -143,7 +143,7 @@
         1540,
         0
       ],
-      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+      "id": "f9cc5149-2c3c-48d0-a4d8-e8b38ecbd82a"
     },
     {
       "name": "Put State",
@@ -163,7 +163,7 @@
         1760,
         0
       ],
-      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+      "id": "484a600d-d8e9-4768-ad87-e5672ac36b02"
     },
     {
       "name": "Split actions",
@@ -176,7 +176,7 @@
         1980,
         0
       ],
-      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+      "id": "33d26766-1805-4a6f-a22e-8a3071b5fec9"
     },
     {
       "name": "Do Action",
@@ -197,7 +197,7 @@
         2200,
         0
       ],
-      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+      "id": "ca9b41d0-3271-4ead-a4bb-faf6493aadbb"
     },
     {
       "name": "Apply receipts",
@@ -210,7 +210,7 @@
         2420,
         0
       ],
-      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+      "id": "657018ee-74a6-49ad-a80a-ce1c4324a45b"
     },
     {
       "name": "Put State 2",
@@ -230,7 +230,7 @@
         2640,
         0
       ],
-      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+      "id": "94b0fa7f-9bdd-48de-a68f-2ed5bb796d5c"
     }
   ],
   "connections": {

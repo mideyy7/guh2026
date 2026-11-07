@@ -11,10 +11,16 @@ const CORE = '//@@HIVE_CORE@@';
 const STORE = 'http://store:4000', SIM = 'http://sim:3000', PROXY = 'http://proxy:8080';
 
 // Stable UUID-shaped ids so re-generating gives identical files.
+// Each 8-hex block is FNV-1a over the WHOLE name with a different seed. (Before, the id came from
+// the hash after the first few characters only, so every node in a workflow got the same id.)
 const uuid = (name) => {
-  let h = 0x811c9dc5; const hex = [];
-  for (let r = 0; r < 4; r++) for (const ch of `${r}:${name}`) { h ^= ch.charCodeAt(0); h = Math.imul(h, 0x01000193) >>> 0; hex.push(h.toString(16).padStart(8, '0')); }
-  const s = hex.join('').slice(0, 32);
+  const hex = [];
+  for (let r = 0; r < 4; r++) {
+    let h = 0x811c9dc5;
+    for (const ch of `${r}:${name}`) { h ^= ch.charCodeAt(0); h = Math.imul(h, 0x01000193) >>> 0; }
+    hex.push(h.toString(16).padStart(8, '0'));
+  }
+  const s = hex.join('');
   return `${s.slice(0, 8)}-${s.slice(8, 12)}-4${s.slice(13, 16)}-a${s.slice(17, 20)}-${s.slice(20, 32)}`;
 };
 

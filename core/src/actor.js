@@ -184,7 +184,13 @@ const HiveCore = (() => {
   //   central-strong: no HQ → finish the cached assignment, then go idle.
   function centralAct(s, hq, actions, move) {
     let task = null;
-    if (hq) { task = hq.assignment || null; s.hq_cached = task; }
+    // HQ replies {assignment: 'T-s07', task: {id, survivor_id, cell, ...}} (contract D13); an older
+    // reply carried the task object in `assignment`. Accept both, normalised to {task_id, survivor_id, cell}.
+    if (hq) {
+      const t = hq.task || (hq.assignment && typeof hq.assignment === 'object' ? hq.assignment : null);
+      task = t ? { ...t, task_id: t.task_id || t.id || hq.assignment } : null;
+      s.hq_cached = task;
+    }
     else if (s.config.mode === 'central-strong') task = s.hq_cached;
     if (!task) return;
     if (s.gone[task.survivor_id] || s.absent[task.survivor_id]) { s.hq_cached = null; return; }
