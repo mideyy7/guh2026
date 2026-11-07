@@ -32,7 +32,7 @@ export async function startSim(env = process.env) {
     const deliveries = st.world.step();
     const tick = st.world.tick;
     for (const id of ACTORS) {
-      postJson(urlFor(id, 'tick'), { tick }, 1000).then((r) => {
+      postJson(urlFor(id, 'tick'), { tick }, 3000).then((r) => {
         if (r.ok) st.lastTickOk[id] = tick; else st.tickFailures[id] += 1;
       });
     }
