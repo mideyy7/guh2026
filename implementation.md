@@ -169,6 +169,7 @@ These choices follow from what n8n 2.x actually does. Some of them refine the st
 | D7 | **The simulator drives ticks** (`POST /webhook/tick` with only `{tick}`); **gossip runs on each actor's own Schedule Trigger.** | Ticks stay in order without jitter. Gossip timing stays independent per actor, which is honest decentralisation. |
 | D8 | **CBBA uses wall-clock timestamps** (`Date.now()` passed in by the shell, simulated time in the benchmark). | Convergence is checked while the simulation is paused. With tick numbers frozen, CBBA's "fresher information" rule would stall, but wall-clock time keeps moving. |
 | D9 | **CBBA uses bid warping:** a bid is never higher than the previous bid in the bundle. | **Tested:** with our travel-style scoring, CBBA *fails* to converge without warping and passes with it. See [core/test/cbba.test.js](core/test/cbba.test.js). |
+| D11 | **n8n instances boot one at a time.** Each n8n `depends_on` the previous one passing `/healthz/readiness` (not `/healthz`, which answers before migrations finish). | **Measured:** 7 simultaneous first boots on the 8 GB Mac never finished (load 35+, none ready after 10 minutes). Staggered, a cold boot takes 5 min 41 s, and steady state is ~350 MiB and 1–12% CPU per instance. |
 | D10 | Workflows are **deployed by CLI** (`n8n import:credentials`, `import:workflow`, `publish:workflow`) with a shared `N8N_ENCRYPTION_KEY`. | n8n 2.x replaced activate/deactivate with publish/unpublish. Importing deactivates workflows, so you must publish them afterwards. Spike S2 proves the exact script. |
 
 **How `hack.md` §5's six workflows map to n8n:** Perceive, Bid and Act run as three labelled Code nodes **inside one `hive-tick` workflow**, so they always execute in order on each tick. Interpret, Gossip and Merge are their own workflows. That gives 4 workflow files and the same 6 stages on the canvas.
@@ -313,17 +314,16 @@ Distances use the Chebyshev metric (diagonal moves allowed). A team speed of 0.5
 **Goal:** agree every interface, then *prove* each risky n8n assumption on real containers before building on it. Each spike has a pass condition and a fallback.
 
 ### Together (first 30 minutes)
-1. Create the repo layout (§3.1) and move the starter files into it. **Done on `dev_a`.**
-2. Write `contracts/README.md` (C1–C7 with example JSON) and `contracts/params.json`.
-3. Run `npm test`: the 9 starter tests must pass (6 in core, 3 in the store).
+1. Create the repo layout (§3.1) and move the starter files into it. **✅ Done (Dev A).**
+2. Write `contracts/README.md` (C1–C7 with example JSON) and `contracts/params.json`. **✅ Drafted by Dev A; Dev B must review before Gate 0.**
+3. Run `npm test`: every unit suite must pass. **✅ 17/17** (6 core, 3 store, 8 compose generator).
 
 ### Dev A
-- **Compose skeleton:** one n8n plus its store on `net-drone-1`, using the settings in §12.2.
-- **S1 — Memory under load.** `memtest.sh` (§1.2) already measured idle memory before the event. Now measure under load: with the full stack running the real workflows for 5 minutes at `TICK_MS=2000`, run `docker stats --no-stream`.
-  **Pass:** no container restarts (`docker compose ps` shows none restarting), every n8n stays under 90% of its 560 MB, and macOS memory pressure stays out of the red.
-  **Fallback:** the steps under "If the memory test fails" in §1.2.
-- **S5 — Network isolation.** Put two dummy containers on separate networks and the proxy on both.
-  **Pass:** a direct call from one actor to the other fails, and a call through the proxy works.
+- **Compose skeleton** **✅ Done:** `scripts/gen-compose.mjs` generates the full 7-actor stack (§12.2) from `params.json`, with `--actors` for the dev stack and `--with-probe` for the Phase 0 stand-in proxy.
+- **S1 — Memory and boot.** **✅ Pass.** Cold boot with fresh volumes via a plain `docker compose up -d`: all 7 n8n ready in **5 min 41 s**, then 345–362 MiB and 1–12% CPU each; `memtest.sh` gives 7/7 ready at 2,533 MiB total.
+  **Finding:** booting all 7 at once **never finishes** on an 8 GB machine (load 35+, none ready after 10 minutes, because all 7 run their first-boot migrations at once). The fix is decision D11: n8n instances boot one at a time.
+  **Still to do:** measure under real load at Gate 2 (the full stack running real workflows for 5 minutes at `TICK_MS=2000`). Pass: no restarts, every n8n under 90% of 560 MB, macOS memory pressure out of the red.
+- **S5 — Network isolation.** **✅ Pass: 105/105 checks.** `scripts/check-isolation.sh` runs inside every actor. Calls to every other actor's n8n and store are blocked; the actor's own `store` alias returns its own ID; the shared service is reachable both ways.
 
 ### Dev B (on a single n8n instance)
 - **S2 — Deploy via CLI.** In the editor, build a trivial workflow: Webhook `POST /webhook/ping` → Code node returning `{ok:true}`. Export it with `n8n export:workflow --all --separate --output=/hive/workflows-src/`, then write `deploy-workflows.sh` (§12.4) and run it against a **fresh** instance.
@@ -645,10 +645,14 @@ n8n-drone-1:
     - ./n8n/build:/hive/build:ro
     - ./n8n/credentials:/hive/credentials
   networks: [net-drone-1]
+  depends_on:
+    store-drone-1: { condition: service_healthy }
+    # every n8n after the first also waits for the previous n8n (D11), e.g. n8n-drone-2 → n8n-drone-1
   healthcheck:
-    test: ["CMD", "node", "-e", "fetch('http://localhost:5678/healthz').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
+    test: ["CMD", "node", "-e", "fetch('http://localhost:5678/healthz/readiness').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
     interval: 10s
-    retries: 12
+    start_period: 180s
+    retries: 18
 
 store-drone-1:
   build: ./services/store
@@ -722,6 +726,8 @@ Spike S2 proves this script as written. If S2 needed its fallback, update the sc
 | An island never converges | Gossip blocked by a 503, or a CBBA bug | The proxy log shows `refused` or `dropped`; reproduce headless with the same seed and links |
 | AI node returns 400 | A sampling parameter (temperature, top-p, top-k) is being sent | Switch to the §12.5 HTTP fallback |
 | Docker freezes or OOM-kills containers | Out of memory | `docker stats`; raise Docker's memory or lower `mem_limit`; close the browser tabs you don't need |
+| n8n never becomes ready, load stays very high | Several n8n instances doing first-boot migrations at once | Don't start n8n containers by hand in parallel; use `docker compose up -d`, which boots them one at a time (D11). A cold boot takes about 6 minutes |
+| `docker pull` fails with `docker-credential-desktop: executable file not found` | Docker Desktop's helper folder isn't on the PATH | Add `export PATH="$PATH:/Applications/Docker.app/Contents/Resources/bin"` to `~/.zshrc` |
 | `docker info` hangs | Docker Desktop is still starting or stuck | Quit and reopen Docker Desktop, then wait for "Engine running" |
 
 ---
