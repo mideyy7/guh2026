@@ -181,3 +181,16 @@ test('distress: with two drones in range, the nearer one receives it (ties → l
   const best = inRange.sort((a, b) => dd(a) - dd(b) || (a < b ? -1 : 1))[0];
   assert.equal(got.to, best);
 });
+
+test('distress: a failed delivery goes back to "Sending…" and is retried', () => {
+  const w = createWorld(11, params);
+  const m = w.scenario.distress[0];
+  w.move('drone-1', parseCell(m.cell), null, 'go');
+  let first = null;
+  for (let t = 0; t < 30 && !first; t++) first = w.step().find((d) => d.msg_id === m.msg_id);
+  assert.ok(first);
+  assert.equal(w.requeueDistress(m.msg_id), true);
+  assert.equal(w.snapshot().distress.find((x) => x.msg_id === m.msg_id).state, 'sending');
+  const again = w.step().find((d) => d.msg_id === m.msg_id);
+  assert.ok(again, 'redelivered on the next tick');
+});

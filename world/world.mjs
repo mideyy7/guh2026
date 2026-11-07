@@ -168,10 +168,18 @@ export function createWorld(seed, params, actorIds) {
     };
   }
 
+  // Delivery failed (the drone's n8n was unreachable): the phone keeps trying, so the text goes back
+  // to "Sending…" and is retried on later ticks.
+  function requeueDistress(msg_id) {
+    const m = st.distress.find((x) => x.msg_id === msg_id);
+    if (m) { m.delivered_to = null; m.delivered_tick = null; }
+    return !!m;
+  }
+
   // Canonical state string for determinism tests.
   function hash() {
     return JSON.stringify({ t: st.tick, a: ids.map((i) => [i, actors[i].pos, actors[i].target, actors[i].travel]), r: st.rescued, at: st.attempts });
   }
 
-  return { step, sense, move, rescue, metrics, snapshot, hash, get tick() { return st.tick; }, actorIds: ids, scenario: sc };
+  return { step, sense, move, rescue, metrics, snapshot, hash, requeueDistress, get tick() { return st.tick; }, actorIds: ids, scenario: sc };
 }
