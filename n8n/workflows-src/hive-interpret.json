@@ -19,9 +19,189 @@
         0
       ],
       "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+    },
+    {
+      "name": "Build AI request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "parameters": {
+        "jsCode": "//@@HIVE_CORE@@\nconst raw = $('Webhook').first().json.body;\nreturn [{ json: { request: HiveCore.aiRequest(raw.text || '') } }];\n"
+      },
+      "position": [
+        220,
+        0
+      ],
+      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+    },
+    {
+      "name": "Claude (Haiku 5.5)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "anthropic-version",
+              "value": "2026-10-21"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.request) }}",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "hiveAnthropic001",
+          "name": "Anthropic x-api-key"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "position": [
+        440,
+        0
+      ],
+      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+    },
+    {
+      "name": "Read reply",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "parameters": {
+        "jsCode": "//@@HIVE_CORE@@\nconst r = $input.first().json;\nreturn [{ json: { parsed: HiveCore.aiParse(r) } }];\n"
+      },
+      "position": [
+        660,
+        0
+      ],
+      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+    },
+    {
+      "name": "Get State",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "parameters": {
+        "url": "http://store:4000/state",
+        "options": {
+          "timeout": 3000
+        }
+      },
+      "position": [
+        880,
+        0
+      ],
+      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+    },
+    {
+      "name": "Interpret",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "parameters": {
+        "jsCode": "//@@HIVE_CORE@@\nconst s = $('Get State').first().json;\nconst now = Date.now();\nconst raw = $('Webhook').first().json.body;\nconst parsed = $('Read reply').first().json.parsed;\nconst state = HiveCore.interpret(s.state ?? HiveCore.init(s.config, now), parsed, raw, now);\nreturn [{ json: { version: s.version, state } }];\n"
+      },
+      "position": [
+        1100,
+        0
+      ],
+      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
+    },
+    {
+      "name": "Put State",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "parameters": {
+        "method": "PUT",
+        "url": "http://store:4000/state",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ version: $json.version, state: $json.state }) }}",
+        "options": {
+          "timeout": 3000
+        }
+      },
+      "position": [
+        1320,
+        0
+      ],
+      "id": "350ca8af-17ed-428f-a1b2-b1a5284de424"
     }
   ],
-  "connections": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Build AI request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build AI request": {
+      "main": [
+        [
+          {
+            "node": "Claude (Haiku 5.5)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude (Haiku 5.5)": {
+      "main": [
+        [
+          {
+            "node": "Read reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read reply": {
+      "main": [
+        [
+          {
+            "node": "Get State",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get State": {
+      "main": [
+        [
+          {
+            "node": "Interpret",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Interpret": {
+      "main": [
+        [
+          {
+            "node": "Put State",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
   "settings": {
     "executionOrder": "v1",
     "saveDataSuccessExecution": "none"

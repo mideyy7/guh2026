@@ -1,0 +1,32 @@
+{
+  "_note": "20 texts in the style of Dev A's scenario generator (implementation.md Phase 3 templates) plus 5 messy hand-written ones. Labels: the true district; people counts the sender. Replace 'generated' with real generator output once world/scenario.js exists.",
+  "generated": [
+    { "text": "stuck on roof w/ 2 kids near Piccadilly, water rising", "district": "Piccadilly", "people": 3 },
+    { "text": "elderly neighbour trapped upstairs Hulme pls help", "district": "Hulme", "people": 1 },
+    { "text": "4 of us on the bus shelter by The Lowry", "district": "Salford Quays", "people": 4 },
+    { "text": "stuck on roof w/ 3 kids near Ancoats, water rising", "district": "Ancoats", "people": 4 },
+    { "text": "elderly neighbour trapped upstairs Deansgate pls help", "district": "Deansgate", "people": 1 },
+    { "text": "2 of us on the bus shelter by Stevenson Square", "district": "Northern Quarter", "people": 2 },
+    { "text": "water coming in fast at Castlefield, me and my dad on the first floor", "district": "Castlefield", "people": 2 },
+    { "text": "5 of us on the bus shelter by Broughton Bridge", "district": "Lower Broughton", "people": 5 },
+    { "text": "my mum is in a wheelchair, we're stuck in our flat in Salford Quays", "district": "Salford Quays", "people": 2 },
+    { "text": "stuck on roof w/ 1 kids near Lower Broughton, water rising", "district": "Lower Broughton", "people": 2 },
+    { "text": "3 of us on the bus shelter by Cutting Room Square", "district": "Ancoats", "people": 3 },
+    { "text": "elderly neighbour trapped upstairs Northern Quarter pls help", "district": "Northern Quarter", "people": 1 },
+    { "text": "injured leg cant walk, on the steps of John Rylands Library", "district": "Deansgate", "people": 1 },
+    { "text": "family of 4 in the attic in Hulme, water up to the stairs", "district": "Hulme", "people": 4 },
+    { "text": "2 of us on the bus shelter by Piccadilly Gardens", "district": "Piccadilly", "people": 2 },
+    { "text": "stuck on roof w/ 2 kids near Castlefield, water rising", "district": "Castlefield", "people": 3 },
+    { "text": "me and my grandad on top of a car outside Hulme Arch Bridge", "district": "Hulme", "people": 2 },
+    { "text": "elderly neighbour trapped upstairs Ancoats pls help", "district": "Ancoats", "people": 1 },
+    { "text": "6 of us on the bus shelter by Castlefield Bowl", "district": "Castlefield", "people": 6 },
+    { "text": "flood water at chest height in a shop on Deansgate, 3 people, one bleeding", "district": "Deansgate", "people": 3 }
+  ],
+  "messy": [
+    { "text": "HELP!!! were on the roof of the old mill by the marina in new islington, kids crying", "district": "Ancoats", "people": null },
+    { "text": "picadilly gdns flooded, nan cant get down the stairs at her flat, pls", "district": "Piccadilly", "people": 1 },
+    { "text": "trapped by the canal basin near the old roman walls, 2 adults", "district": "Castlefield", "people": 2 },
+    { "text": "im at mediacity, water's at my waist n still coming up", "district": "Salford Quays", "people": 1 },
+    { "text": "stuck in afflecks with 5 others, power's gone and theres sparks", "district": "Northern Quarter", "people": 6 }
+  ]
+}

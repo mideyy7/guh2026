@@ -176,6 +176,24 @@ Three keys go beyond the plan's C7 example: `gossip_event_cap` (the 200-event go
 
 ---
 
+## C9. HQ report and assignment (central baselines; Dev A's HQ answers, Dev B's core asks)
+
+In central modes, `hive-tick` calls `POST proxy:8080/rpc {from, to:"hq", path:"report", body}`, where `body = HiveCore.hqRequest(state)`:
+
+```json
+{ "actor": "team-1", "role": "team", "tick": 42, "pos": { "x": 2, "y": 6 },
+  "detections": [ { "survivor_id": "s07", "cell": "4-2", "people": 3, "urgency": 4 } ],
+  "done": ["s03", "s11"] }
+```
+
+`done` lists the last 50 survivors this actor finished (rescued, or found already rescued). HQ replies `{assignment}`. For a team, `assignment` is `{task_id, survivor_id, cell, urgency, people}` or `null`. For a drone it is always `null`, because drones keep searching on their own. A `503` (link down) reaches the core as `hq = null`: `central-naive` then does nothing, and `central-strong` finishes its cached assignment, then idles.
+
+## C10. Distress texts → provisional tasks
+
+`hive-interpret` builds its request with `HiveCore.aiRequest(text)` and reads the reply with `HiveCore.aiParse(response)`, so the accuracy test (`tests/ai/accuracy.mjs`) checks exactly what the workflow sends. The call uses the §12.5 HTTP Request route and an n8n **Header Auth** credential with id `hiveAnthropic001`, named `Anthropic x-api-key` (header `x-api-key`). Spike S6 must export that credential with this id. Any failure gives `parsed = null`, and the regex fallback (`HiveCore.Text.parse`) is used instead. The resulting `TASK_CREATED` event also carries `district` and `via: "ai" | "regex"`, so the dashboard can show which path placed it.
+
+---
+
 ## Phase 0 spike results
 
 | Spike | Owner | Result | Notes |

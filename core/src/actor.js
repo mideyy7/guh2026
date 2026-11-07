@@ -33,6 +33,9 @@ const HiveCore = (() => {
       action: 'idle',
       target: null,
       last_detections: [],
+      hq_cached: null,          // central-strong: the last assignment HQ gave us
+      hq_done: [],              // central modes: survivors we finished (told to HQ)
+      text_failures: 0,         // distress texts neither the AI nor the regex could place
       started_ms: nowMs,
     };
     return refresh(s);
@@ -143,7 +146,8 @@ const HiveCore = (() => {
       s.search_target = cell;
       if (cell) { s.action = 'searching'; s.target = S.cellXY(cell); if (cell !== S.cellId(s.pos)) move(cell); }
     } else {
-      teamAct(s, actions, move);
+      if (s.config.mode === 'hive') teamAct(s, actions, move);
+      else centralAct(s, ctx && ctx.hq, actions, move);
     }
     return { state: refresh(s), actions };
   }
@@ -170,6 +174,17 @@ const HiveCore = (() => {
       s.cbba.bundle = s.cbba.bundle.filter((x) => x !== t.task_id);
     }
     goRescue(s, t, actions, move);
+  }
+  // Central baselines. hq = HQ's reply {assignment}, or null when HQ is unreachable (503).
+  //   central-naive:  no HQ → do nothing.
+  //   central-strong: no HQ → finish the cached assignment, then go idle.
+  function centralAct(s, hq, actions, move) {
+    let task = null;
+    if (hq) { task = hq.assignment || null; s.hq_cached = task; }
+    else if (s.config.mode === 'central-strong') task = s.hq_cached;
+    if (!task) return;
+    if (s.gone[task.survivor_id] || s.absent[task.survivor_id]) { s.hq_cached = null; return; }
+    goRescue(s, task, actions, move);
   }
   function goRescue(s, t, actions, move) {
     const me = s.config.actor_id;
@@ -200,6 +215,10 @@ const HiveCore = (() => {
       else emit(s, 'ATTEMPT', { task_id, survivor_id, result: response.result });
       delete s.intents[key];
       if (s.my_commit === task_id) s.my_commit = null;
+      if (s.config.mode !== 'hive') {
+        s.hq_done = s.hq_done.concat(survivor_id).slice(-50);
+        if (s.hq_cached && s.hq_cached.survivor_id === survivor_id) s.hq_cached = null;
+      }
     }
     return refresh(s);
   }
@@ -209,7 +228,70 @@ const HiveCore = (() => {
   function hqRequest(s) {
     if (s.config.mode === 'hive') return null;
     return { actor: s.config.actor_id, role: s.config.role, tick: s.tick, pos: s.pos,
-      detections: s.last_detections || [], done: [] };
+      detections: s.last_detections || [], done: s.hq_done.slice() };
+  }
+
+  // ---------- interpret: distress text → provisional task ----------
+  // parsed: the AI's JSON ({district, landmark, people, urgency, hazards}) or null, in which
+  // case the regex fallback reads raw.text. The task sits at the district's landmark cell
+  // as P-<msg_id>: drones are pulled toward it; teams wait until a sensor confirms it.
+  function interpret(state, parsed, raw, nowMs) {
+    const s = state;
+    const task_id = `P-${raw.msg_id}`;
+    if (s.tasks[task_id]) return refresh(s);                // redelivered: idempotent
+    const p = parsed && HIVE_GAZETTEER[parsed.district] ? parsed : HiveText.parse(raw.text || '', HIVE_GAZETTEER);
+    if (!p) { s.text_failures += 1; return refresh(s); }
+    const urgency = Math.max(1, Math.min(5, Math.round(p.urgency || 3)));
+    emit(s, 'TASK_CREATED', {
+      task_id, survivor_id: null, cell: HIVE_GAZETTEER[p.district].landmark.cell,
+      people: Number.isInteger(p.people) ? p.people : null, urgency, provisional: true, source: 'text',
+      district: p.district, via: parsed && p === parsed ? 'ai' : 'regex',
+    });
+    return refresh(s);
+  }
+
+  // The Messages API request the hive-interpret workflow sends (implementation.md §12.5).
+  // Never set temperature/top_p/top_k: on API version 2026-10-21 they return a 400.
+  function aiRequest(text) {
+    const names = Object.keys(HIVE_GAZETTEER);
+    const places = names.map((n) => {
+      const d = HIVE_GAZETTEER[n];
+      return `- ${n} (landmark: ${d.landmark.name}; also: ${(d.aliases || []).slice(0, 5).join(', ')})`;
+    }).join('\n');
+    return {
+      model: 'claude-haiku-5-5',
+      max_tokens: 1024,
+      system: `You turn flood distress texts from Manchester into JSON for a rescue team.
+Districts and places in them:
+${places}
+Pick the single most likely district, even if the text only names a landmark, street or nickname.
+people: how many people need rescue, counting the sender ("me + 2 kids" = 3); null if unclear.
+urgency 1-5: start at 3; raise it for children, elderly, injury or rising water; lower it if they say they are safe for now.
+landmark: the place they mention, or null. hazards: short phrases.`,
+      messages: [{ role: 'user', content: String(text) }],
+      output_config: { format: { type: 'json_schema', schema: {
+        type: 'object', additionalProperties: false,
+        required: ['district', 'landmark', 'people', 'urgency', 'hazards'],
+        properties: {
+          district: { type: 'string', enum: names },
+          landmark: { type: ['string', 'null'] },
+          people: { type: ['integer', 'null'] },
+          urgency: { type: 'integer' },
+          hazards: { type: 'array', items: { type: 'string' } },
+        } } } },
+    };
+  }
+  // Read the API's reply → parsed object, or null (error, refusal, truncation, bad JSON).
+  // The JSON is in the "text" content block; a "thinking" block may come first.
+  function aiParse(resp) {
+    if (!resp || resp.error || !Array.isArray(resp.content)) return null;
+    if (resp.stop_reason === 'refusal' || resp.stop_reason === 'max_tokens') return null;
+    const block = resp.content.find((b) => b.type === 'text');
+    if (!block) return null;
+    try {
+      const p = JSON.parse(block.text);
+      return HIVE_GAZETTEER[p.district] ? p : null;
+    } catch (e) { return null; }
   }
 
   // ---------- gossip / merge ----------
@@ -279,7 +361,7 @@ const HiveCore = (() => {
   }
 
   return {
-    init, perceive, bid, act, applyReceipts, hqRequest, gossip, merge, sharedDigest,
+    init, perceive, bid, act, applyReceipts, hqRequest, gossip, merge, interpret, aiRequest, aiParse, sharedDigest,
     score: (pos, task, path, tick, params) => S.score(pos, task, path, tick, params || P),
     PARAMS: P,
     GAZETTEER: HIVE_GAZETTEER,

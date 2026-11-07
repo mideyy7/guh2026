@@ -150,8 +150,44 @@ return [{ json: { version: s.version, state } }];`),
   putState('Put State'),
 ], [['Webhook', 'Get State'], ['Get State', 'Merge'], ['Merge', 'Put State']]);
 
-// ---------------- hive-interpret (Phase 2 stub; Phase 4 adds the AI call) ----------------
-const interpret = wf('hiveInterpret001', 'hive-interpret', [webhook('Webhook', 'distress')], []);
+// ---------------- hive-interpret ----------------
+// The AI call happens BEFORE Get State, so the store read-modify-write stays short.
+// Uses the HTTP Request route to the Messages API (implementation.md §12.5) rather than the
+// AI Agent node: it never sends sampling params (400 on this API version) and S7 proved it.
+// Any failure (bad key, 4xx/5xx, timeout, refusal, bad JSON) → parsed = null → regex fallback.
+export const ANTHROPIC_CREDENTIAL = { id: 'hiveAnthropic001', name: 'Anthropic x-api-key' };
+const interpret = wf('hiveInterpret001', 'hive-interpret', [
+  webhook('Webhook', 'distress'),
+  code('Build AI request', `
+const raw = $('Webhook').first().json.body;
+return [{ json: { request: HiveCore.aiRequest(raw.text || '') } }];`),
+  {
+    name: 'Claude (Haiku 5.5)', type: 'n8n-nodes-base.httpRequest', typeVersion: 4.2,
+    parameters: {
+      method: 'POST', url: 'https://api.anthropic.com/v1/messages',
+      authentication: 'genericCredentialType', genericAuthType: 'httpHeaderAuth',
+      sendHeaders: true,
+      headerParameters: { parameters: [{ name: 'anthropic-version', value: '2026-10-21' }] },
+      sendBody: true, specifyBody: 'json', jsonBody: '={{ JSON.stringify($json.request) }}',
+      options: { timeout: 15000 },
+    },
+    credentials: { httpHeaderAuth: ANTHROPIC_CREDENTIAL },
+    onError: 'continueRegularOutput',
+  },
+  code('Read reply', `
+const r = $input.first().json;
+return [{ json: { parsed: HiveCore.aiParse(r) } }];`),
+  get('Get State', `${STORE}/state`),
+  code('Interpret', `
+const s = $('Get State').first().json;
+const now = Date.now();
+const raw = $('Webhook').first().json.body;
+const parsed = $('Read reply').first().json.parsed;
+const state = HiveCore.interpret(s.state ?? HiveCore.init(s.config, now), parsed, raw, now);
+return [{ json: { version: s.version, state } }];`),
+  putState('Put State'),
+], [['Webhook', 'Build AI request'], ['Build AI request', 'Claude (Haiku 5.5)'], ['Claude (Haiku 5.5)', 'Read reply'],
+  ['Read reply', 'Get State'], ['Get State', 'Interpret'], ['Interpret', 'Put State']]);
 
 mkdirSync(OUT, { recursive: true });
 for (const w of [tick, gossip, merge, interpret]) {

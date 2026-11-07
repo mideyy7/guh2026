@@ -58,7 +58,7 @@ test('build-workflows: a planted bad URL fails the build', () => {
 });
 
 // A live-like harness: one store per actor (its own network), a shared world and proxy.
-function harness({ actors = ACTORS, seed = 1, links = () => true, mode = 'hive', hq } = {}) {
+function harness({ actors = ACTORS, seed = 1, links = () => true, mode = 'hive', hq, ai } = {}) {
   const wf = buildToTemp();
   const world = makeWorld({ seed, actors });
   const stores = Object.fromEntries(actors.map((a) => [a, makeStore({ actor_id: a, role: world.roleOf(a), mode, peers: actors.filter((x) => x !== a) })]));
@@ -77,6 +77,7 @@ function harness({ actors = ACTORS, seed = 1, links = () => true, mode = 'hive',
       queue.push(body); log.push({ from: body.from, to: body.to, status: 'queued' });
       return { status: 202, json: { queued: true } };
     }
+    if (url === 'https://api.anthropic.com/v1/messages') return ai ? ai(body) : { status: 401, json: { error: { type: 'authentication_error' } } };
     if (u.host === 'proxy:8080' && u.pathname === '/rpc') {
       const r = hq ? hq(body) : null;
       return r ? { status: 200, json: r } : { status: 503, json: { error: 'link down' } };
@@ -152,4 +153,45 @@ test('a stale write fails the execution loudly (409), and a stale queued tick is
   assert.equal(res.status, 409);
   const putNode = h.wf['hive-merge'].nodes.find((n) => n.name === 'Put State');
   assert.equal(putNode.onError, undefined, 'Put State must never continue on fail');
+});
+
+test('hive-interpret: AI reply → provisional task at the landmark, via the AI', async () => {
+  let sent;
+  const ai = (body) => { sent = body; return { status: 200, json: { stop_reason: 'end_turn', content: [
+    { type: 'text', text: JSON.stringify({ district: 'Ancoats', landmark: 'Cutting Room Square', people: 3, urgency: 5, hazards: ['rising water'] }) }] } }; };
+  const h = harness({ actors: ['drone-1'], ai });
+  await h.tick();
+  await h.exec('hive-interpret', { body: { msg_id: 'm1', text: 'roof by cutting room sq, 2 kids', sent_tick: 1, delivered_tick: 1 } }, 'drone-1');
+  assert.equal(sent.model, 'claude-haiku-5-5');
+  assert.equal('temperature' in sent, false);
+  const t = h.stores['drone-1'].state.tasks['P-m1'];
+  assert.equal(t.cell, '6-2');
+  assert.equal(h.view('drone-1').provisional, 1);
+  const node = h.wf['hive-interpret'].nodes.find((n) => n.type === 'n8n-nodes-base.httpRequest' && n.credentials);
+  assert.equal(node.credentials.httpHeaderAuth.id, 'hiveAnthropic001');
+});
+
+test('hive-interpret: a bad key (401) falls back to the regex and still creates the task', async () => {
+  const h = harness({ actors: ['drone-1'] });                     // no ai handler → 401
+  await h.tick();
+  await h.exec('hive-interpret', { body: { msg_id: 'm2', text: '4 of us on the bus shelter by the Lowry', sent_tick: 1, delivered_tick: 1 } }, 'drone-1');
+  const ev = Object.values(h.stores['drone-1'].state.log.events).find((e) => e.data.task_id === 'P-m2');
+  assert.equal(ev.data.via, 'regex');
+  assert.equal(ev.data.cell, '1-5');
+  assert.equal(h.stores['drone-1'].conflicts, 0);
+});
+
+test('central-naive through the workflows: teams follow HQ via proxy /rpc and stop when HQ is cut', async () => {
+  let hqUp = true;
+  const target = { task_id: 'T-x', survivor_id: 'x', cell: '7-0', urgency: 3, people: 1 };
+  const hq = (req) => (hqUp && req.to === 'hq' ? { assignment: req.body.role === 'team' ? target : null } : null);
+  const h = harness({ actors: ['team-1'], mode: 'central-naive', hq });
+  for (let i = 0; i < 4; i++) await h.tick();
+  const moved = { ...h.world.pos['team-1'] };
+  assert.notDeepEqual(moved, { x: 0, y: 7 }, 'moved toward the HQ assignment');
+  hqUp = false;
+  for (let i = 0; i < 6; i++) await h.tick();
+  const p = h.world.pos['team-1'];
+  assert.ok(Math.abs(p.x - moved.x) <= 1 && Math.abs(p.y - moved.y) <= 1, 'at most one step already queued, then no more moves');
+  assert.equal(h.view('team-1').action, 'idle');
 });
