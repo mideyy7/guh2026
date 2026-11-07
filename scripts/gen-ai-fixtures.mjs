@@ -19,11 +19,11 @@ for (let seed = 1; picked.length < 20 && seed < 500; seed++) {
   }
 }
 const messy = [
-  { text: 'pls help were stuck on the roof nr picadilly gardens 3 kids n my mum water still risin', expected: { district: 'Piccadilly', people: 4, urgency: 5, cue: 'kids' } },
-  { text: 'SALFORD QUAYS by mediacity. car park flooded. 2 of us on top of the car', expected: { district: 'Salford Quays', people: 2, urgency: 3, cue: null } },
+  { text: 'pls help were stuck on the roof nr picadilly station 3 kids n my mum water still risin', expected: { district: 'Piccadilly', people: 4, urgency: 5, cue: 'kids' } },
+  { text: 'ORDSALL by the old hall. car park flooded. 2 of us on top of the car', expected: { district: 'Ordsall', people: 2, urgency: 3, cue: null } },
   { text: 'grandad (87) cant get downstairs, castlefield near the basin, power out', expected: { district: 'Castlefield', people: 1, urgency: 5, cue: 'elderly' } },
-  { text: 'lower broughton - by the bridge - water in the house, we r upstairs, 5 ppl, 1 hurt leg', expected: { district: 'Lower Broughton', people: 5, urgency: 5, cue: 'injury' } },
-  { text: 'ancoats near cutting room sq, think were ok for now but cant leave building x4', expected: { district: 'Ancoats', people: 4, urgency: 2, cue: null } },
+  { text: 'lower broughton - by the river - water in the house, we r upstairs, 5 ppl, 1 hurt leg', expected: { district: 'Lower Broughton', people: 5, urgency: 5, cue: 'injury' } },
+  { text: 'greengate near the square, think were ok for now but cant leave building x4', expected: { district: 'Greengate', people: 4, urgency: 2, cue: null } },
 ].map((m, i) => ({ id: `messy-${i + 1}`, source: 'hand-written', ...m }));
 
 const out = {

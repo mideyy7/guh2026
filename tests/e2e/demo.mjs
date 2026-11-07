@@ -7,7 +7,7 @@
 import * as hive from './lib.mjs';
 
 const SEED = Number(process.env.DEMO_SEED || 1);
-const STORY = { cell: '1-1', people: 3, urgency: 5, text: 'stuck on roof w/ 2 kids near the Irwell, water rising' };
+const STORY = { cell: '3-0', people: 3, urgency: 5, text: 'stuck on roof w/ 2 kids near the Irwell, water rising' };
 const TIMELINE = [
   { at: 0, say: 'Seven independent n8n instances. No server tells them what to do.', run: async () => { await hive.reset(SEED); await hive.preset('all-up'); await hive.start(); } },
   { at: 15, say: 'A distress text arrives. It only gets through when a drone is in range.', run: () => hive.inject(STORY) },

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createWorld } from '../world.mjs';
 import { makeScenario } from '../scenario.mjs';
-import { DISTRICTS, districtOf, districtCells, HQ_CELL } from '../gazetteer.mjs';
+import { DISTRICTS, districtOf, districtCells, HQ_CELL, GEO, cellToLngLat } from '../gazetteer.mjs';
 import { parseCell } from '../grid.mjs';
 
 const params = JSON.parse(readFileSync(new URL('../../contracts/params.json', import.meta.url), 'utf8'));
@@ -213,15 +213,28 @@ test('a move lasts one tick: an actor that sends nothing holds position', () => 
 test('inject (demo control): new survivor appears now; its text waits until a drone is in range', () => {
   const w = createWorld(1, params);
   w.step();
-  const r = w.inject({ cell: '0-1', people: 3, urgency: 5, text: 'stuck on roof w/ 2 kids near the Irwell, water rising' });
+  const r = w.inject({ cell: '2-1', people: 3, urgency: 5, text: 'stuck on roof w/ 2 kids near the Irwell, water rising' });
   assert.equal(r.district, 'Lower Broughton');
   const snap = w.snapshot();
   assert.equal(snap.survivors.find((x) => x.id === r.survivor_id).state, 'waiting');
-  // Drones start at 3-3 (distance 3 > radius 2): nothing delivered yet.
-  assert.deepEqual(w.step().filter((d) => d.msg_id === r.msg_id), []);
+  // Drones start at 3-3; send the others away first so only drone-1 comes within range.
+  for (const d of ['drone-2', 'drone-3', 'drone-4']) w.move(d, { x: 7, y: 7 }, null, `away-${d}`);
   let got = null;
-  for (let t = 0; t < 6 && !got; t++) { w.move('drone-1', { x: 1, y: 1 }, null, `inj${t}`); got = w.step().find((d) => d.msg_id === r.msg_id); }
+  for (let t = 0; t < 6 && !got; t++) { w.move('drone-1', { x: 2, y: 1 }, null, `inj${t}`); for (const d of ['drone-2', 'drone-3', 'drone-4']) w.move(d, { x: 7, y: 7 }, null, `away-${d}-${t}`); got = w.step().find((d) => d.msg_id === r.msg_id); }
   assert.equal(got?.to, 'drone-1');
   assert.throws(() => w.inject({ cell: '9-9', text: 'x' }), /inside the grid/);
   assert.throws(() => w.inject({ cell: '1-1', text: '' }), /1-280/);
+});
+
+test('gazetteer: every district\'s real centre lies inside its own grid rectangle', () => {
+  // Approximate real centres (lon, lat) of each neighbourhood.
+  const real = { 'Pendleton': [-2.282, 53.4895], 'Lower Broughton': [-2.262, 53.4945], 'Greengate': [-2.249, 53.487], 'Northern Quarter': [-2.236, 53.4835],
+    'Ordsall': [-2.276, 53.4745], 'Castlefield': [-2.258, 53.4745], 'Deansgate': [-2.249, 53.478], 'Piccadilly': [-2.232, 53.477] };
+  for (const d of DISTRICTS) {
+    const [lon, lat] = real[d.name];
+    const x = Math.floor(((lon - GEO.west) / (GEO.east - GEO.west)) * 8), y = Math.floor(((GEO.north - lat) / (GEO.north - GEO.south)) * 8);
+    assert.equal(districtOf(`${x}-${y}`).name, d.name, `${d.name} real centre maps to cell ${x}-${y}`);
+  }
+  const [lon, lat] = cellToLngLat('0-0');
+  assert.ok(lon > GEO.west && lon < GEO.east && lat < GEO.north && lat > GEO.south);
 });

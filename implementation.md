@@ -385,7 +385,7 @@ Both devs build their half against the contracts, with **no live dependency on e
 
 1. **`world/` (pure, seeded, no I/O):**
    - `scenario.js`: from a seed, generate 30 survivors (`survivor_id`, cell, people 1–5, urgency 1–5, `appear_tick` ≤ 150). Weight placement toward low-lying "flooded" districts. Also generate starting positions (drones at the central HQ cell, teams spread out) and a distress-text schedule.
-   - `gazetteer.js`: 8 districts on the grid (Piccadilly, Northern Quarter, Ancoats, Deansgate, Castlefield, Hulme, Salford Quays, Lower Broughton), each with its cells and a landmark cell.
+   - `gazetteer.js`: 8 real districts laid over a real geographic box around the Irwell (Pendleton, Lower Broughton, Greengate, Northern Quarter, Ordsall, Castlefield, Deansgate, Piccadilly), each with its cells and a landmark cell. Each district's real centre lies inside its own rectangle, so the live map is geographically correct.
    - `world.js`: `step()` applies queued moves in actor-ID order at the configured speed; `sense(actor)`; `move()` and `rescue()`, both idempotent by `key`; `metrics()` (score, rescued, unrescued and their urgency, duplicate attempts, wasted travel per actor, attributed using `task_id`).
    - Use a seeded RNG everywhere. **Never** call `Math.random()`.
 2. **`services/sim`:** an HTTP wrapper over `world` (contract C2). A tick loop every `TICK_MS`: `world.step()`, then fire `POST /webhook/tick {tick}` at all 7 actors with a 1 s timeout, ignoring errors. A distress text is delivered to the **nearest drone within `distress_radius`** of its cell. If no drone is in range, the message keeps "Sending…" and is retried every tick.
@@ -729,13 +729,13 @@ Spike S2 proves this script as written. If S2 needed its fallback, update the sc
 {
   "model": "claude-haiku-5-5",
   "max_tokens": 1024,
-  "system": "You turn flood distress texts into JSON. Districts: Piccadilly, Northern Quarter, Ancoats, Deansgate, Castlefield, Hulme, Salford Quays, Lower Broughton. Urgency 1-5: raise it for children, elderly, injury or rising water.",
+  "system": "You turn flood distress texts into JSON. Districts (landmark): Pendleton (Salford Shopping Centre), Lower Broughton (Lower Broughton Road), Greengate (Greengate Square), Northern Quarter (Stevenson Square), Ordsall (Ordsall Hall), Castlefield (Castlefield Basin), Deansgate (Deansgate Locks), Piccadilly (Piccadilly station). Urgency 1-5: raise it for children, elderly, injury or rising water.",
   "messages": [{ "role": "user", "content": "{{ $json.body.text }}" }],
   "output_config": { "format": { "type": "json_schema", "schema": {
     "type": "object", "additionalProperties": false,
     "required": ["district", "landmark", "people", "urgency", "hazards"],
     "properties": {
-      "district": { "type": "string", "enum": ["Piccadilly","Northern Quarter","Ancoats","Deansgate","Castlefield","Hulme","Salford Quays","Lower Broughton"] },
+      "district": { "type": "string", "enum": ["Pendleton","Lower Broughton","Greengate","Northern Quarter","Ordsall","Castlefield","Deansgate","Piccadilly"] },
       "landmark": { "type": ["string", "null"] },
       "people":   { "type": ["integer", "null"] },
       "urgency":  { "type": "integer" },
